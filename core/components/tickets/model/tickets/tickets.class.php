@@ -1,5 +1,10 @@
 <?php
 
+namespace Tickets;
+use Tickets\Ticket;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modSnippet;
+
 class Tickets
 {
     /** @var modX $modx */
@@ -76,7 +81,7 @@ class Tickets
         $this->modx->lexicon->load('tickets:default');
 
         if ($name = $this->config['snippetPrepareComment']) {
-            if ($snippet = $this->modx->getObject('modSnippet', array('name' => $name))) {
+            if ($snippet = $this->modx->getObject(modSnippet::class, array('name' => $name))) {
                 $this->prepareCommentCustom = $snippet->get('content');
             }
         }
@@ -317,7 +322,7 @@ class Tickets
         }
         if (!empty($data['tid'])) {
             $fields['id'] = (int)$data['tid'];
-            if ($ticket = $this->modx->getObject('Ticket', array('class_key' => 'Ticket', 'id' => $fields['id']))) {
+            if ($ticket = $this->modx->getObject(Ticket::class, array('class_key' => 'Ticket', 'id' => $fields['id']))) {
                 $fields['context_key'] = $ticket->get('context_key');
                 $fields['alias'] = $ticket->get('alias');
                 $response = $this->modx->runProcessor('resource/update', $fields);
