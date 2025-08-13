@@ -1,5 +1,7 @@
 <?php
 
+use MODX\Revolution\modX;
+
 if (empty($_REQUEST['action'])) {
     die('Access denied');
 } else {

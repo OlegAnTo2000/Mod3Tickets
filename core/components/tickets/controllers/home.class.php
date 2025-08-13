@@ -1,5 +1,8 @@
 <?php
 
+use MODX\Revolution\modX;
+use MODX\Revolution\modExtraManagerController;
+
 class TicketsHomeManagerController extends modExtraManagerController
 {
 

@@ -1,4 +1,7 @@
 <?php
+
+use xPDO\Transport\xPDOTransport;
+
 /** @var array $options */
 $exists = false;
 $output = null;
@@ -7,8 +10,8 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
 
     case xPDOTransport::ACTION_UPGRADE:
         $exists = $modx->getObject('transport.modTransportPackage',
-                array('package_name' => 'Jevix')) && $modx->getObject('transport.modTransportPackage',
-                array('package_name' => 'pdoTools'));
+                    array('package_name' => 'Jevix')) && $modx->getObject('transport.modTransportPackage',
+                    array('package_name' => 'pdoTools'));
 
         if (!empty($options['attributes']['chunks'])) {
             $chunks = '<ul id="formCheckboxes" style="height:200px;overflow:auto;">';

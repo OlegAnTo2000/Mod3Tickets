@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model package="tickets" version="1.1" baseClass="xPDOObject" platform="mysql" defaultEngine="InnoDB"
-       phpdoc-package="tickets">
-    <object class="TicketsSection" extends="modResource">
+<model package="Tickets\Model" version="1.1" baseClass="xPDO\Om\xPDOObject" platform="mysql" defaultEngine="InnoDB" phpdoc-package="tickets">
+    <object class="TicketsSection" extends="MODX\Revolution\modResource">
         <composite alias="Tickets" class="Ticket" local="id" foreign="parent" cardinality="many" owner="local"/>
         <composite alias="Total" class="TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
             <criteria target="foreign"><![CDATA[{"class":"TicketsSection"}]]></criteria>
         </composite>
     </object>
 
-    <object class="Ticket" extends="modResource">
+    <object class="Ticket" extends="MODX\Revolution\modResource">
         <aggregate alias="Section" class="TicketsSection" local="parent" foreign="id" cardinality="one"
                    owner="foreign"/>
         <aggregate alias="Threads" class="TicketThread" local="id" foreign="resource" cardinality="many" owner="local"/>
@@ -27,7 +26,7 @@
         </composite>
     </object>
 
-    <object class="TicketComment" table="tickets_comments" extends="xPDOSimpleObject">
+    <object class="TicketComment" table="tickets_comments" extends="xPDO\Om\xPDOSimpleObject">
         <field key="thread" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"
                default="0"/>
         <field key="parent" dbtype="integer" precision="10" phptype="integer" attributes="unsigned" null="false"
@@ -76,8 +75,8 @@
             <column key="rating" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="User" class="modUser" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
-        <aggregate alias="UserProfile" class="modUserProfile" local="createdby" foreign="internalKey" cardinality="one"
+        <aggregate alias="User" class="\MODX\Revolution\modUser" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="UserProfile" class="\MODX\Revolution\modUserProfile" local="createdby" foreign="internalKey" cardinality="one"
                    owner="foreign"/>
         <aggregate alias="Thread" class="TicketThread" local="thread" foreign="id" cardinality="one" owner="foreign"/>
         <aggregate alias="Parent" class="TicketComment" local="parent" foreign="id" cardinality="one" owner="foreign"/>
@@ -90,7 +89,7 @@
         </composite>
     </object>
 
-    <object class="TicketThread" table="tickets_threads" extends="xPDOSimpleObject">
+    <object class="TicketThread" table="tickets_threads" extends="xPDO\Om\xPDOSimpleObject">
         <field key="resource" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"
                default="0"/>
         <field key="name" dbtype="varchar" precision="191" phptype="string" null="false" default=""/>
@@ -134,7 +133,7 @@
         </index>
 
         <aggregate alias="Ticket" class="Ticket" local="resource" foreign="id" cardinality="one" owner="foreign"/>
-        <aggregate alias="Resource" class="modResource" local="resource" foreign="id" cardinality="one"
+        <aggregate alias="Resource" class="MODX\Revolution\modResource" local="resource" foreign="id" cardinality="one"
                    owner="foreign"/>
         <composite alias="Comments" class="TicketComment" local="id" foreign="thread" cardinality="many" owner="local"/>
         <composite alias="Total" class="TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
@@ -142,7 +141,7 @@
         </composite>
     </object>
 
-    <object class="TicketVote" table="tickets_votes" extends="xPDOObject">
+    <object class="TicketVote" table="tickets_votes" extends="xPDO\Om\xPDOObject">
         <field key="id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" default="0"
                index="pk"/>
         <field key="class" dbtype="varchar" precision="100" phptype="string" null="false" index="pk"/>
@@ -168,7 +167,7 @@
         </index>
     </object>
 
-    <object class="TicketStar" table="tickets_stars" extends="xPDOObject">
+    <object class="TicketStar" table="tickets_stars" extends="xPDO\Om\xPDOObject">
         <field key="id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" default="0"
                index="pk"/>
         <field key="class" dbtype="varchar" precision="100" phptype="string" null="false" default="Ticket" index="pk"/>
@@ -192,7 +191,7 @@
         </index>
     </object>
 
-    <object class="TicketView" table="tickets_views" extends="xPDOObject">
+    <object class="TicketView" table="tickets_views" extends="xPDO\Om\xPDOObject">
         <field key="parent" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" default="0"
                index="pk"/>
         <field key="uid" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" default="0"
@@ -209,7 +208,7 @@
         <aggregate alias="Ticket" class="Ticket" local="parent" foreign="id" cardinality="one" owner="foreign"/>
     </object>
 
-    <object class="TicketQueue" table="tickets_mail_queues" extends="xPDOSimpleObject">
+    <object class="TicketQueue" table="tickets_mail_queues" extends="xPDO\Om\xPDOSimpleObject">
         <field key="timestamp" dbtype="timestamp" phptype="timestamp" null="false" default="CURRENT_TIMESTAMP"/>
         <field key="uid" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" default="0"/>
         <field key="subject" dbtype="varchar" precision="255" phptype="string" null="true" default=""/>
@@ -223,10 +222,10 @@
             <column key="email" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="User" class="modUser" local="uid" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="User" class="\MODX\Revolution\modUser" local="uid" foreign="id" cardinality="one" owner="foreign"/>
     </object>
 
-    <object class="TicketFile" table="tickets_files" extends="xPDOSimpleObject">
+    <object class="TicketFile" table="tickets_files" extends="xPDO\Om\xPDOSimpleObject">
         <field key="parent" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false"
                default="0"/>
         <field key="class" dbtype="varchar" precision="100" phptype="string"/>
@@ -278,7 +277,7 @@
         </index>
     </object>
 
-    <object class="TicketAuthor" table="tickets_authors" extends="xPDOObject">
+    <object class="TicketAuthor" table="tickets_authors" extends="xPDO\Om\xPDOObject">
         <field key="id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" index="pk"/>
         <field key="rating" dbtype="decimal" precision="12,2" phptype="float" null="true" default="0"/>
 
@@ -342,14 +341,12 @@
             <column key="stars_comments" length="" collation="A" null="false"/>
         </index>
 
-        <composite alias="Actions" class="TicketAuthorAction" local="id" foreign="createdby" cardinality="many"
-                   owner="local"/>
-        <aggregate alias="User" class="modUser" local="id" foreign="id" cardinality="one" owner="foreign"/>
-        <aggregate alias="UserProfile" class="modUserProfile" local="id" foreign="internalKey" cardinality="one"
-                   owner="foreign"/>
+        <composite alias="Actions" class="TicketAuthorAction" local="id" foreign="createdby" cardinality="many" owner="local"/>
+        <aggregate alias="User" class="MODX\Revolution\modUser" local="id" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="UserProfile" class="MODX\Revolution\modUserProfile" local="id" foreign="internalKey" cardinality="one" owner="foreign"/>
     </object>
 
-    <object class="TicketAuthorAction" table="tickets_author_actions" extends="xPDOObject">
+    <object class="TicketAuthorAction" table="tickets_author_actions" extends="xPDO\Om\xPDOObject">
         <field key="id" dbtype="int" precision="10" phptype="integer" null="false" index="pk"/>
         <field key="action" dbtype="varchar" precision="50" phptype="string" null="false" index="pk"/>
         <field key="owner" dbtype="int" precision="10" phptype="integer" null="false" default="0" index="pk"/>
@@ -392,18 +389,14 @@
             <column key="day" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="User" class="modUser" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
-        <aggregate alias="UserProfile" class="modUser" local="createdby" foreign="internalKey" cardinality="one"
-                   owner="foreign"/>
-        <aggregate alias="Author" class="TicketAuthor" local="createdby" foreign="id" cardinality="one"
-                   owner="foreign"/>
-
+        <aggregate alias="User" class="MODX\Revolution\modUser" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="UserProfile" class="MODX\Revolution\modUserProfile" local="createdby" foreign="internalKey" cardinality="one" owner="foreign"/>
+        <aggregate alias="Author" class="TicketAuthor" local="createdby" foreign="id" cardinality="one" owner="foreign"/>
         <aggregate alias="Ticket" class="Ticket" local="ticket" foreign="id" cardinality="one" owner="foreign"/>
-        <aggregate alias="Section" class="TicketsSection" local="section" foreign="id" cardinality="one"
-                   owner="foreign"/>
+        <aggregate alias="Section" class="TicketsSection" local="section" foreign="id" cardinality="one" owner="foreign"/>
     </object>
 
-    <object class="TicketTotal" table="tickets_totals" extends="xPDOObject">
+    <object class="TicketTotal" table="tickets_totals" extends="xPDO\Om\xPDOObject">
         <field key="id" dbtype="int" precision="10" phptype="integer" attributes="unsigned" null="false" index="pk"/>
         <field key="class" dbtype="varchar" precision="100" phptype="string" null="false" index="pk"/>
 
@@ -440,7 +433,7 @@
             <column key="rating" length="" collation="A" null="false"/>
         </index>
 
-        <aggregate alias="User" class="modUser" local="uid" foreign="id" cardinality="one" owner="foreign"/>
+        <aggregate alias="User" class="MODX\Revolution\modUser" local="uid" foreign="id" cardinality="one" owner="foreign"/>
         <aggregate alias="TicketsSection" class="Ticket" local="id" foreign="id" cardinality="one" owner="foreign">
             <criteria target="local"><![CDATA[{"class":"TicketsSection"}]]></criteria>
         </aggregate>

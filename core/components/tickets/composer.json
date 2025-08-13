@@ -1,0 +1,7 @@
+{
+	"name": "bezumkin/pdotools",
+	"type": "library",
+	"require-dev": {
+		"modx/revolution": "v3.1.2-pl"
+	}
+}

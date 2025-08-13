@@ -1,5 +1,7 @@
 <?php
 
+use MODX\Revolution\modX;
+
 define('MODX_API_MODE', true);
 
 /** @noinspection PhpIncludeInspection */

@@ -1,18 +1,20 @@
 <?php
 
+use MODX\Revolution\modX;
+
 if (!defined('MODX_BASE_PATH')) {
-    require 'build.config.php';
+  require 'build.config.php';
 }
 
 // Define sources
 $root = dirname(dirname(__FILE__)) . '/';
 $sources = array(
-    'root' => $root,
-    'build' => $root . '_build/',
-    'source_core' => $root . 'core/components/' . PKG_NAME_LOWER,
-    'model' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/',
-    'schema' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/',
-    'xml' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/' . PKG_NAME_LOWER . '.mysql.schema.xml',
+  'root' => $root,
+  'build' => $root . '_build/',
+  'source_core' => $root . 'core/components/' . PKG_NAME_LOWER . '/src',
+  'model' => $root . 'core/components/' . PKG_NAME_LOWER . '/src/Model',
+  'schema' => $root . 'core/components/' . PKG_NAME_LOWER . '/schema',
+  'xml' => $root . 'core/components/' . PKG_NAME_LOWER . '/schema/' . PKG_NAME_LOWER . '.mysql.schema.xml',
 );
 unset($root);
 
@@ -37,7 +39,12 @@ $generator = $manager->getGenerator();
 rrmdir($sources['model'] . PKG_NAME_LOWER . '/mysql');
 
 // Generate a new one
-$generator->parseSchema($sources['xml'], $sources['model']);
+$generator->parseSchema(
+  $sources['xml'], 
+  $sources['model'], [
+    'namespacePrefix' => 'Tickets',
+    'update' => 0,
+]);
 
 // Add connection to modUser
 $data = file_get_contents($sources['model'] . 'tickets/metadata.mysql.php');

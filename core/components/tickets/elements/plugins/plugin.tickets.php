@@ -1,4 +1,7 @@
 <?php
+
+use MODX\Revolution\modX;
+
 /** @var modX $modx */
 switch ($modx->event->name) {
 
