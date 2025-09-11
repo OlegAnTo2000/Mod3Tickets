@@ -1,8 +1,8 @@
 <?php
 
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketsSection;
+use Tickets\Ticket;
+use Tickets\TicketComment;
+use Tickets\TicketsSection;
 
 class TicketTotal extends \xPDO\Om\xPDOObject
 {
@@ -32,7 +32,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
         $class = $this->get('class');
         switch ($class) {
             case 'Ticket':
-                /** @var \Tickets\Model\Ticket $ticket */
+                /** @var \Tickets\Ticket $ticket */
                 if ($ticket = $this->xpdo->getObject('Ticket', $id)) {
                     $rating = $ticket->getRating();
                     $values = array(
@@ -54,7 +54,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
                 }
                 break;
             case 'TicketsSection':
-                /** @var \Tickets\Model\TicketsSection $section */
+                /** @var \Tickets\TicketsSection $section */
                 if ($section = $this->xpdo->getObject('TicketsSection', $id)) {
                     $rating = $section->getRating();
                     $values = array(

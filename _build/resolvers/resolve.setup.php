@@ -1,25 +1,32 @@
 <?php
 
-/*---------------------------------*/
+use MODX\Revolution\modX;
+use MODX\Revolution\modSnippet;
+use xPDO\Transport\xPDOTransport;
+use MODX\Revolution\Transport\modTransportPackage;
+use MODX\Revolution\Transport\modTransportProvider;
+
 if (!function_exists('installPackage')) {
     function installPackage($packageName)
     {
+        /** @var modX $modx */
         global $modx;
 
         /** @var modTransportProvider $provider */
-        if (!$provider = $modx->getObject('transport.modTransportProvider',
-            array('service_url:LIKE' => '%simpledream.ru%', 'OR:service_url:LIKE' => '%modstore.pro%'))
-        ) {
-            $provider = $modx->getObject('transport.modTransportProvider', 1);
+        if (!$provider = $modx->getObject(modTransportProvider::class, [
+            'service_url:LIKE'    => '%simpledream.ru%',
+            'OR:service_url:LIKE' => '%modstore.pro%'
+        ])) {
+            $provider = $modx->getObject(modTransportProvider::class, 1);
         }
 
         $modx->getVersionData();
         $productVersion = $modx->version['code_name'] . '-' . $modx->version['full_version'];
 
-        $response = $provider->request('package', 'GET', array(
+        $response = $provider->request('package', 'GET', [
             'supports' => $productVersion,
-            'query' => $packageName,
-        ));
+            'query'    => $packageName,
+        ]);
 
         if (!empty($response)) {
             $foundPackages = simplexml_load_string($response->response);
@@ -33,28 +40,28 @@ if (!function_exists('installPackage')) {
                     if (!downloadPackage($url,
                         $modx->getOption('core_path') . 'packages/' . $foundPackage->signature . '.transport.zip')
                     ) {
-                        return array(
+                        return [
                             'success' => 0,
                             'message' => "Could not download package <b>{$packageName}</b>.",
-                        );
+                        ];
                     }
 
                     /* add in the package as an object so it can be upgraded */
                     /** @var modTransportPackage $package */
-                    $package = $modx->newObject('transport.modTransportPackage');
+                    $package = $modx->newObject(modTransportPackage::class);
                     $package->set('signature', $foundPackage->signature);
-                    $package->fromArray(array(
-                        'created' => date('Y-m-d h:i:s'),
-                        'updated' => null,
-                        'state' => 1,
-                        'workspace' => 1,
-                        'provider' => $provider->id,
-                        'source' => $foundPackage->signature . '.transport.zip',
-                        'package_name' => $packageName,
+                    $package->fromArray([
+                        'created'       => date('Y-m-d h:i:s'),
+                        'updated'       => null,
+                        'state'         => 1,
+                        'workspace'     => 1,
+                        'provider'      => $provider->id,
+                        'source'        => $foundPackage->signature . '.transport.zip',
+                        'package_name'  => $packageName,
                         'version_major' => $versionSignature[0],
                         'version_minor' => !empty($versionSignature[1]) ? $versionSignature[1] : 0,
                         'version_patch' => !empty($versionSignature[2]) ? $versionSignature[2] : 0,
-                    ));
+                    ]);
 
                     if (!empty($sig[2])) {
                         $r = preg_split('/([0-9]+)/', $sig[2], -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -67,24 +74,24 @@ if (!function_exists('installPackage')) {
                     }
 
                     if ($package->save() && $package->install()) {
-                        return array(
+                        return [
                             'success' => 1,
                             'message' => "<b>{$packageName}</b> was successfully installed",
-                        );
+                        ];
                     } else {
-                        return array(
+                        return [
                             'success' => 0,
                             'message' => "Could not save package <b>{$packageName}</b>",
-                        );
+                        ];
                     }
                     break;
                 }
             }
         } else {
-            return array(
+            return [
                 'success' => 0,
                 'message' => "Could not find <b>{$packageName}</b> in MODX repository",
-            );
+            ];
         }
 
         return true;
@@ -121,7 +128,6 @@ if (!function_exists('downloadPackage')) {
     }
 }
 
-
 $success = false;
 /** @var xPDOTransport $transport */
 /** @var array $options */
@@ -133,14 +139,14 @@ if ($transport->xpdo) {
         case xPDOTransport::ACTION_UPGRADE:
 
             // Check and install required packages
-            $packages = array(
-                'pdoTools' => '2.1.0-pl',
-                'Jevix' => '1.2.0-pl',
-            );
+            $packages = [
+                'pdoTools' => '2.1.0-pl'
+            ];
 
             foreach ($packages as $package_name => $version) {
-                $installed = $modx->getIterator('transport.modTransportPackage',
-                    array('package_name' => $package_name));
+                $installed = $modx->getIterator(modTransportPackage::class, [
+                    'package_name' => $package_name
+                ]);
                 /** @var modTransportPackage $package */
                 foreach ($installed as $package) {
                     if ($package->compareVersion($version, '<=')) {
@@ -149,153 +155,8 @@ if ($transport->xpdo) {
                 }
                 $modx->log(modX::LOG_LEVEL_INFO, "Trying to install <b>{$package_name}</b>. Please wait...");
                 $response = installPackage($package_name);
-                $level = $response['success']
-                    ? modX::LOG_LEVEL_INFO
-                    : modX::LOG_LEVEL_ERROR;
+                $level = $response['success'] ? modX::LOG_LEVEL_INFO : modX::LOG_LEVEL_ERROR;
                 $modx->log($level, $response['message']);
-            }
-
-            /** @var modSnippet $snippet */
-            if ($snippet = $modx->getObject('modSnippet', array('name' => 'Jevix'))) {
-                if (!$prop_ticket = $modx->getObject('modPropertySet', array('name' => 'Ticket'))) {
-                    $prop_ticket = $modx->newObject('modPropertySet', array(
-                        'name' => 'Ticket',
-                        'description' => 'Filter rules for Tickets',
-                        'properties' => array(
-                            'cfgAllowTagParams' => array(
-                                'name' => 'cfgAllowTagParams',
-                                'desc' => 'cfgAllowTagParams',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '{"pre":{"class":["prettyprint"]},"cut":{"title":["#text"]},"a":["title","href"],"img":{"0":"src","alt":"#text","1":"title","align":["right","left","center"],"width":"#int","height":"#int","hspace":"#int","vspace":"#int"}}',
-                            ),
-                            'cfgAllowTags' => array(
-                                'name' => 'cfgAllowTags',
-                                'desc' => 'cfgAllowTags',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'a,img,i,b,u,em,strong,li,ol,ul,sup,abbr,acronym,h1,h2,h3,h4,h5,h6,cut,br,pre,code,kbd,s,blockquote,table,tr,th,td,video',
-                            ),
-                            'cfgSetTagChilds' => array(
-                                'name' => 'cfgSetTagChilds',
-                                'desc' => 'cfgSetTagChilds',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '[["ul",["li"],false,true],["ol",["li"],false,true],["table",["tr"],false,true],["tr",["td","th"],false,true]]',
-                            ),
-                            'cfgSetAutoReplace' => array(
-                                'name' => 'cfgSetAutoReplace',
-                                'desc' => 'cfgSetAutoReplace',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '[["+/-","(c)","(с)","(r)","(C)","(С)","(R)","<code","code>"],["±","©","©","®","©","©","®","<pre class=\\"prettyprint\\"","pre>"]]',
-                            ),
-                            'cfgSetTagShort' => array(
-                                'name' => 'cfgSetTagShort',
-                                'desc' => 'cfgSetTagShort',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'br,img,cut',
-                            ),
-                            'cfgSetTagPreformatted' => array(
-                                'name' => 'cfgSetTagPreformatted',
-                                'desc' => 'cfgSetTagPreformatted',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'pre,code,kbd',
-                            ),
-                        ),
-                    ));
-                    if ($prop_ticket->save() && $snippet->addPropertySet($prop_ticket)) {
-                        $modx->log(xPDO::LOG_LEVEL_INFO,
-                            '[Tickets] Property set "Ticket" for snippet <b>Jevix</b> was created');
-                    } else {
-                        $modx->log(xPDO::LOG_LEVEL_ERROR,
-                            '[Tickets] Could not create property set "Ticket" for <b>Jevix</b>');
-                    }
-                }
-
-                if (!$prop_comment = $modx->getObject('modPropertySet', array('name' => 'Comment'))) {
-                    $prop_comment = $modx->newObject('modPropertySet', array(
-                        'name' => 'Comment',
-                        'description' => 'Filter rules for Tickets comments',
-                        'properties' => array(
-                            'cfgAllowTagParams' => array(
-                                'name' => 'cfgAllowTagParams',
-                                'desc' => 'cfgAllowTagParams',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '{"pre":{"class":["prettyprint"]},"a":["title","href"],"img":{"0":"src","alt":"#text","1":"title","align":["right","left","center"],"width":"#int","height":"#int","hspace":"#int","vspace":"#int"}}',
-                            ),
-                            'cfgAllowTags' => array(
-                                'name' => 'cfgAllowTags',
-                                'desc' => 'cfgAllowTags',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'a,img,i,b,u,em,strong,li,ol,ul,sup,abbr,acronym,br,pre,code,kbd,s,blockquote',
-                            ),
-                            'cfgSetTagChilds' => array(
-                                'name' => 'cfgSetTagChilds',
-                                'desc' => 'cfgSetTagChilds',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '[["ul",["li"],false,true],["ol",["li"],false,true]]',
-                            ),
-                            'cfgSetAutoReplace' => array(
-                                'name' => 'cfgSetAutoReplace',
-                                'desc' => 'cfgSetAutoReplace',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => '[["+/-","(c)","(с)","(r)","(C)","(С)","(R)","<code","code>"],["±","©","©","®","©","©","®","<pre class=\\"prettyprint\\"","pre>"]]',
-                            ),
-                            'cfgSetTagShort' => array(
-                                'name' => 'cfgSetTagShort',
-                                'desc' => 'cfgSetTagShort',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'br,img',
-                            ),
-                            'cfgSetTagPreformatted' => array(
-                                'name' => 'cfgSetTagPreformatted',
-                                'desc' => 'cfgSetTagPreformatted',
-                                'type' => 'textfield',
-                                'options' => array(),
-                                'lexicon' => 'jevix:properties',
-                                'area' => '',
-                                'value' => 'pre,code,kbd',
-                            ),
-                        ),
-                    ));
-                    if ($prop_comment->save() && $snippet->addPropertySet($prop_comment)) {
-                        $modx->log(xPDO::LOG_LEVEL_INFO,
-                            '[Tickets] Property set "Comment" for snippet <b>Jevix</b> was created');
-                    } else {
-                        $modx->log(xPDO::LOG_LEVEL_ERROR,
-                            '[Tickets] Could not create property set "Comment" for <b>Jevix</b>');
-                    }
-                };
             }
 
             $success = true;

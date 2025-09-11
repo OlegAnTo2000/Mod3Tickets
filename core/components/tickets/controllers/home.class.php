@@ -2,6 +2,7 @@
 
 use MODX\Revolution\modX;
 use MODX\Revolution\modExtraManagerController;
+use Tickets\Tickets;
 
 class TicketsHomeManagerController extends modExtraManagerController
 {
@@ -33,21 +34,21 @@ class TicketsHomeManagerController extends modExtraManagerController
         $Tickets = $this->modx->getService('Tickets');
 
         $Tickets->loadManagerFiles($this, array(
-            'config' => true,
-            'utils' => true,
-            'css' => true,
-            'threads' => true,
+            'config'   => true,
+            'utils'    => true,
+            'css'      => true,
+            'threads'  => true,
             'comments' => true,
-            'tickets' => true,
-            'authors' => true,
+            'tickets'  => true,
+            'authors'  => true,
         ));
         $this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/home.js');
         $this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
         $this->addHtml('
         <script type="text/javascript">
-        Ext.onReady(function() {
-            MODx.load({xtype: "tickets-page-home"});
-        });
+            Ext.onReady(function() {
+                MODx.load({xtype: "tickets-page-home"});
+            });
         </script>');
     }
 

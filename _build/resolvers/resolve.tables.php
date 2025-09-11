@@ -1,5 +1,18 @@
 <?php
 
+use Tickets\TicketFile;
+use Tickets\TicketStar;
+use Tickets\TicketView;
+use Tickets\TicketVote;
+use Tickets\TicketQueue;
+use Tickets\TicketTotal;
+use MODX\Revolution\modX;
+use Tickets\TicketAuthor;
+use Tickets\TicketThread;
+use Tickets\TicketComment;
+use Tickets\TicketAuthorAction;
+use xPDO\Transport\xPDOTransport;
+
 /** @var xPDOTransport $transport */
 /** @var array $options */
 /** @var modX $modx */
@@ -14,29 +27,29 @@ if ($transport->xpdo) {
             $manager = $modx->getManager();
 
             // Remove old tables
-            $c = $modx->prepare("SHOW COLUMNS IN {$modx->getTableName('TicketAuthor')}");
+            $c = $modx->prepare("SHOW COLUMNS IN {$modx->getTableName(TicketAuthor::class)}");
             $c->execute();
             while ($tmp = $c->fetch(PDO::FETCH_ASSOC)) {
                 if ($tmp['Field'] == 'votes' || $tmp['Field'] == 'stars') {
-                    $manager->removeObjectContainer('TicketAuthor');
-                    $manager->removeObjectContainer('TicketAuthorAction');
+                    $manager->removeObjectContainer(TicketAuthor::class);
+                    $manager->removeObjectContainer(TicketAuthorAction::class);
                     break;
                 }
             }
 
             // Create or update new
-            $tables = array(
-                'TicketComment',
-                'TicketThread',
-                'TicketView',
-                'TicketStar',
-                'TicketQueue',
-                'TicketFile',
-                'TicketVote',
-                'TicketAuthor',
-                'TicketAuthorAction',
-                'TicketTotal',
-            );
+            $tables = [
+                TicketComment::class,
+                TicketThread::class,
+                TicketView::class,
+                TicketStar::class,
+                TicketQueue::class,
+                TicketFile::class,
+                TicketVote::class,
+                TicketAuthor::class,
+                TicketAuthorAction::class,
+                TicketTotal::class,
+            ];
 
             foreach ($tables as $table) {
                 $manager->createObjectContainer($table);
@@ -110,6 +123,7 @@ if ($transport->xpdo) {
                         }
                     }
                 }
+
                 // Add or alter existing
                 foreach ($map as $key => $index) {
                     ksort($index['columns']);

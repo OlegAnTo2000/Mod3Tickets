@@ -1,6 +1,10 @@
 <?php
 
+use Tickets\Tickets;
 use MODX\Revolution\modX;
+use Tickets\TicketThread;
+use MODX\Revolution\modContext;
+use MODX\Revolution\modResource;
 
 if (empty($_REQUEST['action'])) {
     die('Access denied');
@@ -21,7 +25,7 @@ $modx->error->message = null;
 // Get properties
 $properties = array();
 /** @var TicketThread $thread */
-if (!empty($_REQUEST['thread']) && $thread = $modx->getObject('TicketThread', array('name' => $_REQUEST['thread']))) {
+if (!empty($_REQUEST['thread']) && $thread = $modx->getObject(TicketThread::class, array('name' => $_REQUEST['thread']))) {
     $properties = $thread->get('properties');
     if (!empty($_REQUEST['form_key']) && isset($_SESSION['TicketForm'][$_REQUEST['form_key']])) {
         $properties = array_merge($_SESSION['TicketForm'][$_REQUEST['form_key']], $properties);
@@ -36,11 +40,11 @@ if (!empty($_REQUEST['thread']) && $thread = $modx->getObject('TicketThread', ar
 $context = 'web';
 if (!empty($thread) && $thread->get('resource') && $object = $thread->getOne('Resource')) {
     $context = $object->get('context_key');
-} elseif (!empty($_REQUEST['section']) && $object = $modx->getObject('modResource', (int)$_REQUEST['section'])) {
+} elseif (!empty($_REQUEST['section']) && $object = $modx->getObject(modResource::class, (int)$_REQUEST['section'])) {
     $context = $object->get('context_key');
-} elseif (!empty($_REQUEST['parent']) && $object = $modx->getObject('modResource', (int)$_REQUEST['parent'])) {
+} elseif (!empty($_REQUEST['parent']) && $object = $modx->getObject(modResource::class, (int)$_REQUEST['parent'])) {
     $context = $object->get('context_key');
-} elseif (!empty($_REQUEST['ctx']) && $object = $modx->getObject('modContext', array('key' => $_REQUEST['ctx']))) {
+} elseif (!empty($_REQUEST['ctx']) && $object = $modx->getObject(modContext::class, array('key' => $_REQUEST['ctx']))) {
     $context = $object->get('key');
 }
 if ($context != 'web') {

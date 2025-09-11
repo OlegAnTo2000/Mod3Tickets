@@ -1,8 +1,8 @@
 <?php
 
-use Tickets\Model\TicketAuthor;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketThread;
+use Tickets\TicketAuthor;
+use Tickets\TicketComment;
+use Tickets\TicketThread;
 
 /**
  * @property int $id
@@ -64,7 +64,7 @@ class TicketVote extends \xPDO\Om\xPDOObject
             $type = 'vote_ticket';
         }
         if (!empty($type)) {
-            /** @var \Tickets\Model\TicketAuthor $profile */
+            /** @var \Tickets\TicketAuthor $profile */
             if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('owner'))) {
                 $profile->removeAction($type, $this->id, $this->get('createdby'));
             }

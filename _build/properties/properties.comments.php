@@ -11,11 +11,7 @@ $tmp = array(
     'fastMode' => array(
         'type' => 'combo-boolean',
         'value' => true,
-    ),/*
-	'dateFormat' => array(
-		'type' => 'textfield'
-		'value' => 'd F Y H:i'
-	),*/
+    ),
     'gravatarIcon' => array(
         'type' => 'textfield',
         'value' => 'mm',
@@ -128,11 +124,11 @@ $tmp = array(
 );
 
 foreach ($tmp as $k => $v) {
-    $properties[$k] = array_merge(array(
-        'name' => $k,
-        'desc' => 'tickets_prop_' . $k,
+    $properties[$k] = array_merge([
+        'name'    => $k,
+        'desc'    => 'tickets_prop_' . $k,
         'lexicon' => 'tickets:properties',
-    ), $v);
+    ], $v);
 }
 
 return $properties;

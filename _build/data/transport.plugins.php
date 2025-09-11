@@ -1,11 +1,16 @@
 <?php
-$plugins = array();
 
-$tmp = array(
-    'Tickets' => array(
-        'file' => 'tickets',
+use MODX\Revolution\modX;
+use MODX\Revolution\modPluginEvent;
+use MODX\Revolution\modPlugin;
+
+$plugins = [];
+
+$tmp = [
+    'Tickets' => [
+        'file'        => 'tickets',
         'description' => '',
-        'events' => array(
+        'events'      => [
             'OnDocFormSave',
             'OnSiteRefresh',
             'OnWebPagePrerender',
@@ -14,34 +19,34 @@ $tmp = array(
             'OnWebPageComplete',
             'OnEmptyTrash',
             'OnUserSave',
-        ),
-    ),
-);
+        ],
+    ],
+];
 
-/** @var modx $modx */
+/** @var modX $modx */
 /** @var array $sources */
 foreach ($tmp as $k => $v) {
-    /** @var modplugin $plugin */
-    $plugin = $modx->newObject('modPlugin');
-    $plugin->fromArray(array(
-        'name' => $k,
+    /** @var modPlugin $plugin */
+    $plugin = $modx->newObject(modPlugin::class);
+    $plugin->fromArray([
+        'name'        => $k,
         'description' => @$v['description'],
-        'plugincode' => getSnippetContent($sources['source_core'] . '/elements/plugins/plugin.' . $v['file'] . '.php'),
-        'static' => BUILD_PLUGIN_STATIC,
-        'source' => 1,
+        'plugincode'  => getSnippetContent($sources['source_core'] . '/elements/plugins/plugin.' . $v['file'] . '.php'),
+        'static'      => BUILD_PLUGIN_STATIC,
+        'source'      => 1,
         'static_file' => 'core/components/' . PKG_NAME_LOWER . '/elements/plugins/plugin.' . $v['file'] . '.php',
-    ), '', true, true);
+    ], '', true, true);
 
-    $events = array();
+    $events = [];
     if (!empty($v['events']) && is_array($v['events'])) {
         foreach ($v['events'] as $k2 => $v2) {
-            /** @var $event modPluginEvent */
-            $event = $modx->newObject('modPluginEvent');
-            $event->fromArray(array(
+            /** @var modPluginEvent $event */
+            $event = $modx->newObject(modPluginEvent::class);
+            $event->fromArray([
                 'event' => $v2,
                 'priority' => 0,
                 'propertyset' => 0,
-            ), '', true, true);
+            ], '', true, true);
             $events[] = $event;
         }
         unset($v['events']);

@@ -6,6 +6,8 @@ require_once MODX_CORE_PATH . 'config/' . MODX_CONFIG_KEY . '.inc.php';
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CONNECTORS_PATH . 'index.php';
 
+use Tickets\Tickets;
+
 /** @var Tickets $Tickets */
 $Tickets = $modx->getService('tickets', 'Tickets', MODX_CORE_PATH . 'components/tickets/model/tickets/');
 $modx->lexicon->load('tickets:default');
@@ -13,6 +15,6 @@ $modx->lexicon->load('tickets:default');
 /** @var modConnectorRequest $request */
 $request = $modx->request;
 $request->handleRequest(array(
-    'processors_path' => $modx->getOption('processorsPath', $Tickets->config, MODX_CORE_PATH . '/components/tickets/processors/'),
+    'processors_path' => $modx->getOption('processorsPath', $Tickets->config, MODX_CORE_PATH . '/components/tickets/src/Processors/'),
     'location' => '',
 ));

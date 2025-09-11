@@ -1,6 +1,7 @@
 <?php
 
 use xPDO\Transport\xPDOTransport;
+use MODX\Revolution\Transport\modTransportPackage;
 
 /** @var array $options */
 $exists = false;
@@ -9,9 +10,7 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
     case xPDOTransport::ACTION_INSTALL:
 
     case xPDOTransport::ACTION_UPGRADE:
-        $exists = $modx->getObject('transport.modTransportPackage',
-                    array('package_name' => 'Jevix')) && $modx->getObject('transport.modTransportPackage',
-                    array('package_name' => 'pdoTools'));
+        $exists = $modx->getObject(modTransportPackage::class, array('package_name' => 'pdoTools'));
 
         if (!empty($options['attributes']['chunks'])) {
             $chunks = '<ul id="formCheckboxes" style="height:200px;overflow:auto;">';
@@ -35,17 +34,15 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
 if (!$exists) {
     switch ($modx->getOption('manager_language')) {
         case 'ru':
-            $output = 'Этот компонент требует сниппет <b>Jevix</b> для фильтрации вывода тикетов и <b>pdoTools</b> для быстрой работы с БД.<br/><br/>Могу я автоматически скачать и установить их?';
+            $output = 'Этот компонент требует <b>pdoTools</b> для быстрой работы с БД.<br/><br/>Могу я автоматически скачать и установить?';
             break;
         default:
-            $output = 'This component is require snippet <b>Jevix</b> for filtering output of tickets and <b>pdoTools</b> for fast work <with></with> database.<br/><br/>Can i automaticly download and install them?';
+            $output = 'This component is require <b>pdoTools</b> for fast work <with></with> database.<br/><br/>Can i automaticly download and install it?';
     }
 }
 
 if ($chunks) {
-    if (!$exists) {
-        $output .= '<br/><br/>';
-    }
+    if (!$exists) $output .= '<br/><br/>';
 
     switch ($modx->getOption('manager_language')) {
         case 'ru':

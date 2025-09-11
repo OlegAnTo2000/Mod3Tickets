@@ -1,11 +1,14 @@
 <?php
 
-$policies = array();
+use MODX\Revolution\modX;
+use MODX\Revolution\modAccessPolicy;
 
-$tmp = array(
-    'TicketUserPolicy' => array(
+$policies = [];
+
+$tmp = [
+    'TicketUserPolicy' => [
         'description' => 'A policy for create and update Tickets.',
-        'data' => array(
+        'data' => [
             'ticket_delete' => true,
             'ticket_publish' => true,
             'ticket_save' => true,
@@ -24,17 +27,17 @@ $tmp = array(
             'thread_close' => true,
             'thread_delete' => true,
             'thread_remove' => true,
-        ),
-    ),
-    'TicketSectionPolicy' => array(
+        ],
+    ],
+    'TicketSectionPolicy' => [
         'description' => 'A policy for add tickets in section.',
-        'data' => array(
+        'data' => [
             'section_add_children' => true,
-        ),
-    ),
-    'TicketVipPolicy' => array(
+        ],
+    ],
+    'TicketVipPolicy' => [
         'description' => 'A policy for create and update private Tickets.',
-        'data' => array(
+        'data' => [
             'ticket_delete' => true,
             'ticket_publish' => true,
             'ticket_save' => true,
@@ -54,23 +57,22 @@ $tmp = array(
             'thread_close' => true,
             'thread_delete' => true,
             'thread_remove' => true,
-        ),
-    ),
-);
+        ],
+    ],
+];
 
-/** @var modx $modx */
+/** @var modX $modx */
 foreach ($tmp as $k => $v) {
     if (isset($v['data'])) {
         $v['data'] = json_encode($v['data']);
     }
 
-    /** @var $policy modAccessPolicy */
-    $policy = $modx->newObject('modAccessPolicy');
-    $policy->fromArray(array_merge(array(
-            'name' => $k,
-            'lexicon' => PKG_NAME_LOWER . ':permissions',
-        ), $v)
-        , '', true, true);
+    /** @var modAccessPolicy $policy */
+    $policy = $modx->newObject(modAccessPolicy::class);
+    $policy->fromArray(array_merge([
+        'name'    => $k,
+        'lexicon' => PKG_NAME_LOWER . ':permissions',
+    ], $v), '', true, true);
 
     $policies[] = $policy;
 }

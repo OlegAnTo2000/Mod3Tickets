@@ -1,4 +1,7 @@
 <?php
+
+use Tickets\Tickets;
+
 /** @var array $scriptProperties */
 if (empty($thread)) {
     $scriptProperties['thread'] = $modx->getOption('thread', $scriptProperties, 'resource-' . $modx->resource->id,

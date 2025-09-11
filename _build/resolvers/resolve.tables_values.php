@@ -1,5 +1,9 @@
 <?php
 
+use Tickets\TicketVote;
+use Tickets\TicketThread;
+use xPDO\Transport\xPDOTransport;
+
 /** @var xPDOTransport $transport */
 /** @var array $options */
 /** @var modX $modx */
@@ -13,7 +17,7 @@ if ($transport->xpdo) {
             $modx->addPackage('tickets', $modelPath);
 
             // Update comments count
-            $threads = $modx->getIterator('TicketThread', array('comments' => 0));
+            $threads = $modx->getIterator(TicketThread::class, ['comments' => 0]);
             /** @var TicketThread $thread */
             foreach ($threads as $thread) {
                 $thread->updateCommentsCount();
@@ -21,7 +25,7 @@ if ($transport->xpdo) {
 
             // Update owners of votes entries
             $tmp = array();
-            $q = $modx->newQuery('TicketVote', array('owner' => 0));
+            $q = $modx->newQuery(TicketVote::class, ['owner' => 0]);
             $q->select('class,id');
             if ($q->prepare() && $q->stmt->execute()) {
                 while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -33,10 +37,10 @@ if ($transport->xpdo) {
                 }
                 if (!empty($tmp)) {
                     foreach ($tmp as $k => $v) {
-                        $q = $modx->newQuery($k, array('id:IN' => $v));
+                        $q = $modx->newQuery($k, ['id:IN' => $v]);
                         $q->select('id,createdby');
 
-                        $table = $modx->getTableName('TicketVote');
+                        $table = $modx->getTableName(TicketVote::class);
                         $sql = "";
                         if ($q->prepare() && $q->stmt->execute()) {
                             while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {

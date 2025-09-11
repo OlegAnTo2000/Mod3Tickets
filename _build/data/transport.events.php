@@ -1,60 +1,62 @@
 <?php
 
-$events = array();
+use MODX\Revolution\modEvent;
+use MODX\Revolution\modX;
 
-$tmp = array(
-    'OnBeforeCommentSave' => array(),
-    'OnCommentSave' => array(),
+$events = [];
 
-    'OnBeforeCommentPublish' => array(),
-    'OnCommentPublish' => array(),
-    'OnBeforeCommentUnpublish' => array(),
-    'OnCommentUnpublish' => array(),
-    'OnBeforeCommentDelete' => array(),
-    'OnCommentDelete' => array(),
-    'OnBeforeCommentUndelete' => array(),
-    'OnCommentUndelete' => array(),
+$tmp = [
+    'OnBeforeCommentSave' => [],
+    'OnCommentSave'       => [],
 
-    'OnBeforeCommentRemove' => array(),
-    'OnCommentRemove' => array(),
+    'OnBeforeCommentPublish'   => [],
+    'OnCommentPublish'         => [],
+    'OnBeforeCommentUnpublish' => [],
+    'OnCommentUnpublish'       => [],
+    'OnBeforeCommentDelete'    => [],
+    'OnCommentDelete'          => [],
+    'OnBeforeCommentUndelete'  => [],
+    'OnCommentUndelete'        => [],
 
-    'OnBeforeTicketThreadClose' => array(),
-    'OnTicketThreadClose' => array(),
-    'OnBeforeTicketThreadOpen' => array(),
-    'OnTicketThreadOpen' => array(),
-    'OnBeforeTicketThreadDelete' => array(),
-    'OnTicketThreadDelete' => array(),
-    'OnBeforeTicketThreadUndelete' => array(),
-    'OnTicketThreadUndelete' => array(),
+    'OnBeforeCommentRemove' => [],
+    'OnCommentRemove'       => [],
 
-    'OnBeforeTicketThreadRemove' => array(),
-    'OnTicketThreadRemove' => array(),
+    'OnBeforeTicketThreadClose'    => [],
+    'OnTicketThreadClose'          => [],
+    'OnBeforeTicketThreadOpen'     => [],
+    'OnTicketThreadOpen'           => [],
+    'OnBeforeTicketThreadDelete'   => [],
+    'OnTicketThreadDelete'         => [],
+    'OnBeforeTicketThreadUndelete' => [],
+    'OnTicketThreadUndelete'       => [],
 
-    'OnBeforeTicketVote' => array(),
-    'OnTicketVote' => array(),
-    'OnBeforeCommentVote' => array(),
-    'OnCommentVote' => array(),
+    'OnBeforeTicketThreadRemove' => [],
+    'OnTicketThreadRemove'       => [],
 
-    'OnBeforeTicketStar' => array(),
-    'OnTicketStar' => array(),
-    'OnBeforeTicketUnStar' => array(),
-    'OnTicketUnStar' => array(),
-    'OnBeforeCommentStar' => array(),
-    'OnCommentStar' => array(),
-    'OnBeforeCommentUnStar' => array(),
-    'OnCommentUnStar' => array(),
-);
+    'OnBeforeTicketVote'  => [],
+    'OnTicketVote'        => [],
+    'OnBeforeCommentVote' => [],
+    'OnCommentVote'       => [],
+
+    'OnBeforeTicketStar'    => [],
+    'OnTicketStar'          => [],
+    'OnBeforeTicketUnStar'  => [],
+    'OnTicketUnStar'        => [],
+    'OnBeforeCommentStar'   => [],
+    'OnCommentStar'         => [],
+    'OnBeforeCommentUnStar' => [],
+    'OnCommentUnStar'       => [],
+];
 
 /** @var modx $modx */
 foreach ($tmp as $k => $v) {
     /** @var modEvent $event */
-    $event = $modx->newObject('modEvent');
-    $event->fromArray(array_merge(array(
-            'name' => $k,
-            'service' => 6,
-            'groupname' => PKG_NAME,
-        ), $v)
-        , '', true, true);
+    $event = $modx->newObject(modEvent::class);
+    $event->fromArray(array_merge([
+        'name' => $k,
+        'service' => 6,
+        'groupname' => PKG_NAME,
+    ], $v), '', true, true);
     $events[] = $event;
 }
 

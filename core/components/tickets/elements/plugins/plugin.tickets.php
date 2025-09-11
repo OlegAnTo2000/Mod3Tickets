@@ -1,19 +1,22 @@
 <?php
 
+use Tickets\Ticket;
 use MODX\Revolution\modX;
+use Tickets\TicketAuthor;
+use Tickets\TicketsSection;
 
 /** @var modX $modx */
 switch ($modx->event->name) {
 
     case 'OnSiteRefresh':
-        if ($modx->cacheManager->refresh(array('default/tickets' => array()))) {
+        if ($modx->cacheManager->refresh(['default/tickets' => []])) {
             $modx->log(modX::LOG_LEVEL_INFO, $modx->lexicon('refresh_default') . ': Tickets');
         }
         break;
 
     case 'OnDocFormSave':
         /** @var Ticket $resource */
-        if ($mode == 'new' && $resource->class_key == "Ticket") {
+        if ($mode == 'new' && $resource->class_key == Ticket::class) {
             $modx->cacheManager->delete('tickets/latest.tickets');
         }
         break;
@@ -40,7 +43,7 @@ switch ($modx->event->name) {
 
         if ($section_id = $modx->findResource($section_uri)) {
             /** @var TicketsSection $section */
-            if ($section = $modx->getObject('TicketsSection', array('id' => $section_id))) {
+            if ($section = $modx->getObject(TicketsSection::class, array('id' => $section_id))) {
                 if (is_numeric($ticket_uri)) {
                     $ticket_id = $ticket_uri;
                 } elseif (preg_match('#^\d+#', $ticket_uri, $tmp)) {
@@ -56,10 +59,9 @@ switch ($modx->event->name) {
                     }
                 }
                 if (!empty($ticket_id)) {
-                    if ($ticket = $modx->getObject('Ticket', array('id' => $ticket_id, 'deleted' => 0))) {
+                    if ($ticket = $modx->getObject(Ticket::class, array('id' => $ticket_id, 'deleted' => 0))) {
                         if ($ticket->published) {
-                            $modx->sendRedirect($modx->makeUrl($ticket_id),
-                                array('responseCode' => 'HTTP/1.1 301 Moved Permanently'));
+                            $modx->sendRedirect($modx->makeUrl($ticket_id), ['responseCode' => 'HTTP/1.1 301 Moved Permanently']);
                         } elseif ($unp_id = $modx->getOption('tickets.unpublished_ticket_page')) {
                             $modx->sendForward($unp_id, 'HTTP/1.1 403 Forbidden');
                         }
@@ -95,7 +97,7 @@ switch ($modx->event->name) {
         if ($authenticated) {
             /** @var TicketAuthor $profile */
             if (!$profile = $modx->user->getOne('AuthorProfile')) {
-                $profile = $modx->newObject('TicketAuthor');
+                $profile = $modx->newObject(TicketAuthor::class);
                 $modx->user->addOne($profile);
             }
             $profile->set('visitedon', time());

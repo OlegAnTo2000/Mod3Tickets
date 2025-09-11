@@ -1,39 +1,42 @@
 <?php
 
+use MODX\Revolution\modX;
+use MODX\Revolution\modSystemSetting;
+
 $settings = array();
 
 $tmp = array(
     'mgr_tree_icon_ticketssection' => array(
         'xtype' => 'textfield',
         'value' => 'icon icon-comments-o',
-        'area' => 'tickets.main',
-        'key' => 'mgr_tree_icon_ticketssection',
+        'area'  => 'tickets.main',
+        'key'   => 'mgr_tree_icon_ticketssection',
     ),
     'mgr_tree_icon_ticket' => array(
         'xtype' => 'textfield',
         'value' => 'icon icon-comment-o',
-        'area' => 'tickets.main',
-        'key' => 'mgr_tree_icon_ticket',
+        'area'  => 'tickets.main',
+        'key'   => 'mgr_tree_icon_ticket',
     ),
     'date_format' => array(
         'xtype' => 'textfield',
         'value' => '%d.%m.%y <small>%H:%M</small>',
-        'area' => 'tickets.main',
+        'area'  => 'tickets.main',
     ),
     'enable_editor' => array(
         'xtype' => 'combo-boolean',
         'value' => true,
-        'area' => 'tickets.main',
+        'area'  => 'tickets.main',
     ),
     'frontend_css' => array(
         'value' => '[[+cssUrl]]web/default.css',
         'xtype' => 'textfield',
-        'area' => 'tickets.main',
+        'area'  => 'tickets.main',
     ),
     'frontend_js' => array(
         'value' => '[[+jsUrl]]web/default.js',
         'xtype' => 'textfield',
-        'area' => 'tickets.main',
+        'area'  => 'tickets.main',
     ),
     'editor_config.ticket' => array(
         'xtype' => 'textarea',
@@ -105,7 +108,7 @@ $tmp = array(
     'ticket_max_cut' => array(
         'xtype' => 'numberfield',
         'value' => 1000,
-        'area' => 'tickets.ticket',
+        'area'  => 'tickets.ticket',
     ),
 
     'mail_from' => array(
@@ -158,16 +161,14 @@ $tmp = array(
     ),
 );
 
-/** @var modx $modx */
+/** @var modX $modx */
 foreach ($tmp as $k => $v) {
     /** @var modSystemSetting $setting */
-    $setting = $modx->newObject('modSystemSetting');
-    $setting->fromArray(array_merge(
-        array(
-            'key' => PKG_NAME_LOWER . '.' . $k,
-            'namespace' => PKG_NAME_LOWER,
-        ), $v
-    ), '', true, true);
+    $setting = $modx->newObject(modSystemSetting::class);
+    $setting->fromArray(array_merge([
+        'key' => PKG_NAME_LOWER . '.' . $k,
+        'namespace' => PKG_NAME_LOWER,
+    ], $v), '', true, true);
     $settings[] = $setting;
 }
 

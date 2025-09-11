@@ -17,7 +17,7 @@ $tmp = array(
     ),
     'tplSectionRow' => array(
         'type' => 'textfield',
-        'value' => '@INLINE <option value="[[+id]]" [[+selected]]>[[+pagetitle]]</option>',
+        'value' => '@INLINE <option value="{$id}" {$selected}>{$pagetitle}</option>',
     ),
     'tplTicketEmailBcc' => array(
         'type' => 'textfield',

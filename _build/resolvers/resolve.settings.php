@@ -1,5 +1,9 @@
 <?php
 
+use xPDO\Transport\xPDOTransport;
+use MODX\Revolution\modX;
+use MODX\Revolution\modSystemSetting;
+
 /** @var xPDOTransport $transport */
 /** @var array $options */
 /** @var modX $modx */
@@ -12,9 +16,9 @@ if ($transport->xpdo) {
             break;
 
         case xPDOTransport::ACTION_UNINSTALL:
-            $modx->removeCollection('modSystemSetting', array(
+            $modx->removeCollection(modSystemSetting::class, [
                 'namespace' => 'tickets',
-            ));
+            ]);
             break;
     }
 }

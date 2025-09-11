@@ -13,12 +13,6 @@ $tmp = array(
         'value' => 'tpl.Tickets.meta.file',
         'desc' => 'tickets_prop_meta_tplFile',
     ),
-    /*
-    'getSection' => array(
-        'type' => 'combo-boolean',
-        'value' => true,
-    ),
-    */
     'getUser' => array(
         'type' => 'combo-boolean',
         'value' => true,
