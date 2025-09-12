@@ -1,14 +1,14 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
-use \xPDO\Om\xPDOObject;
-use \Tickets\Ticket;
-use \Tickets\TicketTotal;
-use \Tickets\TicketsSection;
-use \Tickets\TicketAuthor;
 use \PDO;
 use \xPDO\xPDO;
+use \xPDO\Om\xPDOObject;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketsSection;
 
 /**
  * @property int $id
@@ -29,20 +29,20 @@ class TicketView extends \xPDO\Om\xPDOObject
         if ($new) {
             if ($uid = $this->get('uid')) {
                 /** @var TicketAuthor $profile */
-                if ($profile = $this->xpdo->getObject('TicketAuthor', $uid)) {
+                if ($profile = $this->xpdo->getObject(TicketAuthor::class, $uid)) {
                     $profile->addAction('view', $this->get('parent'), $this->get('parent'), $this->get('uid'));
                 }
             } else {
                 /** @var Ticket $ticket */
-                if ($ticket = $this->xpdo->getObject('Ticket', $this->get('parent'))) {
+                if ($ticket = $this->xpdo->getObject(Ticket::class, $this->get('parent'))) {
                     /** @var TicketTotal $total */
-                    if ($total = $ticket->getOne('Total')) {
+                    if ($total = $ticket->getOne(TicketTotal::class)) {
                         $total->set('views', $total->get('views') + 1);
                         $total->save();
                     }
                     /** @var TicketsSection $section */
-                    if ($section = $ticket->getOne('Parent')) {
-                        if ($total = $section->getOne('Total')) {
+                    if ($section = $ticket->getOne(TicketsSection::class)) {
+                        if ($total = $section->getOne(TicketTotal::class)) {
                             $total->set('views', $total->get('views') + 1);
                             $total->save();
                         }
@@ -63,7 +63,7 @@ class TicketView extends \xPDO\Om\xPDOObject
     public function remove(array $ancestors = array())
     {
         /** @var TicketAuthor $profile */
-        if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('uid'))) {
+        if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('uid'))) {
             $profile->removeAction('view', $this->get('parent'), $this->get('uid'));
         }
 

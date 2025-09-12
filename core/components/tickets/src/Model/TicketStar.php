@@ -1,11 +1,13 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;
-use \Tickets\TicketComment;
-use \Tickets\TicketThread;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketThread;
+use \Tickets\Model\TicketComment;
 
 /**
  * @property int $id
@@ -26,22 +28,22 @@ class TicketStar extends \xPDO\Om\xPDOObject
         if ($new) {
             $type = '';
             $ticket_id = 0;
-            if ($class == 'TicketComment') {
+            if ($class == TicketComment::class) {
                 $type = 'star_comment';
                 /** @var TicketComment $comment */
-                if ($comment = $this->xpdo->getObject('TicketComment', $this->id)) {
+                if ($comment = $this->xpdo->getObject(TicketComment::class, $this->id)) {
                     /** @var TicketThread $comment */
                     if ($thread = $comment->getOne('Thread')) {
                         $ticket_id = $thread->get('resource');
                     }
                 }
-            } elseif ($class == 'Ticket') {
+            } elseif ($class == Ticket::class) {
                 $type = 'star_ticket';
                 $ticket_id = $this->id;
             }
             if (!empty($type) && !empty($ticket_id)) {
                 /** @var TicketAuthor $profile */
-                if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('owner'))) {
+                if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('owner'))) {
                     $profile->addAction($type, $this->id, $ticket_id, $this->get('createdby'));
                 }
             }
@@ -60,14 +62,14 @@ class TicketStar extends \xPDO\Om\xPDOObject
     {
         $type = '';
         $class = $this->get('class');
-        if ($class == 'TicketComment') {
+        if ($class == TicketComment::class) {
             $type = 'star_comment';
-        } elseif ($class == 'Ticket') {
+        } elseif ($class == Ticket::class) {
             $type = 'star_ticket';
         }
         if (!empty($type)) {
             /** @var TicketAuthor $profile */
-            if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('owner'))) {
+            if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('owner'))) {
                 $profile->removeAction($type, $this->id, $this->get('createdby'));
             }
         }

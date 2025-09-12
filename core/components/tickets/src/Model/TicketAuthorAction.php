@@ -1,14 +1,14 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;
 use xPDO\Om\xPDOObject;
-use \Tickets\Ticket;
-use \Tickets\TicketTotal;
-use \Tickets\TicketAuthor;
-use \Tickets\TicketsSection;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketsSection;
 
 class TicketAuthorAction extends xPDOObject
 {

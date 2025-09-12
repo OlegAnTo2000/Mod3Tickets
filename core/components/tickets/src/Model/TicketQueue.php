@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;

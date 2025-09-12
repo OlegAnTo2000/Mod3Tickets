@@ -1,12 +1,12 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \xPDO\Om\xPDOObject;
-use \Tickets\Ticket;
-use \Tickets\TicketAuthorAction;
-use \Tickets\TicketTotal;
-use \Tickets\TicketsSection;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketAuthorAction;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketsSection;
 use \PDO;
 
 /**
@@ -16,7 +16,6 @@ use \PDO;
 class TicketAuthor extends \xPDO\Om\xPDOObject
 {
     protected $_ratings = array();
-
 
     /**
      * @param $type

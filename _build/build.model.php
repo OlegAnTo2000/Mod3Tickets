@@ -9,11 +9,13 @@ require __DIR__ . '/build.config.php';
 // пути
 $root = dirname(__DIR__) . '/';
 $sources = [
-    'root'   => $root,
-    'build'  => $root . '_build/',
-    'model'  => $root . 'core/components/' . PKG_NAME_LOWER . '/src',
-    'schema' => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/',
-    'xml'    => $root . 'core/components/' . PKG_NAME_LOWER . '/model/schema/' . PKG_NAME_LOWER . '.mysql.schema.xml',
+    'root'        => $root,
+    'build'       => $root . '_build/',
+    'source_core' => $root . 'core/components/' . PKG_NAME_LOWER,
+    'src'         => $root . 'core/components/' . PKG_NAME_LOWER . '/src',
+    'model'       => $root . 'core/components/' . PKG_NAME_LOWER . '/src/Model',
+    'schema'      => $root . 'core/components/' . PKG_NAME_LOWER . '/schema/',
+    'xml'         => $root . 'core/components/' . PKG_NAME_LOWER . '/schema/' . PKG_NAME_LOWER . '.mysql.schema.xml',
 ];
 unset($root);
 
@@ -34,7 +36,7 @@ $manager   = $xpdo->getManager();
 $generator = $manager->getGenerator();
 
 // снести старые классы
-$pkgModelPath = $sources['model'] . PKG_NAME_LOWER . '/mysql';
+$pkgModelPath = $sources['model'] . '/mysql';
 if (is_dir($pkgModelPath)) {
   $it = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($pkgModelPath, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -49,9 +51,9 @@ if (is_dir($pkgModelPath)) {
 // сгенерить новые
 $generator->parseSchema(
   $sources['xml'],
-  $sources['model'],
+  $sources['src'],
   [
-    'namespacePrefix' => 'Tickets\\Model\\',
+    'namespacePrefix' => 'Tickets',
     'update'          => 0,
   ]
 );

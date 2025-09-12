@@ -1,16 +1,16 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \MODX\Revolution\modX;
-use \Tickets\Ticket;
+use \Tickets\Model\Ticket;
 use \xPDO\Om\xPDOSimpleObject;
-use \Tickets\TicketAuthor;
-use \Tickets\TicketThread;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketThread;
 use \MODX\Revolution\modPhpThumb;
 use \MODX\Revolution\modResource;
-use MODX\Revolution\Sources\modMediaSource;
+use \MODX\Revolution\Sources\modMediaSource;
 
 /**
  * @property int $id
@@ -28,7 +28,7 @@ class TicketFile extends xPDOSimpleObject
      *
      * @return bool|string
      */
-    public function prepareSource(modMediaSource $mediaSource = null)
+    public function prepareSource(?modMediaSource $mediaSource = null)
     {
         if ($mediaSource) {
             $this->mediaSource = $mediaSource;
@@ -54,7 +54,7 @@ class TicketFile extends xPDOSimpleObject
      *
      * @return bool|string
      */
-    public function generateThumbnails(modMediaSource $mediaSource = null)
+    public function generateThumbnails(?modMediaSource $mediaSource = null)
     {
         if ($this->get('type') != 'image') {
             return true;
@@ -122,7 +122,7 @@ class TicketFile extends xPDOSimpleObject
      *
      * @return bool|string
      */
-    public function generateThumbnail(modMediaSource $mediaSource = null)
+    public function generateThumbnail(?modMediaSource $mediaSource = null)
     {
         return $this->generateThumbnails($mediaSource);
     }
@@ -282,13 +282,6 @@ class TicketFile extends xPDOSimpleObject
                     $this->mediaSource->removeObject($path . $filename);
                 }
             }
-            /*
-            else {
-                $this->xpdo->log(xPDO::LOG_LEVEL_ERROR,
-                    '[Tickets] Could not remove file at "' . $this->get('path') . $this->get('file') . '": ' . $this->mediaSource->errors['file']
-                );
-            }
-            */
         }
 
         return parent::remove($ancestors);

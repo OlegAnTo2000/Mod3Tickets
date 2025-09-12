@@ -1,20 +1,20 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
-use \xPDO\Om\xPDOSimpleObject;
-use \Tickets\TicketThread;
-use \Tickets\TicketAuthor;
-use \Tickets\Ticket;
-use \MODX\Revolution\modResource;
 use \PDO;
+use \xPDO\Om\xPDOSimpleObject;
+use \MODX\Revolution\modResource;
+use \Tickets\Model\TicketThread;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\Ticket;
 
 /**
  * @property int $id
  */
 class TicketComment extends xPDOSimpleObject
 {
-    public $class_key = 'TicketComment';
+    public $class_key = self::class;
 
     /**
      * @param string $alias

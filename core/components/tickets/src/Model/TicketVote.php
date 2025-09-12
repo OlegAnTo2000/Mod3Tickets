@@ -1,11 +1,11 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \xPDO\Om\xPDOObject;
-use \Tickets\TicketComment;
-use \Tickets\TicketThread;
-use \Tickets\TicketAuthor;
+use \Tickets\Model\TicketComment;
+use \Tickets\Model\TicketThread;
+use \Tickets\Model\TicketAuthor;
 use \PDO;
 use \xPDO\xPDO;
 

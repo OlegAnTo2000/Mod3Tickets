@@ -2,16 +2,19 @@
 
 namespace Tickets;
 
-use \Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use \PDO;
-use \Tickets\TicketThread;
+use Tickets\Model\Ticket;
 use \MODX\Revolution\modX;
-use \Tickets\TicketsSection;
+use Tickets\Model\TicketView;
 use \MODX\Revolution\pdoTools;
 use \MODX\Revolution\modSnippet;
+use \Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use \Tickets\Model\TicketsSection;
 use \MODX\Revolution\modManagerController;
 use \MODX\Revolution\Processors\ProcessorResponse;
+use \Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use \Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use \Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
 use \Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
 use \Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
@@ -60,6 +63,7 @@ class Tickets
             'actionUrl'    => $actionUrl,
 
             'corePath'       => $corePath,
+            'srcPath'        => $corePath . 'src/',
             'modelPath'      => $corePath . 'model/',
             'chunksPath'     => $corePath . 'elements/chunks/',
             'templatesPath'  => $corePath . 'elements/templates/',
@@ -92,7 +96,7 @@ class Tickets
             'requiredFields' => '',
         ), $config);
 
-        $this->modx->addPackage('tickets', $this->config['modelPath']);
+        $this->modx->addPackage('Tickets\Model', $this->config['srcPath'], null, 'Tickets\\');
         $this->modx->lexicon->load('tickets:default');
 
         if ($name = $this->config['snippetPrepareComment']) {

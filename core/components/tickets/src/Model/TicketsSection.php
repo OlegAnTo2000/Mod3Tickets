@@ -1,16 +1,16 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;
-use \Tickets\Ticket;
-use \Tickets\TicketVote;
-use \Tickets\TicketTotal;
-use Tickets\TicketAuthor;
-use \Tickets\TicketThread;
-use \Tickets\TicketComment;
-use Tickets\TicketAuthorAction;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketVote;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketThread;
+use \Tickets\Model\TicketComment;
+use \Tickets\Model\TicketAuthorAction;
 use \MODX\Revolution\modResource;
 use \MODX\Revolution\modAccessibleObject;
 

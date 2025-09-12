@@ -1,17 +1,17 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;
-use \Tickets\TicketComment;
-use \Tickets\Ticket;
-use \Tickets\TicketAuthor;
-use \Tickets\TicketTotal;
-use \Tickets\TicketsSection;
-use \Tickets\TicketVote;
-use \Tickets\TicketStar;
-use \Tickets\TicketQueue;
+use \Tickets\Model\TicketComment;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketsSection;
+use \Tickets\Model\TicketVote;
+use \Tickets\Model\TicketStar;
+use \Tickets\Model\TicketQueue;
 use \xPDO\Om\xPDOSimpleObject;
 
 /**
@@ -34,7 +34,7 @@ class TicketThread extends xPDOSimpleObject
      */
     public function updateLastComment()
     {
-        $q = $this->xpdo->newQuery('TicketComment', array('thread' => $this->id, 'published' => 1, 'deleted' => 0));
+        $q = $this->xpdo->newQuery(TicketComment::class, array('thread' => $this->id, 'published' => 1, 'deleted' => 0));
         $q->sortby('createdon', 'DESC');
         $q->limit(1);
         $q->select('id as comment_last, createdon as comment_time');
@@ -60,7 +60,7 @@ class TicketThread extends xPDOSimpleObject
     public function updateCommentsCount()
     {
         $comments = 0;
-        $q = $this->xpdo->newQuery('TicketComment', array('thread' => $this->id, 'published' => 1, 'deleted' => 0));
+        $q = $this->xpdo->newQuery(TicketComment::class, array('thread' => $this->id, 'published' => 1, 'deleted' => 0));
         $q->select('COUNT(`id`)');
         if ($q->prepare() && $q->stmt->execute()) {
             $comments = $q->stmt->fetch(PDO::FETCH_COLUMN);
@@ -166,7 +166,7 @@ class TicketThread extends xPDOSimpleObject
      */
     public function remove(array $ancestors = array())
     {
-        $collection = $this->xpdo->getIterator('TicketComment', array('thread' => $this->id, 'parent' => 0));
+        $collection = $this->xpdo->getIterator(TicketComment::class, array('thread' => $this->id, 'parent' => 0));
         /** @var TicketComment $item */
         foreach ($collection as $item) {
             $item->remove();

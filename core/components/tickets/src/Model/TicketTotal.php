@@ -1,13 +1,13 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
-use \Tickets\Ticket;
-use \Tickets\TicketComment;
-use \Tickets\TicketsSection;
-use \Tickets\TicketStar;
 use \PDO;
 use \xPDO\xPDO;
+use \Tickets\Model\Ticket;
+use \Tickets\Model\TicketStar;
+use \Tickets\Model\TicketComment;
+use \Tickets\Model\TicketsSection;
 
 class TicketTotal extends \xPDO\Om\xPDOObject
 {
@@ -36,9 +36,9 @@ class TicketTotal extends \xPDO\Om\xPDOObject
         $id = $this->get('id');
         $class = $this->get('class');
         switch ($class) {
-            case 'Ticket':
+            case Ticket::class:
                 /** @var Ticket $ticket */
-                if ($ticket = $this->xpdo->getObject('Ticket', $id)) {
+                if ($ticket = $this->xpdo->getObject(Ticket::class, $id)) {
                     $rating = $ticket->getRating();
                     $values = array(
                         'comments'     => $ticket->getCommentsCount(),
@@ -50,10 +50,10 @@ class TicketTotal extends \xPDO\Om\xPDOObject
                     );
                 }
                 break;
-            case 'TicketComment':
-                if ($comment = $this->xpdo->getObject('TicketComment', $id)) {
+            case TicketComment::class:
+                if ($comment = $this->xpdo->getObject(TicketComment::class, $id)) {
                     $values = array(
-                        'stars' => $this->xpdo->getCount('TicketStar', array('id' => $id, 'class' => 'TicketComment')),
+                        'stars' => $this->xpdo->getCount(TicketStar::class, array('id' => $id, 'class' => TicketComment::class)),
                         'rating' => $comment->get('rating'),
                     );
                 }

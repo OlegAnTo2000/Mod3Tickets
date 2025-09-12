@@ -1,18 +1,18 @@
 <?php
 
-namespace Tickets;
+namespace Tickets\Model;
 
 use \PDO;
 use \xPDO\xPDO;
-use \Tickets\TicketView;
-use \Tickets\TicketVote;
-use \Tickets\TicketTotal;
-use \Tickets\TicketAuthor;
-use \Tickets\TicketThread;
+use \Tickets\Model\TicketView;
+use \Tickets\Model\TicketVote;
+use \Tickets\Model\TicketTotal;
+use \Tickets\Model\TicketAuthor;
+use \Tickets\Model\TicketThread;
 use \MODX\Revolution\modResource;
-use MODX\Revolution\modContentType;
-use \Tickets\TicketAuthorAction;
-use MODX\Revolution\modAccessibleObject;
+use \MODX\Revolution\modContentType;
+use \Tickets\Model\TicketAuthorAction;
+use \MODX\Revolution\modAccessibleObject;
 
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CORE_PATH . 'components/tickets/processors/mgr/ticket/create.class.php';
