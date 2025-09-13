@@ -1,5 +1,7 @@
 <?php
 
+namespace Tickets\Processors\Mgr\Ticket;
+
 use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
 use Tickets\Model\Ticket;
 use Tickets\Model\TicketAuthor;
@@ -180,7 +182,7 @@ class Create extends ResourceCreateProcessor
 	 */
 	public function beforeSave()
 	{
-		/* @var TicketsSection $section */
+		/** @var TicketsSection $section */
 		if ($this->getProperty('published')) {
 			if ($section = $this->modx->getObject(TicketsSection::class, $this->object->get('parent'))) {
 				$ratings = $section->getProperties('ratings');

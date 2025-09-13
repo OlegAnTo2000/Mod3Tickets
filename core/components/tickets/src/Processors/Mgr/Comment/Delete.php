@@ -2,9 +2,9 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use MODX\Revolution\Processors\Model\UpdateProcessor;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketThread;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
 
 use function time;
 
@@ -12,7 +12,7 @@ class Delete extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
+	public $objectType      = TicketComment::class;
 	public $classKey        = TicketComment::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentDelete';
@@ -47,7 +47,7 @@ class Delete extends UpdateProcessor
 	{
 		$this->object->clearTicketCache();
 		if ($thread = $this->object->getOne('Thread')) {
-			/* @var TicketThread $thread */
+			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 		$this->modx->cacheManager->delete('tickets/latest.comments');

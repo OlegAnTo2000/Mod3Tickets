@@ -1,13 +1,15 @@
 <?php
 
-require_once MODX_CORE_PATH . 'model/modx/modprocessor.class.php';
-require_once MODX_CORE_PATH . 'model/modx/processors/resource/create.class.php';
+namespace Tickets\Processors\Mgr\Section;
 
-class TicketsSectionCreateProcessor extends modResourceCreateProcessor
+use MODX\Revolution\Processors\Resource\Create as ResourceCreate;
+use Tickets\Model\TicketsSection;
+
+class Create extends ResourceCreate
 {
 	/** @var TicketsSection */
 	public $object;
-	public $classKey = 'TicketsSection';
+	public $classKey = TicketsSection::class;
 
 	/**
 	 * @return array|string

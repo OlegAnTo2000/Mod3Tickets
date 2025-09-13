@@ -1,11 +1,11 @@
 <?php
 
-use MODX\Revolution\Error\modError;
-use MODX\Revolution\modContext;
-use MODX\Revolution\modResource;
-use MODX\Revolution\modX;
-use Tickets\Model\TicketThread;
 use Tickets\Tickets;
+use MODX\Revolution\modX;
+use MODX\Revolution\modContext;
+use Tickets\Model\TicketThread;
+use MODX\Revolution\modResource;
+use MODX\Revolution\Error\modError;
 
 if (empty($_REQUEST['action'])) {
 	exit('Access denied');
@@ -52,7 +52,7 @@ if ('web' != $context) {
 	$modx->switchContext($context);
 }
 
-/* @var Tickets $Tickets */
+/** @var Tickets $Tickets */
 \define('MODX_ACTION_MODE', true);
 $Tickets = \tickets_service($modx, $properties);
 if ($modx->error->hasError() || !($Tickets instanceof Tickets)) {

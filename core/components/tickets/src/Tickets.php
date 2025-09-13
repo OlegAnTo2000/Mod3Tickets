@@ -475,7 +475,7 @@ class Tickets
 	public function voteTicket($id, $value = 1)
 	{
 		$data = ['id' => $id, 'value' => $value];
-		/* @var ProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor(TicketVoteProcessor::class, $data);
 			if ($response->isError()) {
@@ -511,7 +511,7 @@ class Tickets
 	public function starTicket($id)
 	{
 		$data = ['id' => $id];
-		/* @var ProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor('web/ticket/star', $data);
 			if ($response->isError()) {
@@ -710,7 +710,7 @@ class Tickets
 	{
 		$data = ['id' => $id, 'value' => $value];
 
-		/* @var ProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id) && !empty($value)) {
 			$response = $this->runProcessor('web/comment/vote', $data);
 			if ($response->isError()) {
@@ -746,7 +746,7 @@ class Tickets
 	public function starComment($id)
 	{
 		$data = ['id' => $id];
-		/* @var ProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor('web/comment/star', $data);
 			if ($response->isError()) {

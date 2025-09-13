@@ -1,5 +1,11 @@
 <?php
 
+use Tickets\Model\TicketsSection;
+use Tickets\Tickets;
+
+/**
+ * @package Tickets
+ */
 class TicketsSectionCreateManagerController extends ResourceCreateManagerController
 {
 	/** @var TicketsSection */

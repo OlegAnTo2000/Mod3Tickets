@@ -242,7 +242,7 @@ class Update extends ResourceUpdate
 	 */
 	public function handleParent()
 	{
-		if ('manager' == $this->modx->context->key) {
+		if ('mgr' == $this->modx->context->key) {
 			return parent::handleParent();
 		}
 
@@ -285,7 +285,7 @@ class Update extends ResourceUpdate
 		$this->object->clearCache();
 		/** @var TicketsSection $section */
 		if ($section = $this->object->getOne('Section')) {
-			/* @var TicketsSection $section */
+			/** @var TicketsSection $section */
 			$section->clearCache();
 		}
 	}

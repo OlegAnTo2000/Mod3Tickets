@@ -2,18 +2,19 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use function array_key_exists;
-
-use MODX\Revolution\Processors\Model\UpdateProcessor;
-
 use function tickets_service;
 
-class TicketCommentPublishProcessor extends UpdateProcessor
+use function array_key_exists;
+
+use Tickets\Model\TicketComment;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+class Publish extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
-	public $classKey        = 'Tickets\Model\TicketComment';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentPublish';
 	public $afterSaveEvent  = 'OnCommentPublish';
@@ -49,8 +50,9 @@ class TicketCommentPublishProcessor extends UpdateProcessor
 	public function afterSave()
 	{
 		$this->object->clearTicketCache();
-		/** @var Tickets\Model\TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Thread')) {
+			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 
@@ -66,8 +68,9 @@ class TicketCommentPublishProcessor extends UpdateProcessor
 
 	protected function sendCommentMails()
 	{
-		/** @var Tickets\Model\TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Thread')) {
+			/** @var TicketThread $thread */
 			/** @var Tickets $Tickets */
 			if ($Tickets = tickets_service()) {
 				$Tickets->config = $thread->get('properties');
@@ -88,5 +91,3 @@ class TicketCommentPublishProcessor extends UpdateProcessor
 		);
 	}
 }
-
-return 'TicketCommentPublishProcessor';

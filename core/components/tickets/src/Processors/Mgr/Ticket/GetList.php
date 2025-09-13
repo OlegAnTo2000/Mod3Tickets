@@ -1,5 +1,7 @@
 <?php
 
+namespace Tickets\Processors\Mgr\Ticket;
+
 use MODX\Revolution\modResource;
 use MODX\Revolution\modUser;
 use MODX\Revolution\modUserProfile;
@@ -155,5 +157,3 @@ class GetList extends GetListProcessor
 		return $array;
 	}
 }
-
-return 'TicketGetListProcessor';

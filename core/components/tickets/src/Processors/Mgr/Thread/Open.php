@@ -1,11 +1,16 @@
 <?php
 
-class TicketThreadOpenProcessor extends MODX\Revolution\Processors\Model\UpdateProcessor
+namespace Tickets\Processors\Mgr\Thread;
+
+use Tickets\Model\TicketThread;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+class Open extends UpdateProcessor
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey        = 'TicketThread';
-	public $objectType      = 'TicketThread';
+	public $classKey        = TicketThread::class;
+	public $objectType      = TicketThread::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadOpen';
 	public $afterSaveEvent  = 'OnTicketThreadOpen';
@@ -53,5 +58,3 @@ class TicketThreadOpenProcessor extends MODX\Revolution\Processors\Model\UpdateP
 		);
 	}
 }
-
-return 'TicketThreadOpenProcessor';

@@ -4,7 +4,7 @@ use MODX\Revolution\Sources\modMediaSource;
 use Tickets\Model\TicketThread;
 use Tickets\Tickets;
 
-/* @var array $scriptProperties */
+/** @var array $scriptProperties */
 if (empty($thread)) {
 	$scriptProperties['thread'] = $modx->getOption(
 		'thread',

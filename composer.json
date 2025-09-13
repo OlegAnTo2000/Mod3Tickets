@@ -53,6 +53,9 @@
   },
 	"scripts": {
 		"phpstan": "phpstan analyse --error-format=raw --no-progress --memory-limit=8G",
-		"rector": "rector process --no-progress --dry-run"
+		"rector": "rector process --no-progress",
+		"rector-dry": "rector process --no-progress --dry-run",
+		"phpcsfixer": "php-cs-fixer fix --diff",
+		"phpcsfixer-dry": "php-cs-fixer fix --diff --dry-run"
 	}
 }

@@ -24,7 +24,7 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $objectType           = 'Tickets\Model\TicketComment';
+	public $objectType           = TicketComment::class;
 	public $classKey             = TicketComment::class;
 	public $languageTopics       = ['tickets:default'];
 	public $defaultSortField     = 'createdon';
@@ -33,7 +33,7 @@ class GetList extends GetListProcessor
 	/**
 	 * @return xPDOQuery
 	 */
-	public function prepareQueryBeforeCount(xPDOQuery $c)
+	public function prepareQueryBeforeCount(xPDOQuery $c): xPDOQuery
 	{
 		/* Get all comments by section */
 		if ($section = (int) $this->getProperty('section')) {

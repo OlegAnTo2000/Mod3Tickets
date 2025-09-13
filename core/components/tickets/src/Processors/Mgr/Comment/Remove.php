@@ -4,15 +4,16 @@ namespace Tickets\Processors\Mgr\Comment;
 
 use function count;
 
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
 use MODX\Revolution\Processors\Model\RemoveProcessor;
 
 class Remove extends RemoveProcessor
 {
-	/** @var TicketComment */
 	public $object;
 	public $checkRemovePermission = true;
-	public $objectType            = 'Tickets\Model\TicketComment';
-	public $classKey              = 'Tickets\Model\TicketComment';
+	public $objectType            = TicketComment::class;
+	public $classKey              = TicketComment::class;
 	public $languageTopics        = ['tickets'];
 	public $beforeRemoveEvent     = 'OnBeforeCommentRemove';
 	public $afterRemoveEvent      = 'OnCommentRemove';
@@ -38,8 +39,8 @@ class Remove extends RemoveProcessor
 	public function beforeRemove()
 	{
 		$this->getChildren($this->object);
-		$children = $this->modx->getIterator('Tickets\Model\TicketComment', ['id:IN' => $this->children]);
-		/** @var Tickets\Model\TicketComment $child */
+		$children = $this->modx->getIterator(TicketComment::class, ['id:IN' => $this->children]);
+		/** @var TicketComment $child */
 		foreach ($children as $child) {
 			$child->remove();
 		}
@@ -47,7 +48,7 @@ class Remove extends RemoveProcessor
 		return true;
 	}
 
-	protected function getChildren(Tickets\Model\TicketComment $parent)
+	protected function getChildren(TicketComment $parent)
 	{
 		$children = $parent->getMany('Children');
 		if (count($children) > 0) {
@@ -64,9 +65,12 @@ class Remove extends RemoveProcessor
 	 */
 	public function afterRemove()
 	{
-		$this->object->clearTicketCache();
-		/** @var Tickets\Model\TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		/** @var TicketComment $comment */
+		$comment = $this->object;
+		$comment->clearTicketCache();
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Thread')) {
+			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 
@@ -85,5 +89,3 @@ class Remove extends RemoveProcessor
 		);
 	}
 }
-
-return 'TicketCommentRemoveProcessor';

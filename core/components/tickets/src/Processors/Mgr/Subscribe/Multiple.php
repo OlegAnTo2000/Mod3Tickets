@@ -5,11 +5,12 @@ namespace Tickets\Processors\Mgr\Subscribe;
 use function intval;
 use function json_decode;
 
+use MODX\Revolution\Processors\Processor;
 use MODX\Revolution\Processors\ProcessorResponse;
 
 use function tickets_service;
 
-class Multiple extends \MODX\Revolution\Processors\Processor
+class Multiple extends Processor
 {
 	/**
 	 * @return array|string
@@ -38,5 +39,3 @@ class Multiple extends \MODX\Revolution\Processors\Processor
 		return $this->success();
 	}
 }
-
-return 'TicketSubscribeMultipleProcessor';

@@ -24,7 +24,7 @@ class Multiple extends Processor
 		}
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->services->get('Tickets');
+		$Tickets = $this->modx->services->get('tickets');
 
 		foreach ($ids as $id) {
 			/** @var ProcessorResponse $response */

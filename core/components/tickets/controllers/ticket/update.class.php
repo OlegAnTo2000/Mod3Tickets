@@ -1,5 +1,7 @@
 <?php
 
+use Tickets\Model\Ticket;
+
 class TicketUpdateManagerController extends ResourceUpdateManagerController
 {
 	/** @var Ticket */
@@ -69,27 +71,22 @@ class TicketUpdateManagerController extends ResourceUpdateManagerController
 			'canDuplicate'     => (int) $this->canDuplicate,
 			'canDelete'        => (int) $this->canDelete,
 			'show_tvs'         => (int) !empty($this->tvCounts),
-			'next_page'        => !empty($neighborhood['right'][0])
-				? $neighborhood['right'][0]
-				: 0,
-			'prev_page' => !empty($neighborhood['left'][0])
-				? $neighborhood['left'][0]
-				: 0,
-			'up_page' => $this->resource->parent,
-			'mode'    => 'update',
+			'next_page'        => !empty($neighborhood['right'][0]) ? $neighborhood['right'][0] : 0,
+			'prev_page'        => !empty($neighborhood['left'][0]) ? $neighborhood['left'][0] : 0,
+			'up_page'          => $this->resource->parent,
+			'mode'             => 'update',
 		];
 		$this->addHtml('
-        <script type="text/javascript">
-        // <![CDATA[
-        MODx.config.publish_document = ' . (int) $this->canPublish . ';
-        MODx.onDocFormRender = "' . $this->onDocFormRender . '";
-        MODx.ctx = "' . $this->ctx . '";
-        Ext.onReady(function() {
-            MODx.load(' . \json_encode($ready) . ');
-        });
-        // ]]>
-        </script>');
-
+			<script type="text/javascript">
+				// <![CDATA[
+					MODx.config.publish_document = ' . (int) $this->canPublish . ';
+					MODx.onDocFormRender = "' . $this->onDocFormRender . '";
+					MODx.ctx = "' . $this->ctx . '";
+					Ext.onReady(function() {
+						MODx.load(' . \json_encode($ready) . ');
+					});
+				// ]]>
+			</script>');
 		// load RTE
 		$this->loadRichTextEditor();
 	}

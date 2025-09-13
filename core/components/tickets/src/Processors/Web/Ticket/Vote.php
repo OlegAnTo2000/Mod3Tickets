@@ -45,7 +45,7 @@ class Vote extends CreateProcessor
 		} elseif ($this->ticket->createdby == $this->modx->user->id) {
 			return $this->modx->lexicon('ticket_err_vote_own');
 		}
-		/* @var TicketVote $vote */
+		/** @var TicketVote $vote */
 		elseif ($this->modx->getCount(
 			$this->classKey,
 			['id' => $id, 'createdby' => $this->modx->user->id, 'class' => Ticket::class]

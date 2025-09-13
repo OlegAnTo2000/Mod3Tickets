@@ -1,8 +1,17 @@
 <?php
 
-class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\GetListProcessor
+namespace Tickets\Processors\Mgr\Section;
+
+use PDO;
+use xPDO\Om\xPDOQuery;
+use MODX\Revolution\modResource;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modAccessibleObject;
+use MODX\Revolution\Processors\Model\GetListProcessor;
+
+class GetList extends GetListProcessor
 {
-	public $classKey             = 'TicketsSection';
+	public $classKey             = TicketsSection::class;
 	public $defaultSortField     = 'pagetitle';
 	public $defaultSortDirection = 'ASC';
 	public $checkListPermission  = true;
@@ -85,11 +94,11 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 	/**
 	 * @return xPDOQuery
 	 */
-	public function prepareQueryBeforeCount(xPDOQuery $c)
+	public function prepareQueryBeforeCount(xPDOQuery $c): xPDOQuery
 	{
 		$c->select('id,parent,pagetitle,context_key');
 		$c->where([
-			'class_key' => 'TicketsSection',
+			'class_key' => TicketsSection::class,
 		]);
 
 		if ($query = $this->getProperty('query')) {
@@ -113,7 +122,7 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 		$list               = [];
 		$list               = $this->beforeIteration($list);
 		$this->currentIndex = 0;
-		/* @var \xPDO\Om\xPDOObject|modAccessibleObject $object */
+		/** @var xPDOObject|modAccessibleObject $object */
 		foreach ($data['results'] as $array) {
 			$objectArray = $this->prepareResult($array);
 			if (!empty($objectArray) && \is_array($objectArray)) {
@@ -157,5 +166,3 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 		return $resourceArray;
 	}
 }
-
-return 'TicketsSectionGetCatsProcessor';

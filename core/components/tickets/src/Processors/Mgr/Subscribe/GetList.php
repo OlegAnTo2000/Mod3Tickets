@@ -2,14 +2,18 @@
 
 namespace Tickets\Processors\Mgr\Subscribe;
 
-use function intval;
-use function is_numeric;
 use function trim;
-
-use xPDO\Om\xPDOObject;
+use function intval;
 use xPDO\Om\xPDOQuery;
 
-class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
+use xPDO\Om\xPDOObject;
+use function is_numeric;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
+use MODX\Revolution\Processors\Model\GetListProcessor;
+
+class GetList extends GetListProcessor
 {
 	public $objectType           = modUser::class;
 	public $classKey             = modUser::class;
@@ -126,5 +130,3 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 		return $array;
 	}
 }
-
-return 'TicketSubscribesGetListProcessor';

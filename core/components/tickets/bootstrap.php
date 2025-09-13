@@ -19,8 +19,10 @@ if (!\function_exists('tickets_service')) {
 			return $tickets;
 		}
 
+
 		$modelPath = $modx->getOption('tickets.core_path', null, $modx->getOption('core_path') . 'components/tickets/') . 'src/Model/';
 		$modx->addPackage('Tickets\Model', $modelPath, null, 'Tickets\\');
+		$modx->lexicon->load('tickets:default');
 		$modx->services->add('tickets', function ($c) use ($modx, $config) {
 			return new Tickets($modx, $config);
 		});

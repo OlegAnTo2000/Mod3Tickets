@@ -75,7 +75,7 @@ class Create extends CreateProcessor
 		$text = $this->getProperty('text');
 
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->modx->services->get('Tickets')) {
+		if ($Tickets = $this->modx->services->get('tickets')) {
 			$this->object->fromArray([
 				'text' => $Tickets->sanitizeText($text, true),
 				'raw'  => $text,

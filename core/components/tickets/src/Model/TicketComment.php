@@ -70,7 +70,7 @@ class TicketComment extends xPDOSimpleObject
 			/** @var modResource|Ticket $ticket */
 			if ($ticket = $this->xpdo->getObject(modResource::class, $thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
-					/* @var modResource|Ticket $ticket */
+					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
 
 					return true;
@@ -111,7 +111,7 @@ class TicketComment extends xPDOSimpleObject
 			/** @var modResource|Ticket $ticket */
 			if ($ticket = $this->xpdo->getObject(modResource::class, $old_thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
-					/* @var modResource|Ticket $ticket */
+					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
 				}
 			}
@@ -120,7 +120,7 @@ class TicketComment extends xPDOSimpleObject
 			/** @var modResource|Ticket $ticket */
 			if ($ticket = $this->xpdo->getObject(modResource::class, $new_thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
-					/* @var modResource|Ticket $ticket */
+					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
 				}
 			}

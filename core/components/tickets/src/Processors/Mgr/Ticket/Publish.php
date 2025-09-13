@@ -21,7 +21,7 @@ class Publish extends ResourcePublish
 	protected function sendTicketMails()
 	{
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->modx->services->get('Tickets')) {
+		if ($Tickets = $this->modx->services->get('tickets')) {
 			$Tickets->config['tplTicketEmailBcc']          = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->config['tplAuthorEmailSubscription'] = 'tpl.Tickets.author.email.subscription';

@@ -23,7 +23,7 @@ class Multiple extends Processor
 		}
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->services->get('Tickets');
+		$Tickets = $this->modx->services->get('tickets');
 
 		foreach ($ids as $id) {
 			$response = $Tickets->runProcessor('mgr/comment/' . $method, ['id' => $id]);
@@ -35,5 +35,3 @@ class Multiple extends Processor
 		return $this->success();
 	}
 }
-
-return 'TicketCommentMultipleProcessor';

@@ -1,13 +1,16 @@
 <?php
 
 use MODX\Revolution\modX;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketAuthor;
+use MODX\Revolution\Error\modError;
 
 \define('MODX_API_MODE', true);
 
 /** @noinspection PhpIncludeInspection */
 require_once \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__))))) . '/index.php';
-/* @var modX $modx */
-$modx->getService('error', 'error.modError');
+/** @var modX $modx */
+$modx->services->add('error', modError::class);
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');
@@ -25,7 +28,7 @@ $users = $modx->getIterator(modUser::class, $c);
 foreach ($users as $user) {
 	/** @var TicketAuthor $profile */
 	if (!$profile = $user->getOne('AuthorProfile')) {
-		$profile = $modx->newObject('TicketAuthor');
+		$profile = $modx->newObject(TicketAuthor::class);
 		$user->addOne($profile);
 	}
 	$profile->refreshActions(true, true);

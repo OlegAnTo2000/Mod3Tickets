@@ -1,5 +1,7 @@
 <?php
 
+namespace Tickets\Processors\Mgr\Thread;
+
 use MODX\Revolution\Processors\Processor;
 use MODX\Revolution\Processors\ProcessorResponse;
 use Tickets\Tickets;

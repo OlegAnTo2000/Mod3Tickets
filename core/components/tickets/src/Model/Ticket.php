@@ -94,7 +94,7 @@ class Ticket extends modResource
 	 */
 	public function getContextMenuText()
 	{
-		/* @var xPDO $xpdo */
+		/** @var xPDO $xpdo */
 		$this->xpdo->lexicon->load('tickets:default');
 
 		return [
@@ -108,7 +108,7 @@ class Ticket extends modResource
 	 */
 	public function getResourceTypeName()
 	{
-		/* @var xPDO $xpdo */
+		/** @var xPDO $xpdo */
 		$this->xpdo->lexicon->load('tickets:default');
 
 		return $this->xpdo->lexicon('ticket');
@@ -523,7 +523,7 @@ class Ticket extends modResource
 
 		/** @var modContentType $contentType */
 		if ($contentType = $this->xpdo->getObject(modContentType::class, $this->get('content_type'))) {
-			/* @var modContentType $contentType */
+			/** @var modContentType $contentType */
 			$pls['vl'][] = $contentType->getExtension();
 		} else {
 			$pls['vl'][] = '';

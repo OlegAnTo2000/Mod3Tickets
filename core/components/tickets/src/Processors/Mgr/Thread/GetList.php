@@ -1,11 +1,13 @@
 <?php
 
-use MODX\Revolution\Processors\Model\GetListProcessor;
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketThread;
-use xPDO\Om\xPDOObject;
+namespace Tickets\Processors\Mgr\Thread;
+
 use xPDO\Om\xPDOQuery;
+use xPDO\Om\xPDOObject;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use MODX\Revolution\Processors\Model\GetListProcessor;
 
 class GetList extends GetListProcessor
 {

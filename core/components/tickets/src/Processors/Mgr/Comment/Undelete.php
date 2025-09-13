@@ -2,14 +2,16 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
 use MODX\Revolution\Processors\Model\UpdateProcessor;
 
-class TicketCommentUndeleteProcessor extends UpdateProcessor
+class Undelete extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
-	public $classKey        = 'Tickets\Model\TicketComment';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUndelete';
 	public $afterSaveEvent  = 'OnCommentUndelete';
@@ -42,8 +44,9 @@ class TicketCommentUndeleteProcessor extends UpdateProcessor
 	public function afterSave()
 	{
 		$this->object->clearTicketCache();
-		/** @var Tickets\Model\TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Thread')) {
+			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 		$this->modx->cacheManager->delete('tickets/latest.comments');
@@ -61,5 +64,3 @@ class TicketCommentUndeleteProcessor extends UpdateProcessor
 		);
 	}
 }
-
-return 'TicketCommentUndeleteProcessor';

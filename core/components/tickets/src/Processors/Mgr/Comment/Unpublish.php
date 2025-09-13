@@ -2,16 +2,17 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use MODX\Revolution\Processors\Model\UpdateProcessor;
-
 use function tickets_service;
 
-class TicketCommentUnpublishProcessor extends UpdateProcessor
+use Tickets\Model\TicketComment;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+class Unpublish extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
-	public $classKey        = 'Tickets\Model\TicketComment';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUnpublish';
 	public $afterSaveEvent  = 'OnCommentUnpublish';
@@ -42,7 +43,8 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 	{
 		$this->object->clearTicketCache();
 		/** @var TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		if ($thread = $this->object->getOne('Thread')) {
+			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 
@@ -59,7 +61,7 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 	protected function sendCommentMails()
 	{
 		/** @var TicketThread $thread */
-		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+		if ($thread = $this->object->getOne('Thread')) {
 			/** @var Tickets $Tickets */
 			if ($Tickets = tickets_service()) {
 				$Tickets->config = $thread->get('properties');
@@ -80,5 +82,3 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 		);
 	}
 }
-
-return 'TicketCommentUnpublishProcessor';

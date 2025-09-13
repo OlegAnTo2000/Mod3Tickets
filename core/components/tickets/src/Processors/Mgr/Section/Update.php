@@ -1,13 +1,16 @@
 <?php
 
-require_once MODX_CORE_PATH . 'model/modx/modprocessor.class.php';
-require_once MODX_CORE_PATH . 'model/modx/processors/resource/update.class.php';
+namespace Tickets\Processors\Mgr\Section;
 
-class TicketsSectionUpdateProcessor extends modResourceUpdateProcessor
+use MODX\Revolution\modResource;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\Processors\Resource\Update as ResourceUpdate;
+
+class Update extends ResourceUpdate
 {
 	/** @var TicketsSection */
 	public $object;
-	public $classKey = 'TicketsSection';
+	public $classKey = TicketsSection::class;
 
 	/**
 	 * @return bool|string|null

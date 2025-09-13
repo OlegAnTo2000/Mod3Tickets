@@ -1,5 +1,7 @@
 <?php
 
+use Tickets\Tickets;
+
 class TicketsSectionUpdateManagerController extends ResourceUpdateManagerController
 {
 	/** @var TicketsSection */

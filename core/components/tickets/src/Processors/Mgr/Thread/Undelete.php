@@ -1,11 +1,16 @@
 <?php
 
-class Undelete extends MODX\Revolution\Processors\Model\UpdateProcessor
+namespace Tickets\Processors\Mgr\Thread;
+
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+use Tickets\Model\TicketThread;
+
+class Undelete extends UpdateProcessor
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey        = 'TicketThread';
-	public $objectType      = 'TicketThread';
+	public $classKey        = TicketThread::class;
+	public $objectType      = TicketThread::class;
 	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadUndelete';
 	public $afterSaveEvent  = 'OnTicketThreadUndelete';
@@ -55,5 +60,3 @@ class Undelete extends MODX\Revolution\Processors\Model\UpdateProcessor
 		);
 	}
 }
-
-return 'TicketThreadUndeleteProcessor';

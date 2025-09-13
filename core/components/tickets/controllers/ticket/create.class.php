@@ -1,5 +1,8 @@
 <?php
 
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketsSection;
+
 class TicketCreateManagerController extends ResourceCreateManagerController
 {
 	/** @var TicketsSection */

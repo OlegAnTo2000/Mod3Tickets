@@ -13,7 +13,7 @@ use Tickets\Model\TicketComment;
 
 class Get extends GetProcessor
 {
-	public $objectType     = 'Tickets\Model\TicketComment';
+	public $objectType     = TicketComment::class;
 	public $classKey       = TicketComment::class;
 	public $languageTopics = ['tickets:default'];
 

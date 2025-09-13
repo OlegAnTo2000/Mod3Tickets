@@ -1,5 +1,7 @@
 <?php
 
+namespace Tickets\Processors\Mgr\Thread;
+
 use MODX\Revolution\Processors\Model\UpdateProcessor;
 use Tickets\Model\TicketThread;
 

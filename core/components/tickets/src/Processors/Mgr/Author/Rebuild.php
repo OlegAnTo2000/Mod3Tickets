@@ -39,7 +39,7 @@ class Rebuild extends Processor
 				$profile = $this->modx->newObject(TicketAuthor::class);
 				$user->addOne($profile);
 			}
-			/* @var TicketAuthor $profile */
+			/** @var TicketAuthor $profile */
 			$profile->refreshActions(false);
 			++$start;
 			if ((time() - $time) >= $time_limit) {

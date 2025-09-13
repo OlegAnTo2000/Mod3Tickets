@@ -10,12 +10,11 @@ require_once MODX_CONNECTORS_PATH . 'index.php';
 use Tickets\Tickets;
 
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', MODX_CORE_PATH . 'components/tickets/model/tickets/');
-$modx->lexicon->load('tickets:default');
+$tickets = tickets_service($modx);
 
-/** @var modConnectorRequest $request */
+/** @var \MODX\Revolution\modConnectorRequest $request */
 $request = $modx->request;
 $request->handleRequest([
-	'processors_path' => $modx->getOption('processorsPath', $Tickets->config, MODX_CORE_PATH . '/components/tickets/src/Processors/'),
+	'processors_path' => $modx->getOption('processorsPath', $tickets->config, MODX_CORE_PATH . '/components/tickets/src/Processors/'),
 	'location'        => '',
 ]);
