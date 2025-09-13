@@ -48,15 +48,15 @@ class TicketAuthor extends xPDOObject
 			return false;
 		}
 
-		$rating = 0;
+		$rating  = 0;
 		$ratings = $section->getProperties('ratings');
 		if (isset($ratings[$type])) {
 			$rating = $ratings[$type] * $multiplier;
 			/** @noinspection PhpUndefinedFieldInspection */
 			$key = [
-				'id' => $id,
-				'action' => $type,
-				'owner' => $this->get('id'),
+				'id'        => $id,
+				'action'    => $type,
+				'owner'     => $this->get('id'),
 				'createdby' => $createdby,
 			];
 			/** @var TicketAuthorAction $action */
@@ -64,10 +64,10 @@ class TicketAuthor extends xPDOObject
 				$action = $this->xpdo->newObject('TicketAuthorAction');
 				$action->fromArray($key, '', true, true);
 				$action->fromArray([
-					'rating' => $rating,
+					'rating'     => $rating,
 					'multiplier' => $multiplier,
-					'ticket' => $ticket->get('id'),
-					'section' => $section->get('id'),
+					'ticket'     => $ticket->get('id'),
+					'section'    => $section->get('id'),
 				]);
 				if ($action->save()) {
 					if (!empty($rating)) {
@@ -107,9 +107,9 @@ class TicketAuthor extends xPDOObject
 	public function removeAction($type, $id = 0, $createdby = 0)
 	{
 		$key = [
-			'id' => $id,
-			'action' => $type,
-			'owner' => $this->get('id'),
+			'id'        => $id,
+			'action'    => $type,
+			'owner'     => $this->get('id'),
 			'createdby' => $createdby,
 		];
 		/** @var TicketAuthorAction $action */
@@ -199,7 +199,7 @@ class TicketAuthor extends xPDOObject
 			'createdby' => $this->id,
 			'class_key' => 'Ticket',
 			'published' => 1,
-			'deleted' => 0,
+			'deleted'   => 0,
 		]);
 
 		$c->select('id, parent, createdby, createdon');
@@ -209,22 +209,22 @@ class TicketAuthor extends xPDOObject
 				if (isset($ratings[$action])) {
 					$rating = $ratings[$action];
 					$record = [
-						'id' => $row['id'],
-						'action' => $action,
-						'rating' => $rating,
-						'ticket' => $row['id'],
-						'section' => $row['parent'],
+						'id'        => $row['id'],
+						'action'    => $action,
+						'rating'    => $rating,
+						'ticket'    => $row['id'],
+						'section'   => $row['parent'],
 						'createdby' => $row['createdby'],
 						'createdon' => date('Y-m-d H:i:s', $row['createdon']),
-						'owner' => $row['createdby'],
-						'year' => date('Y', $row['createdon']),
-						'month' => date('m', $row['createdon']),
-						'day' => date('d', $row['createdon']),
+						'owner'     => $row['createdby'],
+						'year'      => date('Y', $row['createdon']),
+						'month'     => date('m', $row['createdon']),
+						'day'       => date('d', $row['createdon']),
 					];
-					$keys = array_keys($record);
-					$fields = '`' . implode('`,`', $keys) . '`';
+					$keys         = array_keys($record);
+					$fields       = '`' . implode('`,`', $keys) . '`';
 					$placeholders = substr(str_repeat('?,', count($keys)), 0, -1);
-					$sql = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
+					$sql          = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
 					$this->xpdo->prepare($sql)->execute(array_values($record));
 				}
 			}
@@ -241,7 +241,7 @@ class TicketAuthor extends xPDOObject
 		$c = $this->xpdo->newQuery('TicketComment', [
 			'createdby' => $this->id,
 			'published' => 1,
-			'deleted' => 0,
+			'deleted'   => 0,
 		]);
 		$c->innerJoin('TicketThread', 'Thread');
 		$c->innerJoin('Ticket', 'Ticket', 'Ticket.id = Thread.resource AND Ticket.class_key = "Ticket"');
@@ -255,22 +255,22 @@ class TicketAuthor extends xPDOObject
 				if (isset($ratings[$action])) {
 					$rating = $ratings[$action];
 					$record = [
-						'id' => $row['id'],
-						'action' => $action,
-						'rating' => $rating,
-						'ticket' => $row['ticket'],
-						'section' => $row['section'],
+						'id'        => $row['id'],
+						'action'    => $action,
+						'rating'    => $rating,
+						'ticket'    => $row['ticket'],
+						'section'   => $row['section'],
 						'createdby' => $row['createdby'],
 						'createdon' => $row['createdon'],
-						'owner' => $row['createdby'],
-						'year' => date('Y', strtotime($row['createdon'])),
-						'month' => date('m', strtotime($row['createdon'])),
-						'day' => date('d', strtotime($row['createdon'])),
+						'owner'     => $row['createdby'],
+						'year'      => date('Y', strtotime($row['createdon'])),
+						'month'     => date('m', strtotime($row['createdon'])),
+						'day'       => date('d', strtotime($row['createdon'])),
 					];
-					$keys = array_keys($record);
-					$fields = '`' . implode('`,`', $keys) . '`';
+					$keys         = array_keys($record);
+					$fields       = '`' . implode('`,`', $keys) . '`';
 					$placeholders = substr(str_repeat('?,', count($keys)), 0, -1);
-					$sql = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
+					$sql          = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
 					$this->xpdo->prepare($sql)->execute(array_values($record));
 				}
 			}
@@ -285,9 +285,9 @@ class TicketAuthor extends xPDOObject
 		}
 
 		$c = $this->xpdo->newQuery('TicketView', [
-			'uid' => $this->id,
+			'uid'              => $this->id,
 			'Ticket.published' => 1,
-			'Ticket.deleted' => 0,
+			'Ticket.deleted'   => 0,
 		]);
 		$c->innerJoin('Ticket', 'Ticket', 'Ticket.id = TicketView.parent AND Ticket.class_key = "Ticket"');
 		$c->select('uid, timestamp, Ticket.id, Ticket.parent as section');
@@ -297,22 +297,22 @@ class TicketAuthor extends xPDOObject
 				if (isset($ratings[$action])) {
 					$rating = $ratings[$action];
 					$record = [
-						'id' => $row['id'],
-						'action' => $action,
-						'rating' => $rating,
-						'ticket' => $row['id'],
-						'section' => $row['section'],
+						'id'        => $row['id'],
+						'action'    => $action,
+						'rating'    => $rating,
+						'ticket'    => $row['id'],
+						'section'   => $row['section'],
 						'createdby' => $row['uid'],
 						'createdon' => $row['timestamp'],
-						'owner' => $row['uid'],
-						'year' => date('Y', strtotime($row['timestamp'])),
-						'month' => date('m', strtotime($row['timestamp'])),
-						'day' => date('d', strtotime($row['timestamp'])),
+						'owner'     => $row['uid'],
+						'year'      => date('Y', strtotime($row['timestamp'])),
+						'month'     => date('m', strtotime($row['timestamp'])),
+						'day'       => date('d', strtotime($row['timestamp'])),
 					];
-					$keys = array_keys($record);
-					$fields = '`' . implode('`,`', $keys) . '`';
+					$keys         = array_keys($record);
+					$fields       = '`' . implode('`,`', $keys) . '`';
 					$placeholders = substr(str_repeat('?,', count($keys)), 0, -1);
-					$sql = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
+					$sql          = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
 					$this->xpdo->prepare($sql)->execute(array_values($record));
 				}
 			}
@@ -337,7 +337,7 @@ class TicketAuthor extends xPDOObject
                 ');
 				$c->where([
 					'Ticket.published' => 1,
-					'Ticket.deleted' => 0,
+					'Ticket.deleted'   => 0,
 				]);
 			} else {
 				$c->where(['class' => 'TicketComment']);
@@ -350,7 +350,7 @@ class TicketAuthor extends xPDOObject
                 ');
 				$c->where([
 					'Comment.published' => 1,
-					'Comment.deleted' => 0,
+					'Comment.deleted'   => 0,
 				]);
 			}
 
@@ -360,22 +360,22 @@ class TicketAuthor extends xPDOObject
 					if (isset($ratings[$action]) && $row['createdby'] != $this->id) {
 						$rating = $ratings[$action];
 						$record = [
-							'id' => $row['id'],
-							'action' => $action,
-							'rating' => $rating,
-							'ticket' => $row['ticket'],
-							'section' => $row['section'],
+							'id'        => $row['id'],
+							'action'    => $action,
+							'rating'    => $rating,
+							'ticket'    => $row['ticket'],
+							'section'   => $row['section'],
 							'createdby' => $row['createdby'],
 							'createdon' => $row['createdon'],
-							'owner' => $this->id,
-							'year' => date('Y', strtotime($row['createdon'])),
-							'month' => date('m', strtotime($row['createdon'])),
-							'day' => date('d', strtotime($row['createdon'])),
+							'owner'     => $this->id,
+							'year'      => date('Y', strtotime($row['createdon'])),
+							'month'     => date('m', strtotime($row['createdon'])),
+							'day'       => date('d', strtotime($row['createdon'])),
 						];
-						$keys = array_keys($record);
-						$fields = '`' . implode('`,`', $keys) . '`';
+						$keys         = array_keys($record);
+						$fields       = '`' . implode('`,`', $keys) . '`';
 						$placeholders = substr(str_repeat('?,', count($keys)), 0, -1);
-						$sql = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
+						$sql          = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
 						$this->xpdo->prepare($sql)->execute(array_values($record));
 					}
 				}
@@ -401,7 +401,7 @@ class TicketAuthor extends xPDOObject
                 ');
 				$c->where([
 					'Ticket.published' => 1,
-					'Ticket.deleted' => 0,
+					'Ticket.deleted'   => 0,
 				]);
 			} else {
 				$c->where(['class' => 'TicketComment']);
@@ -414,7 +414,7 @@ class TicketAuthor extends xPDOObject
                 ');
 				$c->where([
 					'Comment.published' => 1,
-					'Comment.deleted' => 0,
+					'Comment.deleted'   => 0,
 				]);
 			}
 			if ($c->prepare() && $c->stmt->execute()) {
@@ -423,9 +423,9 @@ class TicketAuthor extends xPDOObject
 					if (!isset($ratings[$action])) {
 						continue;
 					}
-					$max = 0;
+					$max         = 0;
 					$ticket_date = $row['ticket_date'];
-					$createdon = strtotime($row['createdon']);
+					$createdon   = strtotime($row['createdon']);
 					if ('vote_ticket' == $action) {
 						if (isset($ratings['days_ticket_vote']) && '' !== $ratings['days_ticket_vote']) {
 							$max = $ticket_date + ((float) $ratings['days_ticket_vote'] * 86400);
@@ -436,24 +436,24 @@ class TicketAuthor extends xPDOObject
 					if ($row['createdby'] != $this->id && (!$max || $max > $createdon)) {
 						$rating = $ratings[$action] * $row['value'];
 						$record = [
-							'id' => $row['id'],
-							'action' => $action,
-							'rating' => $rating,
+							'id'         => $row['id'],
+							'action'     => $action,
+							'rating'     => $rating,
 							'multiplier' => $row['value'],
-							'ticket' => $row['ticket'],
-							'section' => $row['section'],
-							'createdby' => $row['createdby'],
-							'createdon' => $row['createdon'],
-							'owner' => $this->id,
-							'year' => date('Y', $createdon),
-							'month' => date('m', $createdon),
-							'day' => date('d', $createdon),
+							'ticket'     => $row['ticket'],
+							'section'    => $row['section'],
+							'createdby'  => $row['createdby'],
+							'createdon'  => $row['createdon'],
+							'owner'      => $this->id,
+							'year'       => date('Y', $createdon),
+							'month'      => date('m', $createdon),
+							'day'        => date('d', $createdon),
 						];
 
-						$keys = array_keys($record);
-						$fields = '`' . implode('`,`', $keys) . '`';
+						$keys         = array_keys($record);
+						$fields       = '`' . implode('`,`', $keys) . '`';
 						$placeholders = substr(str_repeat('?,', count($keys)), 0, -1);
-						$sql = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
+						$sql          = "INSERT INTO {$this->xpdo->getTableName('TicketAuthorAction')} ({$fields}) VALUES ({$placeholders});";
 						$this->xpdo->prepare($sql)->execute(array_values($record));
 					}
 				}
@@ -467,16 +467,16 @@ class TicketAuthor extends xPDOObject
 	public function updateTotals()
 	{
 		$fields = [
-			'tickets' => 'ticket',
-			'comments' => 'comment',
-			'views' => 'view',
-			'stars_tickets' => 'star_ticket',
+			'tickets'        => 'ticket',
+			'comments'       => 'comment',
+			'views'          => 'view',
+			'stars_tickets'  => 'star_ticket',
 			'stars_comments' => 'star_comment',
 		];
 		// Simple totals
 		foreach ($fields as $field => $action) {
 			$c = $this->xpdo->newQuery('TicketAuthorAction', [
-				'owner' => $this->id,
+				'owner'  => $this->id,
 				'action' => $action,
 			]);
 			$c->select('id');
@@ -487,9 +487,9 @@ class TicketAuthor extends xPDOObject
 		foreach (['ticket', 'comment'] as $field) {
 			foreach (['up', 'down'] as $type) {
 				$count = $this->xpdo->getCount('TicketAuthorAction', [
-					'owner' => $this->id,
+					'owner'                                 => $this->id,
 					'rating:' . ('up' == $type ? '>' : '<') => 0,
-					'action' => "vote_{$field}",
+					'action'                                => "vote_{$field}",
 				]);
 				$this->set("votes_{$field}s_{$type}", $count);
 			}
@@ -497,7 +497,7 @@ class TicketAuthor extends xPDOObject
 		// Votes rating
 		foreach (['ticket', 'comment'] as $field) {
 			$c = $this->xpdo->newQuery('TicketAuthorAction', [
-				'owner' => $this->id,
+				'owner'  => $this->id,
 				'action' => "vote_{$field}",
 			]);
 			$c->select('SUM(rating)');
@@ -591,7 +591,7 @@ class TicketAuthor extends xPDOObject
 	protected function _updateTotal($type, $ticket, $section, $rating, $remove = false)
 	{
 		$key = [
-			'id' => $section->id,
+			'id'    => $section->id,
 			'class' => 'TicketsSection',
 		];
 		if (!$section_total = $this->xpdo->getObject(TicketTotal::class, $key)) {
@@ -600,7 +600,7 @@ class TicketAuthor extends xPDOObject
 		}
 
 		$key = [
-			'id' => $ticket->id,
+			'id'    => $ticket->id,
 			'class' => 'Ticket',
 		];
 		if (!$ticket_total = $this->xpdo->getObject(TicketTotal::class, $key)) {

@@ -11,10 +11,10 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $objectType = Ticket::class;
-	public $classKey = Ticket::class;
-	public $languageTopics = ['tickets:default'];
-	public $defaultSortField = 'createdon';
+	public $objectType           = Ticket::class;
+	public $classKey             = Ticket::class;
+	public $languageTopics       = ['tickets:default'];
+	public $defaultSortField     = 'createdon';
 	public $defaultSortDirection = 'DESC';
 
 	/**
@@ -32,7 +32,7 @@ class GetList extends GetListProcessor
 		$c->where([
 			'class_key' => Ticket::class,
 			'published' => 1,
-			'deleted' => 0,
+			'deleted'   => 0,
 		]);
 
 		return $c;

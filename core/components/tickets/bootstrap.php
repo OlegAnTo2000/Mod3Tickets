@@ -1,18 +1,17 @@
 <?php
 
-use \Tickets\Tickets;
-use \MODX\Revolution\modX;
+use MODX\Revolution\modX;
+use Tickets\Tickets;
 
 if (!\function_exists('tickets_service')) {
-	function tickets_service($modx = null, $config = []): \Tickets\Tickets
+	function tickets_service($modx = null, $config = []): Tickets
 	{
-
-		if ($modx === null) {
+		if (null === $modx) {
 			$modx = modX::getInstance('web');
 		}
 
-		if ($modx === null || !($modx instanceof modX)) {
-			throw new \Exception('modX instance is required');
+		if (null === $modx || !($modx instanceof modX)) {
+			throw new Exception('modX instance is required');
 		}
 
 		$tickets = $modx->services->get('tickets');

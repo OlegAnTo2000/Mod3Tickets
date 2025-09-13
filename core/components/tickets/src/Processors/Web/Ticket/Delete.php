@@ -15,7 +15,7 @@ class Delete extends ResourceDeleteProcessor
 
 	public function checkPermissions()
 	{
-		$id = $this->getProperty('id', false);
+		$id             = $this->getProperty('id', false);
 		$this->resource = $this->modx->getObject(modResource::class, $id);
 		if (empty($this->resource)) {
 			return $this->modx->lexicon('resource_err_nfs', ['id' => $id]);

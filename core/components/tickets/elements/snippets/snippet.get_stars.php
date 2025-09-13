@@ -11,7 +11,7 @@ if (empty($user)) {
 unset($scriptProperties['user']);
 
 $ids = [];
-$q = $modx->newQuery('TicketStar', ['class' => $class, 'createdby' => $user]);
+$q   = $modx->newQuery('TicketStar', ['class' => $class, 'createdby' => $user]);
 $q->select('id');
 $tstart = \microtime(true);
 if ($q->prepare() && $q->stmt->execute()) {

@@ -2,43 +2,44 @@
 
 namespace Tickets\Model;
 
-use PDO;
-use xPDO\xPDO;
 use function abs;
-use function date;
-use function reset;
-use function rtrim;
-use function intval;
-use function strpos;
+use function array_key_exists;
+use function array_merge;
+use function array_reverse;
+use function array_search;
 use function boolval;
+use function date;
 use function explode;
 use function in_array;
+use function intval;
 use function is_array;
+use function is_numeric;
 use function is_object;
 use function is_string;
 use function microtime;
 
-use function strtotime;
-use xPDO\Om\xPDOObject;
-use function is_numeric;
-use function preg_match;
-
-use function array_merge;
-use function str_replace;
-use function array_search;
-use function preg_replace;
-use function array_reverse;
-use Tickets\Model\TicketView;
-use function array_key_exists;
-use MODX\Revolution\modResource;
-use MODX\Revolution\modContentType;
 use MODX\Revolution\modAccessibleObject;
+use MODX\Revolution\modContentType;
+use MODX\Revolution\modResource;
+use PDO;
+
+use function preg_match;
+use function preg_replace;
+use function reset;
+use function rtrim;
+use function str_replace;
+use function strpos;
+use function strtotime;
+use function tickets_service;
+
+use xPDO\Om\xPDOObject;
+use xPDO\xPDO;
 
 class Ticket extends modResource
 {
-	public $showInContextMenu = false;
+	public $showInContextMenu      = false;
 	public $allowChildrenResources = false;
-	private $_oldAuthor = 0;
+	private $_oldAuthor            = 0;
 
 	/**
 	 * @param string $className
@@ -93,11 +94,11 @@ class Ticket extends modResource
 	 */
 	public function getContextMenuText()
 	{
-		/** @var xPDO $xpdo */
+		/* @var xPDO $xpdo */
 		$this->xpdo->lexicon->load('tickets:default');
 
 		return [
-			'text_create' => $this->xpdo->lexicon('tickets'),
+			'text_create'      => $this->xpdo->lexicon('tickets'),
 			'text_create_here' => $this->xpdo->lexicon('ticket_create_here'),
 		];
 	}
@@ -107,7 +108,7 @@ class Ticket extends modResource
 	 */
 	public function getResourceTypeName()
 	{
-		/** @var xPDO $xpdo */
+		/* @var xPDO $xpdo */
 		$this->xpdo->lexicon->load('tickets:default');
 
 		return $this->xpdo->lexicon('ticket');
@@ -135,19 +136,19 @@ class Ticket extends modResource
 			switch ($k) {
 				case 'comments':
 					$values = $this->_getVirtualFields();
-					$value = $values['comments'];
+					$value  = $values['comments'];
 					break;
 				case 'views':
 					$values = $this->_getVirtualFields();
-					$value = $values['views'];
+					$value  = $values['views'];
 					break;
 				case 'stars':
 					$values = $this->_getVirtualFields();
-					$value = $values['stars'];
+					$value  = $values['stars'];
 					break;
 				case 'rating':
 					$values = $this->_getVirtualFields();
-					$value = $values['rating'];
+					$value  = $values['rating'];
 					break;
 				case 'date_ago':
 					$value = $this->getDateAgo();
@@ -213,9 +214,9 @@ class Ticket extends modResource
 
 	public function getContent(array $options = [])
 	{
-		$content = parent::get('content');
+		$content    = parent::get('content');
 		$properties = $this->getProperties();
-		$content = tickets_service()->sanitizeText($content, false);
+		$content    = tickets_service()->sanitizeText($content, false);
 
 		if (!$properties['process_tags']) {
 			$content = str_replace(
@@ -265,7 +266,7 @@ class Ticket extends modResource
 		if (!preg_match('/<cut\/>/', $content)) {
 			$introtext = $content;
 		} else {
-			$tmp = explode('<cut/>', $content);
+			$tmp       = explode('<cut/>', $content);
 			$introtext = reset($tmp);
 			if ($Tickets = tickets_service()) {
 				$introtext = $Tickets->sanitizeText($introtext, true);
@@ -301,7 +302,7 @@ class Ticket extends modResource
 		$added = false;
 		if (is_array($obj)) {
 			foreach ($obj as $o) {
-				/** @var \xPDO\Om\xPDOObject $o */
+				/** @var xPDOObject $o */
 				if (is_object($o)) {
 					$o->set('class', $this->class_key);
 					$added = parent::addMany($obj, $alias);
@@ -368,7 +369,7 @@ class Ticket extends modResource
 		);
 		$q->select('COUNT(`TicketComment`.`id`) as `comments`');
 
-		$count = 0;
+		$count  = 0;
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
 			$this->xpdo->startTime += microtime(true) - $tstart;
@@ -414,13 +415,13 @@ class Ticket extends modResource
 	{
 		$q = $this->xpdo->newQuery('TicketVote');
 		$q->where([
-			'id' => $this->id,
+			'id'        => $this->id,
 			'createdby' => $this->xpdo->user->id,
-			'class' => 'Ticket',
+			'class'     => 'Ticket',
 		]);
 		$q->select('`value`');
 
-		$vote = 0;
+		$vote   = 0;
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
 			$this->xpdo->startTime += microtime(true) - $tstart;
@@ -443,9 +444,9 @@ class Ticket extends modResource
 		$q = $this->xpdo->newQuery('TicketVote');
 		$q->innerJoin('Ticket', 'Ticket', 'Ticket.id = TicketVote.id');
 		$q->where([
-			'class' => 'Ticket',
-			'id' => $this->id,
-			'Ticket.deleted' => 0,
+			'class'            => 'Ticket',
+			'id'               => $this->id,
+			'Ticket.deleted'   => 0,
 			'Ticket.published' => 1,
 		]);
 		$q->select('value');
@@ -522,7 +523,7 @@ class Ticket extends modResource
 
 		/** @var modContentType $contentType */
 		if ($contentType = $this->xpdo->getObject(modContentType::class, $this->get('content_type'))) {
-			/** @var modContentType $contentType */
+			/* @var modContentType $contentType */
 			$pls['vl'][] = $contentType->getExtension();
 		} else {
 			$pls['vl'][] = '';
@@ -553,12 +554,12 @@ class Ticket extends modResource
 		// Convert old settings
 		if (empty($this->reloadOnly)) {
 			$flag = false;
-			$tmp = ['disable_jevix', 'process_tags', 'rating'];
+			$tmp  = ['disable_jevix', 'process_tags', 'rating'];
 			if ($old = parent::get('properties')) {
 				foreach ($tmp as $v) {
 					if (array_key_exists($v, $old)) {
 						$properties[$v] = $old[$v];
-						$flag = true;
+						$flag           = true;
 						unset($old[$v]);
 					}
 				}
@@ -619,9 +620,9 @@ class Ticket extends modResource
 	 */
 	public function save($cacheFlag = null)
 	{
-		$isNew = $this->isNew();
-		$action = $isNew || $this->isDirty('deleted') || $this->isDirty('published');
-		$enabled = $this->get('published') && !$this->get('deleted');
+		$isNew      = $this->isNew();
+		$action     = $isNew || $this->isDirty('deleted') || $this->isDirty('published');
+		$enabled    = $this->get('published') && !$this->get('deleted');
 		$new_parent = $this->isDirty('parent');
 		$new_author = $this->isDirty('createdby');
 		if ($new_parent || $this->isDirty('alias') || $this->isDirty('published') || ($this->get('uri_override') && !$this->get('uri'))) {
@@ -686,7 +687,7 @@ class Ticket extends modResource
 
 		/** @var TicketsSection $section */
 		$ratings = $section->getProperties('ratings');
-		$table = $this->xpdo->getTableName('TicketAuthorAction');
+		$table   = $this->xpdo->getTableName('TicketAuthorAction');
 		foreach ($ratings as $action => $rating) {
 			$sql = "
                 UPDATE {$table} SET `rating` = `multiplier` * {$rating}, `section` = {$section->id}
@@ -717,13 +718,13 @@ class Ticket extends modResource
 	public function getNeighborhood()
 	{
 		$arr = [];
-		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->parent, 'class_key' => Ticket::class]);
+		$q   = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->parent, 'class_key' => Ticket::class]);
 		$q->sortby('id', 'ASC');
 		$q->select('id');
 		if ($q->prepare() && $q->stmt->execute()) {
-			$ids = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
+			$ids     = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 			$current = array_search($this->get('id'), $ids, true);
-			$right = $left = [];
+			$right   = $left = [];
 			foreach ($ids as $k => $v) {
 				if ($k > $current) {
 					$right[] = $v;
@@ -732,7 +733,7 @@ class Ticket extends modResource
 				}
 			}
 			$arr = [
-				'left' => array_reverse($left),
+				'left'  => array_reverse($left),
 				'right' => $right,
 			];
 		}

@@ -27,13 +27,13 @@ class Update extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = TicketComment::class;
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
-	public $permission = 'comment_save';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
+	public $languageTopics  = ['tickets:default'];
+	public $permission      = 'comment_save';
 	public $beforeSaveEvent = 'OnBeforeCommentSave';
-	public $afterSaveEvent = 'OnCommentSave';
-	private $guest = false;
+	public $afterSaveEvent  = 'OnCommentSave';
+	private $guest          = false;
 
 	/**
 	 * @return bool
@@ -53,7 +53,7 @@ class Update extends UpdateProcessor
 	public function beforeSet()
 	{
 		$time = time() - strtotime($this->object->get('createdon'));
-		$ip = $this->modx->request->getClientIp();
+		$ip   = $this->modx->request->getClientIp();
 
 		if (!$this->modx->getCount(TicketThread::class, ['name' => $this->getProperty('thread'), 'deleted' => 0, 'closed' => 0])) {
 			return $this->modx->lexicon('ticket_err_wrong_thread');
@@ -101,8 +101,8 @@ class Update extends UpdateProcessor
 		}
 
 		$properties = $this->getProperties();
-		$add = [];
-		$meta = $this->modx->getFieldMeta(TicketComment::class);
+		$add        = [];
+		$meta       = $this->modx->getFieldMeta(TicketComment::class);
 		foreach ($properties as $k => $v) {
 			if (!isset($meta[$k])) {
 				$add[$k] = $this->modx->stripTags($v);
@@ -110,10 +110,10 @@ class Update extends UpdateProcessor
 		}
 
 		$this->properties = [
-			'text' => $text,
-			'raw' => $this->getProperty('raw'),
-			'name' => $this->getProperty('name'),
-			'email' => $this->getProperty('email'),
+			'text'       => $text,
+			'raw'        => $this->getProperty('raw'),
+			'name'       => $this->getProperty('name'),
+			'email'      => $this->getProperty('email'),
 			'properties' => !empty($add) ? $add : $this->object->get('properties'),
 		];
 		$this->unsetProperty('action');
@@ -134,7 +134,7 @@ class Update extends UpdateProcessor
 		]);
 
 		if ($this->guest) {
-			$_SESSION['TicketComments']['name'] = $this->object->get('name');
+			$_SESSION['TicketComments']['name']  = $this->object->get('name');
 			$_SESSION['TicketComments']['email'] = $this->object->get('email');
 		}
 
@@ -166,7 +166,7 @@ class Update extends UpdateProcessor
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
 		$replace = [];
-		$count = 0;
+		$count   = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
 			if ($item->get('deleted')) {
@@ -177,8 +177,8 @@ class Update extends UpdateProcessor
 				$item->set('parent', $this->object->id);
 				$item->save();
 				$replace[$old_url] = [
-					'url' => $item->get('url'),
-					'thumb' => $item->get('thumb'),
+					'url'    => $item->get('url'),
+					'thumb'  => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
 				];
 				++$count;
@@ -188,7 +188,7 @@ class Update extends UpdateProcessor
 		// Update ticket links
 		if (!empty($replace)) {
 			$array = [
-				'raw' => $this->object->get('raw'),
+				'raw'  => $this->object->get('raw'),
 				'text' => $this->object->get('text'),
 			];
 			$update = false;

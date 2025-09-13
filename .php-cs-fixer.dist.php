@@ -50,7 +50,13 @@ return (new Config())
 		'single_line_throw' => false, // не всегда удобно, можно отключить
 
 		// 🔹 Стиль
-		'binary_operator_spaces' => ['default' => 'single_space'],
+		'binary_operator_spaces' => [
+			'default' => 'single_space',
+			'operators' => [
+				'=>' => 'align_single_space_minimal',
+				'='  => 'align_single_space_minimal',
+			],
+		],
 		'blank_line_after_namespace' => true,
 		'blank_line_after_opening_tag' => true,
 		'blank_line_before_statement' => ['statements' => ['return']],

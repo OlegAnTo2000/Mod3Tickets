@@ -25,7 +25,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 	{
 		$values = [];
 
-		$id = $this->get('id');
+		$id    = $this->get('id');
 		$class = $this->get('class');
 		switch ($class) {
 			case Ticket::class:
@@ -33,11 +33,11 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 				if ($ticket = $this->xpdo->getObject(Ticket::class, $id)) {
 					$rating = $ticket->getRating();
 					$values = [
-						'comments' => $ticket->getCommentsCount(),
-						'views' => $ticket->getViewsCount(),
-						'stars' => $ticket->getStarsCount(),
-						'rating' => $rating['rating'],
-						'rating_plus' => $rating['rating_plus'],
+						'comments'     => $ticket->getCommentsCount(),
+						'views'        => $ticket->getViewsCount(),
+						'stars'        => $ticket->getStarsCount(),
+						'rating'       => $rating['rating'],
+						'rating_plus'  => $rating['rating_plus'],
 						'rating_minus' => $rating['rating_minus'],
 					];
 				}
@@ -45,7 +45,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 			case TicketComment::class:
 				if ($comment = $this->xpdo->getObject(TicketComment::class, $id)) {
 					$values = [
-						'stars' => $this->xpdo->getCount(TicketStar::class, ['id' => $id, 'class' => TicketComment::class]),
+						'stars'  => $this->xpdo->getCount(TicketStar::class, ['id' => $id, 'class' => TicketComment::class]),
 						'rating' => $comment->get('rating'),
 					];
 				}
@@ -55,12 +55,12 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 				if ($section = $this->xpdo->getObject(TicketsSection::class, $id)) {
 					$rating = $section->getRating();
 					$values = [
-						'tickets' => $section->getTicketsCount(),
-						'comments' => $section->getCommentsCount(),
-						'views' => $section->getViewsCount(),
-						'stars' => $section->getStarsCount(),
-						'rating' => $rating['rating'],
-						'rating_plus' => $rating['rating_plus'],
+						'tickets'      => $section->getTicketsCount(),
+						'comments'     => $section->getCommentsCount(),
+						'views'        => $section->getViewsCount(),
+						'stars'        => $section->getStarsCount(),
+						'rating'       => $rating['rating'],
+						'rating_plus'  => $rating['rating_plus'],
 						'rating_minus' => $rating['rating_minus'],
 					];
 				}

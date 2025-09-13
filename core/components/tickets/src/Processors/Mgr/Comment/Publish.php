@@ -6,17 +6,19 @@ use function array_key_exists;
 
 use MODX\Revolution\Processors\Model\UpdateProcessor;
 
+use function tickets_service;
+
 class TicketCommentPublishProcessor extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = 'Tickets\Model\TicketComment';
+	public $classKey        = 'Tickets\Model\TicketComment';
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentPublish';
-	public $afterSaveEvent = 'OnCommentPublish';
-	public $permission = 'comment_publish';
-	protected $_sendEmails = false;
+	public $afterSaveEvent  = 'OnCommentPublish';
+	public $permission      = 'comment_publish';
+	protected $_sendEmails  = false;
 
 	public function beforeSet()
 	{

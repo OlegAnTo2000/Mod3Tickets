@@ -1,7 +1,7 @@
 <?php
 
-use Tickets\Model\TicketThread;
 use MODX\Revolution\Processors\Model\GetProcessor;
+use Tickets\Model\TicketThread;
 
 class Get extends GetProcessor
 {

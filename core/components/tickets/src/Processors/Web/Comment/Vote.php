@@ -21,12 +21,12 @@ class Vote extends CreateProcessor
 {
 	/** @var TicketVote */
 	public $object;
-	public $objectType = TicketVote::class;
-	public $classKey = TicketVote::class;
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = TicketVote::class;
+	public $classKey        = TicketVote::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentVote';
-	public $afterSaveEvent = 'OnCommentVote';
-	public $permission = 'comment_vote';
+	public $afterSaveEvent  = 'OnCommentVote';
+	public $permission      = 'comment_vote';
 	/** @var TicketComment */
 	private $comment;
 

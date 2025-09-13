@@ -29,36 +29,36 @@ class TicketsSectionUpdateManagerController extends ResourceUpdateManagerControl
 		}
 		$this->resourceArray['properties']['tickets'] = $this->resource->getProperties('tickets');
 		$this->resourceArray['properties']['ratings'] = $this->resource->getProperties('ratings');
-		$this->resourceArray['syncsite'] = (bool) $this->resource->getProperties('syncsite');
+		$this->resourceArray['syncsite']              = (bool) $this->resource->getProperties('syncsite');
 
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 		$Tickets->loadManagerFiles($this, [
-			'config' => true,
-			'utils' => true,
-			'css' => true,
-			'section' => true,
+			'config'    => true,
+			'utils'     => true,
+			'css'       => true,
+			'section'   => true,
 			'subscribe' => true,
-			'comments' => true,
+			'comments'  => true,
 		]);
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/section/update.js');
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
 
 		$ready = [
-			'xtype' => 'tickets-page-section-update',
-			'resource' => $this->resource->get('id'),
-			'record' => $this->resourceArray,
+			'xtype'            => 'tickets-page-section-update',
+			'resource'         => $this->resource->get('id'),
+			'record'           => $this->resourceArray,
 			'publish_document' => (int) $this->canPublish,
-			'preview_url' => $this->previewUrl,
-			'locked' => (int) $this->locked,
-			'lockedText' => $this->lockedText,
-			'canSave' => (int) $this->canSave,
-			'canEdit' => (int) $this->canEdit,
-			'canCreate' => (int) $this->canCreate,
-			'canDuplicate' => (int) $this->canDuplicate,
-			'canDelete' => (int) $this->canDelete,
-			'show_tvs' => (int) !empty($this->tvCounts),
-			'mode' => 'update',
+			'preview_url'      => $this->previewUrl,
+			'locked'           => (int) $this->locked,
+			'lockedText'       => $this->lockedText,
+			'canSave'          => (int) $this->canSave,
+			'canEdit'          => (int) $this->canEdit,
+			'canCreate'        => (int) $this->canCreate,
+			'canDuplicate'     => (int) $this->canDuplicate,
+			'canDelete'        => (int) $this->canDelete,
+			'show_tvs'         => (int) !empty($this->tvCounts),
+			'mode'             => 'update',
 		];
 		$this->addHtml('
         <script type="text/javascript">

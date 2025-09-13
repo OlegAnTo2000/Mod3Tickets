@@ -1,23 +1,20 @@
 <?php
 
-use xPDO\Om\xPDOQuery;
-use xPDO\Om\xPDOObject;
-use Tickets\Model\Ticket;
-use MODX\Revolution\modUser;
-use Tickets\Model\TicketThread;
 use MODX\Revolution\modResource;
+use MODX\Revolution\modUser;
 use MODX\Revolution\modUserProfile;
 use MODX\Revolution\Processors\Model\GetListProcessor;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketThread;
+use xPDO\Om\xPDOObject;
+use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $classKey = Ticket::class;
-	public $defaultSortField = 'id';
+	public $classKey             = Ticket::class;
+	public $defaultSortField     = 'id';
 	public $defaultSortDirection = 'DESC';
 
-	/**
-	 * @return xPDOQuery
-	 */
 	public function prepareQueryBeforeCount(xPDOQuery $c): xPDOQuery
 	{
 		$c->leftJoin(modUser::class, 'CreatedBy');
@@ -40,7 +37,7 @@ class GetList extends GetListProcessor
 			$c->leftJoin(modResource::class, 'Parent');
 			$c->select([
 				'section_id' => 'Parent.id',
-				'section' => 'Parent.pagetitle',
+				'section'    => 'Parent.pagetitle',
 			]);
 		}
 		if ($query = $this->getProperty('query', null)) {
@@ -56,11 +53,6 @@ class GetList extends GetListProcessor
 		return $c;
 	}
 
-	/**
-	 * @param xPDOObject $object
-	 *
-	 * @return array
-	 */
 	public function prepareRow(xPDOObject $object): array
 	{
 		$array = parent::prepareRow($object);

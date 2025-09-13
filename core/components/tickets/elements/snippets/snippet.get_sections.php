@@ -50,14 +50,14 @@ $select = [
 ];
 
 $default = [
-	'class' => $class,
-	'where' => \json_encode($where),
+	'class'    => $class,
+	'where'    => \json_encode($where),
 	'leftJoin' => \json_encode($leftJoin),
-	'select' => \json_encode($select),
-	'groupby' => $class . '.id',
-	'sortby' => 'views',
-	'sortdir' => 'DESC',
-	'return' => !empty($returnIds)
+	'select'   => \json_encode($select),
+	'groupby'  => $class . '.id',
+	'sortby'   => 'views',
+	'sortdir'  => 'DESC',
+	'return'   => !empty($returnIds)
 		? 'ids'
 		: 'data',
 	'nestedChunkPrefix' => 'tickets_',
@@ -77,9 +77,9 @@ $output = [];
 if (!empty($rows) && \is_array($rows)) {
 	foreach ($rows as $k => $row) {
 		$row['date_ago'] = $Tickets->dateFormat($row['createdon']);
-		$row['idx'] = $pdoFetch->idx++;
+		$row['idx']      = $pdoFetch->idx++;
 
-		$tpl = $pdoFetch->defineChunk($row);
+		$tpl      = $pdoFetch->defineChunk($row);
 		$output[] = empty($tpl)
 			? '<pre>' . $pdoFetch->getChunk('', $row) . '</pre>'
 			: $pdoFetch->getChunk($tpl, $row, $pdoFetch->config['fastMode']);

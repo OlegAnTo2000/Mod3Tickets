@@ -22,7 +22,7 @@ class Publish extends ResourcePublish
 	{
 		/** @var Tickets $Tickets */
 		if ($Tickets = $this->modx->services->get('Tickets')) {
-			$Tickets->config['tplTicketEmailBcc'] = 'tpl.Tickets.ticket.email.bcc';
+			$Tickets->config['tplTicketEmailBcc']          = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->config['tplAuthorEmailSubscription'] = 'tpl.Tickets.author.email.subscription';
 			$Tickets->sendTicketMails($this->resource->toArray(), true);

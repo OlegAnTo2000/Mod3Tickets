@@ -4,12 +4,12 @@ class Undelete extends MODX\Revolution\Processors\Model\UpdateProcessor
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey = 'TicketThread';
-	public $objectType = 'TicketThread';
-	public $languageTopics = ['tickets:default'];
+	public $classKey        = 'TicketThread';
+	public $objectType      = 'TicketThread';
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadUndelete';
-	public $afterSaveEvent = 'OnTicketThreadUndelete';
-	public $permission = 'thread_delete';
+	public $afterSaveEvent  = 'OnTicketThreadUndelete';
+	public $permission      = 'thread_delete';
 
 	/**
 	 * @return bool
@@ -27,7 +27,7 @@ class Undelete extends MODX\Revolution\Processors\Model\UpdateProcessor
 	public function beforeSave()
 	{
 		$this->object->fromArray([
-			'deleted' => 0,
+			'deleted'   => 0,
 			'deletedon' => null,
 			'deletedby' => 0,
 		]);

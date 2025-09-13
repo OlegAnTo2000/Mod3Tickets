@@ -41,28 +41,28 @@ class TicketCreateManagerController extends ResourceCreateManagerController
 		if (\is_null($this->resourceArray['properties'])) {
 			$this->resourceArray['properties'] = [];
 		}
-		$properties = $this->parent->getProperties('tickets');
-		$this->resourceArray = \array_merge($this->resourceArray, $properties);
+		$properties                                   = $this->parent->getProperties('tickets');
+		$this->resourceArray                          = \array_merge($this->resourceArray, $properties);
 		$this->resourceArray['properties']['tickets'] = $properties;
 
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 		$Tickets->loadManagerFiles($this, [
 			'config' => true,
-			'utils' => true,
-			'css' => true,
+			'utils'  => true,
+			'css'    => true,
 			'ticket' => true,
 		]);
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/ticket/create.js');
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
 
 		$ready = [
-			'xtype' => 'tickets-page-ticket-create',
-			'record' => $this->resourceArray,
+			'xtype'            => 'tickets-page-ticket-create',
+			'record'           => $this->resourceArray,
 			'publish_document' => (int) $this->canPublish,
-			'canSave' => (int) $this->canSave,
-			'show_tvs' => (int) !empty($this->tvCounts),
-			'mode' => 'create',
+			'canSave'          => (int) $this->canSave,
+			'show_tvs'         => (int) !empty($this->tvCounts),
+			'mode'             => 'create',
 		];
 		$this->addHtml('
         <script type="text/javascript">

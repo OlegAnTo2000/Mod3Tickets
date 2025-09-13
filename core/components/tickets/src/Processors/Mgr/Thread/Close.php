@@ -1,7 +1,7 @@
 <?php
 
-use Tickets\Model\TicketThread;
 use MODX\Revolution\Processors\Model\UpdateProcessor;
+use Tickets\Model\TicketThread;
 
 class Close extends UpdateProcessor
 {

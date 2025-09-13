@@ -1,7 +1,7 @@
 <?php
 
-use Tickets\Model\TicketThread;
 use MODX\Revolution\Processors\Model\UpdateProcessor;
+use Tickets\Model\TicketThread;
 
 class Delete extends UpdateProcessor
 {
@@ -31,7 +31,7 @@ class Delete extends UpdateProcessor
 	{
 		$this->object->fromArray([
 			'deleted'   => 1,
-			'deletedon' => time(),
+			'deletedon' => \time(),
 			'deletedby' => $this->modx->user->get('id'),
 		]);
 

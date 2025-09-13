@@ -24,10 +24,10 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
-	public $defaultSortField = 'createdon';
+	public $objectType           = 'Tickets\Model\TicketComment';
+	public $classKey             = TicketComment::class;
+	public $languageTopics       = ['tickets:default'];
+	public $defaultSortField     = 'createdon';
 	public $defaultSortDirection = 'DESC';
 
 	/**
@@ -70,14 +70,14 @@ class GetList extends GetListProcessor
 			$query = trim($query);
 			if (is_numeric($query)) {
 				$c->where([
-					'TicketComment.id:=' => $query,
+					'TicketComment.id:='        => $query,
 					'OR:TicketComment.parent:=' => $query,
 				]);
 			} else {
 				$c->where([
-					'TicketComment.text:LIKE' => '%' . $query . '%',
-					'OR:TicketComment.raw:LIKE' => '%' . $query . '%',
-					'OR:TicketComment.name:LIKE' => '%' . $query . '%',
+					'TicketComment.text:LIKE'     => '%' . $query . '%',
+					'OR:TicketComment.raw:LIKE'   => '%' . $query . '%',
+					'OR:TicketComment.name:LIKE'  => '%' . $query . '%',
 					'OR:TicketComment.email:LIKE' => '%' . $query . '%',
 				]);
 			}
@@ -128,101 +128,101 @@ class GetList extends GetListProcessor
 		// Reply
 		if ($this->getProperty('threads') || $this->getProperty('parents')) {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-reply',
-				'title' => $this->modx->lexicon('tickets_action_reply'),
+				'cls'    => '',
+				'icon'   => 'icon icon-reply',
+				'title'  => $this->modx->lexicon('tickets_action_reply'),
 				'action' => 'replyComment',
 				'button' => true,
-				'menu' => true,
+				'menu'   => true,
 			];
 		}
 
 		// Edit
 		$array['actions'][] = [
-			'cls' => '',
-			'icon' => 'icon icon-edit',
-			'title' => $this->modx->lexicon('tickets_action_edit'),
+			'cls'    => '',
+			'icon'   => 'icon icon-edit',
+			'title'  => $this->modx->lexicon('tickets_action_edit'),
 			'action' => 'editComment',
 			'button' => empty($array['deleted']) || !empty($array['published']),
-			'menu' => true,
+			'menu'   => true,
 		];
 
 		// View
 		if (!empty($array['preview_url']) && !empty($array['published']) && empty($array['deleted'])) {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-eye',
-				'title' => $this->modx->lexicon('tickets_action_view'),
+				'cls'    => '',
+				'icon'   => 'icon icon-eye',
+				'title'  => $this->modx->lexicon('tickets_action_view'),
 				'action' => 'viewComment',
 				'button' => true,
-				'menu' => true,
+				'menu'   => true,
 			];
 		}
 
 		// Publish
 		if (!$array['published']) {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-power-off action-green',
-				'title' => $this->modx->lexicon('tickets_action_publish'),
+				'cls'      => '',
+				'icon'     => 'icon icon-power-off action-green',
+				'title'    => $this->modx->lexicon('tickets_action_publish'),
 				'multiple' => $this->modx->lexicon('tickets_action_publish'),
-				'action' => 'publishComment',
-				'button' => true,
-				'menu' => true,
+				'action'   => 'publishComment',
+				'button'   => true,
+				'menu'     => true,
 			];
 		} else {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-power-off action-gray',
-				'title' => $this->modx->lexicon('tickets_action_unpublish'),
+				'cls'      => '',
+				'icon'     => 'icon icon-power-off action-gray',
+				'title'    => $this->modx->lexicon('tickets_action_unpublish'),
 				'multiple' => $this->modx->lexicon('tickets_action_unpublish'),
-				'action' => 'unpublishComment',
-				'button' => false,
-				'menu' => true,
+				'action'   => 'unpublishComment',
+				'button'   => false,
+				'menu'     => true,
 			];
 		}
 
 		// Delete
 		if (!$array['deleted']) {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-trash-o action-yellow',
-				'title' => $this->modx->lexicon('tickets_action_delete'),
+				'cls'      => '',
+				'icon'     => 'icon icon-trash-o action-yellow',
+				'title'    => $this->modx->lexicon('tickets_action_delete'),
 				'multiple' => $this->modx->lexicon('tickets_action_delete'),
-				'action' => 'deleteComment',
-				'button' => false,
-				'menu' => true,
+				'action'   => 'deleteComment',
+				'button'   => false,
+				'menu'     => true,
 			];
 		} else {
 			$array['actions'][] = [
-				'cls' => '',
-				'icon' => 'icon icon-undo action-green',
-				'title' => $this->modx->lexicon('tickets_action_undelete'),
+				'cls'      => '',
+				'icon'     => 'icon icon-undo action-green',
+				'title'    => $this->modx->lexicon('tickets_action_undelete'),
 				'multiple' => $this->modx->lexicon('tickets_action_undelete'),
-				'action' => 'undeleteComment',
-				'button' => true,
-				'menu' => true,
+				'action'   => 'undeleteComment',
+				'button'   => true,
+				'menu'     => true,
 			];
 		}
 
 		$array['actions'][] = [
-			'cls' => '',
-			'icon' => 'icon icon-trash-o action-red',
-			'title' => $this->modx->lexicon('tickets_action_remove'),
+			'cls'      => '',
+			'icon'     => 'icon icon-trash-o action-red',
+			'title'    => $this->modx->lexicon('tickets_action_remove'),
 			'multiple' => $this->modx->lexicon('tickets_action_remove'),
-			'action' => 'removeComment',
-			'button' => false,
-			'menu' => true,
+			'action'   => 'removeComment',
+			'button'   => false,
+			'menu'     => true,
 		];
 
 		// Menu
 		$array['actions'][] = [
-			'cls' => '',
-			'icon' => 'icon icon-cog actions-menu',
-			'menu' => false,
+			'cls'    => '',
+			'icon'   => 'icon icon-cog actions-menu',
+			'menu'   => false,
 			'button' => true,
 			'action' => 'showMenu',
-			'type' => 'menu',
+			'type'   => 'menu',
 		];
 
 		return $array;

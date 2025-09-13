@@ -1,8 +1,8 @@
 <?php
 
+use MODX\Revolution\Sources\modMediaSource;
 use Tickets\Model\Ticket;
 use Tickets\Model\TicketFile;
-use MODX\Revolution\Sources\modMediaSource;
 
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
@@ -20,9 +20,9 @@ if (!$Tickets->authenticated) {
 $tplSectionRow = $modx->getOption('tplSectionRow', $scriptProperties, 'tpl.Tickets.sections.row');
 $tplFormCreate = $modx->getOption('tplFormCreate', $scriptProperties, 'tpl.Tickets.form.create');
 $tplFormUpdate = $modx->getOption('tplFormUpdate', $scriptProperties, 'tpl.Tickets.form.update');
-$tplFiles = $modx->getOption('tplFiles', $scriptProperties, 'tpl.Tickets.form.files');
-$tplFile = $Tickets->config['tplFile'] = $modx->getOption('tplFile', $scriptProperties, 'tpl.Tickets.form.file', true);
-$tplImage = $Tickets->config['tplImage'] = $modx->getOption(
+$tplFiles      = $modx->getOption('tplFiles', $scriptProperties, 'tpl.Tickets.form.files');
+$tplFile       = $Tickets->config['tplFile'] = $modx->getOption('tplFile', $scriptProperties, 'tpl.Tickets.form.file', true);
+$tplImage      = $Tickets->config['tplImage'] = $modx->getOption(
 	'tplImage',
 	$scriptProperties,
 	'tpl.Tickets.form.image',
@@ -52,7 +52,7 @@ if (!empty($tid)) {
 		if ($ticket->get('createdby') != $modx->user->id && !$modx->hasPermission('edit_document')) {
 			return $modx->lexicon('ticket_err_wrong_user');
 		}
-		$charset = $modx->getOption('modx_charset');
+		$charset       = $modx->getOption('modx_charset');
 		$allowedFields = \array_map('trim', \explode(',', $scriptProperties['allowedFields']));
 		$allowedFields = \array_unique(\array_merge($allowedFields, ['parent', 'pagetitle', 'content']));
 
@@ -72,9 +72,9 @@ if (!empty($tid)) {
 			}
 			$data[$field] = $value;
 		}
-		$data['id'] = $ticket->id;
-		$data['published'] = $ticket->published;
-		$data['deleted'] = $ticket->deleted;
+		$data['id']          = $ticket->id;
+		$data['published']   = $ticket->published;
+		$data['deleted']     = $ticket->deleted;
 		$data['allowDelete'] = $allowDelete ? 1 : 0;
 		if (empty($parent)) {
 			$parent = $ticket->get('parent');
@@ -120,17 +120,17 @@ if (!empty($allowFiles)) {
 	$q->sortby('rank', 'ASC');
 	$q->sortby('createdon', 'ASC');
 	$collection = $modx->getIterator(TicketFile::class, $q);
-	$files = '';
+	$files      = '';
 	/** @var TicketFile $item */
 	foreach ($collection as $item) {
 		if ($item->get('deleted') && !$item->get('parent')) {
 			$item->remove();
 		} else {
-			$item          = $item->toArray();
-			$item['size']  = \round($item['size'] / 1024, 2);
-			$item['new']   = empty($item['parent']);
-			$tpl           = 'image' == $item['type'] ? $tplImage : $tplFile;
-			$files        .= $Tickets->getChunk($tpl, $item);
+			$item         = $item->toArray();
+			$item['size'] = \round($item['size'] / 1024, 2);
+			$item['new']  = empty($item['parent']);
+			$tpl          = 'image' == $item['type'] ? $tplImage : $tplFile;
+			$files .= $Tickets->getChunk($tpl, $item);
 		}
 	}
 	$data['files'] = $Tickets->getChunk($tplFiles, [
@@ -139,7 +139,7 @@ if (!empty($allowFiles)) {
 	/** @var modMediaSource $source */
 	if ($source = $modx->getObject(modMediaSource::class, ['id' => $source])) {
 		$properties = $source->getPropertyList();
-		$config = [
+		$config     = [
 			'size' => !empty($properties['maxUploadSize'])
 				? $properties['maxUploadSize']
 				: 3145728,
@@ -155,7 +155,7 @@ if (!empty($allowFiles)) {
 		];
 		$modx->regClientStartupScript(
 			'<script type="text/javascript">
-				TicketsConfig.source=' . json_encode($config) . ';
+				TicketsConfig.source=' . \json_encode($config) . ';
 			</script>',
 			true
 		);
@@ -164,15 +164,15 @@ if (!empty($allowFiles)) {
 	$modx->regClientScript($Tickets->config['jsUrl'] . 'web/files.js');
 
 	$lang = $modx->getOption('cultureKey');
-	if ('en' != $lang && file_exists($Tickets->config['jsPath'] . 'web/lib/plupload/i18n/' . $lang . '.js')) {
+	if ('en' != $lang && \file_exists($Tickets->config['jsPath'] . 'web/lib/plupload/i18n/' . $lang . '.js')) {
 		$modx->regClientScript($Tickets->config['jsUrl'] . 'web/lib/plupload/i18n/' . $lang . '.js');
 	}
 }
 
-$output = $Tickets->getChunk($tplWrapper, $data);
-$key = md5(json_encode($Tickets->config));
+$output                       = $Tickets->getChunk($tplWrapper, $data);
+$key                          = \md5(\json_encode($Tickets->config));
 $_SESSION['TicketForm'][$key] = $Tickets->config;
-$output = str_ireplace(
+$output                       = \str_ireplace(
 	'</form>',
 	"\n<input type=\"hidden\" name=\"form_key\" value=\"{$key}\" class=\"disable-sisyphus\" />\n</form>",
 	$output

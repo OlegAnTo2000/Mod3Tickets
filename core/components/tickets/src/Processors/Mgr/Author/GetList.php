@@ -11,8 +11,8 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $classKey = TicketAuthor::class;
-	public $defaultSortField = 'rating';
+	public $classKey             = TicketAuthor::class;
+	public $defaultSortField     = 'rating';
 	public $defaultSortDirection = 'DESC';
 
 	/**
@@ -41,13 +41,13 @@ class GetList extends GetListProcessor
 		$c->select([
 			'username' => 'User.username',
 			'fullname' => 'UserProfile.fullname',
-			'active' => 'User.active',
-			'blocked' => 'UserProfile.blocked',
+			'active'   => 'User.active',
+			'blocked'  => 'UserProfile.blocked',
 		]);
 
 		if ($query = $this->getProperty('query', null)) {
 			$c->where([
-				'User.username:LIKE' => "%{$query}%",
+				'User.username:LIKE'           => "%{$query}%",
 				'OR:UserProfile.fullname:LIKE' => "%{$query}%",
 			]);
 		}

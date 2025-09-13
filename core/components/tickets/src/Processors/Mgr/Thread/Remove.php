@@ -5,12 +5,12 @@ class TicketThreadRemoveProcessor extends MODX\Revolution\Processors\Model\Remov
 	/** @var TicketThread */
 	public $object;
 	public $checkRemovePermission = true;
-	public $classKey = 'TicketThread';
-	public $objectType = 'TicketThread';
-	public $languageTopics = ['tickets'];
-	public $beforeRemoveEvent = 'OnBeforeTicketThreadRemove';
-	public $afterRemoveEvent = 'OnTicketThreadRemove';
-	public $permission = 'thread_remove';
+	public $classKey              = 'TicketThread';
+	public $objectType            = 'TicketThread';
+	public $languageTopics        = ['tickets'];
+	public $beforeRemoveEvent     = 'OnBeforeTicketThreadRemove';
+	public $afterRemoveEvent      = 'OnTicketThreadRemove';
+	public $permission            = 'thread_remove';
 
 	/**
 	 * @return bool

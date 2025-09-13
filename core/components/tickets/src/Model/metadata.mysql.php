@@ -1,10 +1,10 @@
 <?php
 
 $xpdo_meta_map = [
-	'version' => '3.0',
-	'namespace' => 'Tickets\\Model',
+	'version'         => '3.0',
+	'namespace'       => 'Tickets\\Model',
 	'namespacePrefix' => 'Tickets',
-	'class_map' => [
+	'class_map'       => [
 		'MODX\\Revolution\\modResource' => [
 			0 => 'Tickets\\Model\\TicketsSection',
 			1 => 'Tickets\\Model\\Ticket',

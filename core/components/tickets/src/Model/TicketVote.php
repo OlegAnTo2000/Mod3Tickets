@@ -3,8 +3,6 @@
 namespace Tickets\Model;
 
 use xPDO\Om\xPDOObject;
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketComment;
 
 /**
  * @property int $id
@@ -18,11 +16,11 @@ class TicketVote extends xPDOObject
 	 */
 	public function save($cacheFlag = null)
 	{
-		$new = $this->isNew();
+		$new   = $this->isNew();
 		$class = $this->get('class');
-		$save = parent::save($cacheFlag);
+		$save  = parent::save($cacheFlag);
 		if ($new) {
-			$type = '';
+			$type      = '';
 			$ticket_id = 0;
 			if (TicketComment::class == $class) {
 				$type = 'vote_comment';
@@ -34,7 +32,7 @@ class TicketVote extends xPDOObject
 					}
 				}
 			} elseif (Ticket::class == $class) {
-				$type = 'vote_ticket';
+				$type      = 'vote_ticket';
 				$ticket_id = $this->id;
 			}
 			if (!empty($type) && !empty($ticket_id)) {
@@ -54,7 +52,7 @@ class TicketVote extends xPDOObject
 	 */
 	public function remove(array $ancestors = [])
 	{
-		$type = '';
+		$type  = '';
 		$class = $this->get('class');
 		if (TicketComment::class == $class) {
 			$type = 'vote_comment';

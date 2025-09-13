@@ -1,8 +1,8 @@
 <?php
 
-use Tickets\Tickets;
 use MODX\Revolution\Processors\Processor;
 use MODX\Revolution\Processors\ProcessorResponse;
+use Tickets\Tickets;
 
 class Multiple extends Processor
 {
@@ -20,7 +20,7 @@ class Multiple extends Processor
 		}
 
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 
 		foreach ($ids as $id) {
 			/** @var ProcessorResponse $response */

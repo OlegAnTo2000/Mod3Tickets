@@ -25,7 +25,7 @@ if ('tickets' == $action && 'tpl.Tickets.comment.latest' == $scriptProperties['t
 	$scriptProperties['tpl'] = 'tpl.Tickets.ticket.latest';
 }
 $action = \strtolower($action);
-$where = 'tickets' == $action
+$where  = 'tickets' == $action
 	? ['class_key' => 'Ticket']
 	: [];
 
@@ -42,7 +42,7 @@ if (!isset($cacheTime)) {
 	$cacheTime = 1800;
 }
 if (!empty($user)) {
-	$user = \array_map('trim', \explode(',', $user));
+	$user    = \array_map('trim', \explode(',', $user));
 	$user_id = $user_username = [];
 	foreach ($user as $v) {
 		if (\is_numeric($v)) {
@@ -70,7 +70,7 @@ if (!empty($user)) {
 // Filter by ids
 if (!empty($resources)) {
 	$resources = \array_map('trim', \explode(',', $resources));
-	$in = $out = [];
+	$in        = $out = [];
 	foreach ($resources as $v) {
 		if (!\is_numeric($v)) {
 			continue;
@@ -90,7 +90,7 @@ if (!empty($resources)) {
 } // Filter by parents
 else {
 	if (!empty($parents) && $parents > 0) {
-		$pids = \array_map('trim', \explode(',', $parents));
+		$pids    = \array_map('trim', \explode(',', $parents));
 		$parents = $pids;
 		if (!empty($depth) && $depth > 0) {
 			foreach ($pids as $v) {
@@ -110,24 +110,24 @@ else {
 if ('comments' == $action) {
 	$class = 'TicketComment';
 
-	$innerJoin = [];
+	$innerJoin           = [];
 	$innerJoin['Thread'] = empty($user)
 		? [
 			'class' => 'TicketThread',
-			'on' => '`TicketComment`.`id` = `Thread`.`comment_last` AND `Thread`.`deleted` = 0',
+			'on'    => '`TicketComment`.`id` = `Thread`.`comment_last` AND `Thread`.`deleted` = 0',
 		]
 		: [
 			'class' => 'TicketThread',
-			'on' => '`TicketComment`.`thread` = `Thread`.`id` AND `Thread`.`deleted` = 0',
+			'on'    => '`TicketComment`.`thread` = `Thread`.`id` AND `Thread`.`deleted` = 0',
 		];
 	$innerJoin['Ticket'] = ['class' => 'Ticket', 'on' => '`Ticket`.`id` = `Thread`.`resource`'];
 
 	$leftJoin = [
 		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
-		'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+		'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 		'Profile' => [
 			'class' => modUserProfile::class,
-			'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`',
+			'on'    => '`Profile`.`internalKey` = `TicketComment`.`createdby`',
 		],
 	];
 
@@ -148,13 +148,13 @@ if ('comments' == $action) {
 	$class = 'Ticket';
 
 	$innerJoin = [];
-	$leftJoin = [
+	$leftJoin  = [
 		'Thread' => [
 			'class' => 'TicketThread',
-			'on' => '`Thread`.`resource` = `Ticket`.`id` AND `Thread`.`deleted` = 0',
+			'on'    => '`Thread`.`resource` = `Ticket`.`id` AND `Thread`.`deleted` = 0',
 		],
 		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
-		'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
+		'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
 		'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `Ticket`.`createdby`'],
 	];
 
@@ -172,7 +172,7 @@ if ('comments' == $action) {
 // Fields to select
 $select = \array_merge($select, [
 	'Section' => $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
-	'User' => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
+	'User'    => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
 	'Profile' => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true),
 ]);
 
@@ -191,15 +191,15 @@ foreach (['where', 'select', 'leftJoin', 'innerJoin'] as $v) {
 }
 
 $default = [
-	'class' => $class,
-	'where' => \json_encode($where),
-	'innerJoin' => \json_encode($innerJoin),
-	'leftJoin' => \json_encode($leftJoin),
-	'select' => \json_encode($select),
-	'sortby' => 'createdon',
-	'sortdir' => 'DESC',
-	'groupby' => $groupby,
-	'return' => 'data',
+	'class'             => $class,
+	'where'             => \json_encode($where),
+	'innerJoin'         => \json_encode($innerJoin),
+	'leftJoin'          => \json_encode($leftJoin),
+	'select'            => \json_encode($select),
+	'sortby'            => 'createdon',
+	'sortdir'           => 'DESC',
+	'groupby'           => $groupby,
+	'return'            => 'data',
 	'nestedChunkPrefix' => 'tickets_',
 ];
 
@@ -215,7 +215,7 @@ if (!empty($rows) && \is_array($rows)) {
 		// Prepare row
 		if ('Ticket' == $class) {
 			$row['date_ago'] = $Tickets->dateFormat($row['createdon']);
-			$properties = \is_string($row['properties'])
+			$properties      = \is_string($row['properties'])
 				? \json_decode($row['properties'], true)
 				: $row['properties'];
 			if (empty($properties['process_tags'])) {
@@ -230,16 +230,16 @@ if (!empty($rows) && \is_array($rows)) {
 		} else {
 			if (empty($row['createdby'])) {
 				$row['fullname'] = $row['name'];
-				$row['guest'] = 1;
+				$row['guest']    = 1;
 			}
 			$row['resource'] = $row['ticket.id'];
-			$row = $Tickets->prepareComment($row);
+			$row             = $Tickets->prepareComment($row);
 		}
 
 		// Processing chunk
 		$row['idx'] = $pdoFetch->idx++;
-		$tpl = $pdoFetch->defineChunk($row);
-		$output[] = !empty($tpl)
+		$tpl        = $pdoFetch->defineChunk($row);
+		$output[]   = !empty($tpl)
 			? $pdoFetch->getChunk($tpl, $row, $pdoFetch->config['fastMode'])
 			: $pdoFetch->getChunk('', $row);
 	}

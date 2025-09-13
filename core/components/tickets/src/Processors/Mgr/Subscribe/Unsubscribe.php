@@ -3,9 +3,9 @@
 class TicketUnsubscribeRemoveProcessor extends MODX\Revolution\Processors\Processor
 {
 	public $object;
-	public $classKey = 'TicketsSection';
+	public $classKey       = 'TicketsSection';
 	public $languageTopics = ['tickets'];
-	public $permission = 'section_unsubscribe';
+	public $permission     = 'section_unsubscribe';
 
 	/**
 	 * @return bool
@@ -31,8 +31,7 @@ class TicketUnsubscribeRemoveProcessor extends MODX\Revolution\Processors\Proces
 
 		$arrUnsubscribe = $this->getProperty('ids');
 		if (!empty($properties['subscribers'])) {
-			$properties['subscribers'] =
-				\array_filter($properties['subscribers'], function ($k) use ($arrUnsubscribe, $parents) {
+			$properties['subscribers'] = \array_filter($properties['subscribers'], function ($k) use ($arrUnsubscribe, $parents) {
 					if ($unsub = \in_array($k, $arrUnsubscribe, true)) {
 						$this->logManagerAction($k, $parents);
 					}

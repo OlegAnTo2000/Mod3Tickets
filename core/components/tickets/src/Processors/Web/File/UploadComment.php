@@ -8,7 +8,7 @@ use Tickets\Model\TicketComment;
 class UploadComment extends Upload
 {
 	public $permission = 'comment_file_upload';
-	protected $class = TicketComment::class;
+	protected $class   = TicketComment::class;
 
 	public function initialize()
 	{

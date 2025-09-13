@@ -16,7 +16,7 @@ use Tickets\Model\TicketThread;
 
 class Get extends Processor
 {
-	public $classKey = TicketThread::class;
+	public $classKey       = TicketThread::class;
 	public $languageTopics = ['tickets:default'];
 	/** @var TicketThread */
 	private $object;
@@ -32,10 +32,10 @@ class Get extends Processor
 		if (!$this->object = $this->modx->getObject($this->classKey, ['name' => $thread])) {
 			$this->object = $this->modx->newObject($this->classKey);
 			$this->object->fromArray([
-				'name' => $thread,
+				'name'      => $thread,
 				'createdby' => $this->modx->user->get('id'),
 				'createdon' => date('Y-m-d H:i:s'),
-				'resource' => $this->modx->resource->get('id'),
+				'resource'  => $this->modx->resource->get('id'),
 			]);
 			$this->object->save();
 		} else {
@@ -63,9 +63,9 @@ class Get extends Processor
 
 	public function getComments()
 	{
-		$res = [];
+		$res    = [];
 		$result = null;
-		$q = $this->modx->newQuery(TicketComment::class);
+		$q      = $this->modx->newQuery(TicketComment::class);
 		$q->select($this->modx->getSelectColumns(TicketComment::class, 'TicketComment'));
 		$q->select($this->modx->getSelectColumns(modUserProfile::class, 'modUserProfile', '', ['id'], true));
 		$q->select('`TicketThread`.`resource`');
@@ -79,7 +79,7 @@ class Get extends Processor
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 				$res[$row['id']] = $row;
 			}
-			$this->total = count($res);
+			$this->total    = count($res);
 			$this->comments = $res;
 		}
 	}
@@ -98,7 +98,7 @@ class Get extends Processor
 
 	public function buildTree()
 	{
-		$data = $this->comments;
+		$data           = $this->comments;
 		$this->comments = [];
 		foreach ($data as $id => &$row) {
 			if (empty($row['parent'])) {

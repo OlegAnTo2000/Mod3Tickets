@@ -8,12 +8,12 @@ class TicketCommentUndeleteProcessor extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = 'Tickets\Model\TicketComment';
+	public $classKey        = 'Tickets\Model\TicketComment';
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUndelete';
-	public $afterSaveEvent = 'OnCommentUndelete';
-	public $permission = 'comment_delete';
+	public $afterSaveEvent  = 'OnCommentUndelete';
+	public $permission      = 'comment_delete';
 
 	public function beforeSet()
 	{
@@ -28,7 +28,7 @@ class TicketCommentUndeleteProcessor extends UpdateProcessor
 	public function beforeSave()
 	{
 		$this->object->fromArray([
-			'deleted' => 0,
+			'deleted'   => 0,
 			'deletedon' => null,
 			'deletedby' => 0,
 		]);

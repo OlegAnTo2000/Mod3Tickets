@@ -28,12 +28,12 @@ class Create extends CreateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = TicketComment::class;
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
-	public $permission = 'comment_save';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
+	public $languageTopics  = ['tickets:default'];
+	public $permission      = 'comment_save';
 	public $beforeSaveEvent = 'OnBeforeCommentSave';
-	public $afterSaveEvent = 'OnCommentSave';
+	public $afterSaveEvent  = 'OnCommentSave';
 	/** @var TicketThread */
 	private $thread;
 	private $guest = false;
@@ -92,8 +92,8 @@ class Create extends CreateProcessor
 
 		// Additional properties
 		$properties = $this->getProperties();
-		$add = [];
-		$meta = $this->modx->getFieldMeta(TicketComment::class);
+		$add        = [];
+		$meta       = $this->modx->getFieldMeta(TicketComment::class);
 		foreach ($properties as $k => $v) {
 			if (!isset($meta[$k])) {
 				$add[$k] = $this->modx->stripTags($v);
@@ -107,16 +107,16 @@ class Create extends CreateProcessor
 		// Comment values
 		$ip = $this->modx->request->getClientIp();
 		$this->setProperties([
-			'text' => $text,
-			'thread' => $this->thread->id,
-			'ip' => $ip['ip'],
-			'createdon' => date('Y-m-d H:i:s'),
-			'createdby' => $this->modx->user->isAuthenticated($this->modx->context->key) ? $this->modx->user->id : 0,
-			'editedon' => '',
-			'editedby' => 0,
-			'deleted' => 0,
-			'deletedon' => '',
-			'deletedby' => 0,
+			'text'       => $text,
+			'thread'     => $this->thread->id,
+			'ip'         => $ip['ip'],
+			'createdon'  => date('Y-m-d H:i:s'),
+			'createdby'  => $this->modx->user->isAuthenticated($this->modx->context->key) ? $this->modx->user->id : 0,
+			'editedon'   => '',
+			'editedby'   => 0,
+			'deleted'    => 0,
+			'deletedon'  => '',
+			'deletedby'  => 0,
 			'properties' => $add,
 		]);
 		$this->unsetProperty('action');
@@ -138,7 +138,7 @@ class Create extends CreateProcessor
 					$ratings = $section->getProperties('ratings');
 					if (isset($ratings['min_comment_create']) && '' !== $ratings['min_comment_create']) {
 						if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
-							$min = (float) $ratings['min_comment_create'];
+							$min    = (float) $ratings['min_comment_create'];
 							$rating = $profile->get('rating');
 							if ($rating < $min) {
 								return $this->modx->lexicon('ticket_err_rating_comment', ['rating' => $min]);
@@ -169,8 +169,8 @@ class Create extends CreateProcessor
 			if (!isset($_SESSION['TicketComments'])) {
 				$_SESSION['TicketComments'] = ['ids' => []];
 			}
-			$_SESSION['TicketComments']['name'] = $this->object->get('name');
-			$_SESSION['TicketComments']['email'] = $this->object->get('email');
+			$_SESSION['TicketComments']['name']                          = $this->object->get('name');
+			$_SESSION['TicketComments']['email']                         = $this->object->get('email');
 			$_SESSION['TicketComments']['ids'][$this->object->get('id')] = 1;
 		}
 
@@ -195,7 +195,7 @@ class Create extends CreateProcessor
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
 		$replace = [];
-		$count = 0;
+		$count   = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
 			if ($item->get('deleted')) {
@@ -206,8 +206,8 @@ class Create extends CreateProcessor
 				$item->set('parent', $this->object->get('id'));
 				$item->save();
 				$replace[$old_url] = [
-					'url' => $item->get('url'),
-					'thumb' => $item->get('thumb'),
+					'url'    => $item->get('url'),
+					'thumb'  => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
 				];
 				++$count;
@@ -217,7 +217,7 @@ class Create extends CreateProcessor
 		// Update ticket links
 		if (!empty($replace)) {
 			$array = [
-				'raw' => $this->object->get('raw'),
+				'raw'  => $this->object->get('raw'),
 				'text' => $this->object->get('text'),
 			];
 			$update = false;

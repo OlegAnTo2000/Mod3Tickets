@@ -13,7 +13,7 @@ use Tickets\Model\TicketStar;
 
 class Star extends ModelProcessor
 {
-	public $classKey = TicketStar::class;
+	public $classKey   = TicketStar::class;
 	public $permission = 'comment_star';
 
 	/**
@@ -41,8 +41,8 @@ class Star extends ModelProcessor
 		}
 
 		$data = [
-			'id' => $id,
-			'class' => TicketComment::class,
+			'id'        => $id,
+			'class'     => TicketComment::class,
 			'createdby' => $this->modx->user->id,
 		];
 
@@ -50,7 +50,7 @@ class Star extends ModelProcessor
 		if ($star = $this->modx->getObject($this->classKey, $data)) {
 			$event = $this->modx->invokeEvent('OnBeforeCommentUnStar', [
 				$this->objectType => &$star,
-				'object' => &$star,
+				'object'          => &$star,
 			]);
 			if (is_array($event) && !empty($event)) {
 				return $this->failure(implode("\n", $event));
@@ -60,16 +60,16 @@ class Star extends ModelProcessor
 
 			$this->modx->invokeEvent('OnCommentUnStar', [
 				$this->objectType => &$star,
-				'object' => &$star,
+				'object'          => &$star,
 			]);
 		} else {
-			$star = $this->modx->newObject($this->classKey);
-			$data['owner'] = $object->get('createdby');
+			$star              = $this->modx->newObject($this->classKey);
+			$data['owner']     = $object->get('createdby');
 			$data['createdon'] = date('Y-m-d H:i:s');
 
 			$event = $this->modx->invokeEvent('OnBeforeCommentStar', [
 				$this->objectType => &$star,
-				'object' => &$star,
+				'object'          => &$star,
 			]);
 			if (is_array($event) && !empty($event)) {
 				return $this->failure(implode("\n", $event));
@@ -80,7 +80,7 @@ class Star extends ModelProcessor
 
 			$this->modx->invokeEvent('OnCommentStar', [
 				$this->objectType => &$star,
-				'object' => &$star,
+				'object'          => &$star,
 			]);
 		}
 		$stars = $this->modx->getCount(TicketStar::class, ['id' => $id, 'class' => TicketComment::class]);

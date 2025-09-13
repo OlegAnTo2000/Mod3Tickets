@@ -4,12 +4,12 @@ class TicketThreadOpenProcessor extends MODX\Revolution\Processors\Model\UpdateP
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey = 'TicketThread';
-	public $objectType = 'TicketThread';
-	public $languageTopics = ['tickets:default'];
+	public $classKey        = 'TicketThread';
+	public $objectType      = 'TicketThread';
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadOpen';
-	public $afterSaveEvent = 'OnTicketThreadOpen';
-	public $permission = 'thread_close';
+	public $afterSaveEvent  = 'OnTicketThreadOpen';
+	public $permission      = 'thread_close';
 
 	/**
 	 * @return bool

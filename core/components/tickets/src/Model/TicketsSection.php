@@ -23,10 +23,10 @@ use xPDO\xPDO;
 
 class TicketsSection extends modResource
 {
-	public $showInContextMenu = true;
+	public $showInContextMenu      = true;
 	public $allowChildrenResources = false;
-	private $_oldUri = '';
-	private $_oldRatings = '';
+	private $_oldUri               = '';
+	private $_oldRatings           = '';
 
 	public function __construct(xPDO &$xpdo)
 	{
@@ -91,7 +91,7 @@ class TicketsSection extends modResource
 		$this->xpdo->lexicon->load('tickets:default');
 
 		return [
-			'text_create' => $this->xpdo->lexicon('tickets_section'),
+			'text_create'      => $this->xpdo->lexicon('tickets_section'),
 			'text_create_here' => $this->xpdo->lexicon('tickets_section_create_here'),
 		];
 	}
@@ -154,23 +154,23 @@ class TicketsSection extends modResource
 			switch ($k) {
 				case 'comments':
 					$values = $this->_getVirtualFields();
-					$value = $values['comments'];
+					$value  = $values['comments'];
 					break;
 				case 'views':
 					$values = $this->_getVirtualFields();
-					$value = $values['views'];
+					$value  = $values['views'];
 					break;
 				case 'stars':
 					$values = $this->_getVirtualFields();
-					$value = $values['stars'];
+					$value  = $values['stars'];
 					break;
 				case 'rating':
 					$values = $this->_getVirtualFields();
-					$value = $values['rating'];
+					$value  = $values['rating'];
 					break;
 				case 'tickets':
 					$values = $this->_getVirtualFields();
-					$value = $values['tickets'];
+					$value  = $values['tickets'];
 					break;
 				default:
 					$value = parent::get($k, $format, $formatTemplate);
@@ -227,7 +227,7 @@ class TicketsSection extends modResource
 		if (!$total = $this->getOne('Total')) {
 			$total = $this->xpdo->newObject(TicketTotal::class);
 			$total->fromArray([
-				'id' => $this->id,
+				'id'    => $this->id,
 				'class' => TicketsSection::class,
 			], '', true, true);
 			$total->fetchValues();
@@ -253,8 +253,8 @@ class TicketsSection extends modResource
 	public function getRating()
 	{
 		$rating = [
-			'rating' => 0,
-			'rating_plus' => 0,
+			'rating'       => 0,
+			'rating_plus'  => 0,
 			'rating_minus' => 0,
 		];
 
@@ -262,9 +262,9 @@ class TicketsSection extends modResource
 		$q->innerJoin(Ticket::class, 'Ticket', 'Ticket.id = TicketVote.id');
 		$q->innerJoin(TicketsSection::class, 'Section', 'Section.id = Ticket.parent');
 		$q->where([
-			'class' => Ticket::class,
-			'Section.id' => $this->id,
-			'Ticket.deleted' => 0,
+			'class'            => Ticket::class,
+			'Section.id'       => $this->id,
+			'Ticket.deleted'   => 0,
 			'Ticket.published' => 1,
 		]);
 		$q->select('value');
@@ -366,54 +366,54 @@ class TicketsSection extends modResource
 			? ' <span dir="ltr">(' . $this->id . ')</span>'
 			: '';
 		$menu[] = [
-			'text' => '<b>' . $this->get('pagetitle') . '</b>' . $idNote,
+			'text'    => '<b>' . $this->get('pagetitle') . '</b>' . $idNote,
 			'handler' => 'Ext.emptyFn',
 		];
 		$menu[] = '-';
 		$menu[] = [
-			'text' => $this->xpdo->lexicon('tickets_section_management'),
+			'text'    => $this->xpdo->lexicon('tickets_section_management'),
 			'handler' => 'this.editResource',
 		];
 		$menu[] = [
-			'text' => $this->xpdo->lexicon('ticket_create_here'),
+			'text'    => $this->xpdo->lexicon('ticket_create_here'),
 			'handler' => 'function(itm,e) { var tree = Ext.getCmp("modx-resource-tree"); itm.classKey = "' . Ticket::class . '"; tree.createResourceHere(itm,e); }',
 		];
 
 		$menu[] = '-';
 		$menu[] = [
-			'text' => $this->xpdo->lexicon('tickets_section_duplicate'),
+			'text'    => $this->xpdo->lexicon('tickets_section_duplicate'),
 			'handler' => 'function(itm,e) {itm.classKey = "' . TicketsSection::class . '"; this.duplicateResource(itm,e); }',
 		];
 
 		if ($this->get('published')) {
 			$menu[] = [
-				'text' => $this->xpdo->lexicon('tickets_section_unpublish'),
+				'text'    => $this->xpdo->lexicon('tickets_section_unpublish'),
 				'handler' => 'this.unpublishDocument',
 			];
 		} else {
 			$menu[] = [
-				'text' => $this->xpdo->lexicon('tickets_section_publish'),
+				'text'    => $this->xpdo->lexicon('tickets_section_publish'),
 				'handler' => 'this.publishDocument',
 			];
 		}
 		if ($this->get('deleted')) {
 			$menu[] = [
-				'text' => $this->xpdo->lexicon('tickets_section_undelete'),
+				'text'    => $this->xpdo->lexicon('tickets_section_undelete'),
 				'handler' => 'this.undeleteDocument',
 			];
 		} else {
 			$menu[] = [
-				'text' => $this->xpdo->lexicon('tickets_section_delete'),
+				'text'    => $this->xpdo->lexicon('tickets_section_delete'),
 				'handler' => 'this.deleteDocument',
 			];
 		}
 		$menu[] = '-';
 		$menu[] = [
-			'text' => $this->xpdo->lexicon('tickets_section_view'),
+			'text'    => $this->xpdo->lexicon('tickets_section_view'),
 			'handler' => 'this.preview',
 		];
 
-		$node['menu'] = ['items' => $menu];
+		$node['menu']        = ['items' => $menu];
 		$node['hasChildren'] = true;
 
 		return $node;
@@ -431,15 +431,15 @@ class TicketsSection extends modResource
 		$properties = parent::getProperties($namespace);
 		if ('tickets' == $namespace) {
 			$default_properties = [
-				'template' => $this->xpdo->context->getOption('tickets.default_template', 0),
-				'uri' => '%id-%alias%ext',
+				'template'     => $this->xpdo->context->getOption('tickets.default_template', 0),
+				'uri'          => '%id-%alias%ext',
 				'show_in_tree' => $this->xpdo->context->getOption('tickets.ticket_show_in_tree_default', false),
-				'hidemenu' => $this->xpdo->context->getOption(
+				'hidemenu'     => $this->xpdo->context->getOption(
 					'tickets.ticket_hidemenu_force',
 					$this->xpdo->context->getOption('hidemenu_default')
 				),
 				'disable_jevix' => $this->xpdo->context->getOption('tickets.disable_jevix_default', false),
-				'process_tags' => $this->xpdo->context->getOption('tickets.process_tags_default', false),
+				'process_tags'  => $this->xpdo->context->getOption('tickets.process_tags_default', false),
 			];
 
 			// Old default values
@@ -465,17 +465,17 @@ class TicketsSection extends modResource
 			}
 		} elseif ('ratings' == $namespace) {
 			$default_properties = [
-				'ticket' => $this->xpdo->context->getOption('tickets.rating_ticket_default', 10),
-				'comment' => $this->xpdo->context->getOption('tickets.rating_comment_default', 1),
-				'view' => $this->xpdo->context->getOption('tickets.rating_view_default', 0.1),
-				'vote_ticket' => $this->xpdo->context->getOption('tickets.rating_vote_ticket_default', 1),
-				'vote_comment' => $this->xpdo->context->getOption('tickets.rating_vote_comment_default', 0.2),
-				'star_ticket' => $this->xpdo->context->getOption('tickets.rating_star_ticket_default', 3),
-				'star_comment' => $this->xpdo->context->getOption('tickets.rating_star_comment_default', 0.6),
-				'min_ticket_create' => '',
+				'ticket'             => $this->xpdo->context->getOption('tickets.rating_ticket_default', 10),
+				'comment'            => $this->xpdo->context->getOption('tickets.rating_comment_default', 1),
+				'view'               => $this->xpdo->context->getOption('tickets.rating_view_default', 0.1),
+				'vote_ticket'        => $this->xpdo->context->getOption('tickets.rating_vote_ticket_default', 1),
+				'vote_comment'       => $this->xpdo->context->getOption('tickets.rating_vote_comment_default', 0.2),
+				'star_ticket'        => $this->xpdo->context->getOption('tickets.rating_star_ticket_default', 3),
+				'star_comment'       => $this->xpdo->context->getOption('tickets.rating_star_comment_default', 0.6),
+				'min_ticket_create'  => '',
 				'min_comment_create' => '',
-				'days_ticket_vote' => '',
-				'days_comment_vote' => '',
+				'days_ticket_vote'   => '',
+				'days_comment_vote'  => '',
 			];
 
 			foreach ($default_properties as $key => $value) {
@@ -505,12 +505,12 @@ class TicketsSection extends modResource
 					$properties['ratings']['days_ticket_vote'],
 					$properties['ratings']['days_comment_vote']
 				);
-				$ratings = implode(array_values($properties['ratings']));
+				$ratings        = implode(array_values($properties['ratings']));
 				$update_actions = !empty($this->_oldRatings) && $this->_oldRatings != $ratings;
 			}
 		}
 
-		$new = $this->isNew();
+		$new   = $this->isNew();
 		$saved = parent::save($cacheFlag);
 		if ($saved && !$new) {
 			$this->updateChildrenURIs();
@@ -532,7 +532,7 @@ class TicketsSection extends modResource
 		$count = 0;
 		if (!empty($this->_oldUri) && $this->_oldUri != $this->get('uri')) {
 			$table = $this->xpdo->getTableName(Ticket::class);
-			$sql = "UPDATE {$table}
+			$sql   = "UPDATE {$table}
                 SET `uri` = REPLACE(`uri`, '{$this->_oldUri}', '{$this->get('uri')}')
                 WHERE `parent` = {$this->get('id')}";
 			$count = $this->xpdo->exec($sql);
@@ -581,7 +581,7 @@ class TicketsSection extends modResource
 		}
 
 		$properties = [];
-		$q = $this->xpdo->newQuery(TicketsSection::class, ['id' => $this->id]);
+		$q          = $this->xpdo->newQuery(TicketsSection::class, ['id' => $this->id]);
 		$q->select('properties');
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
@@ -602,7 +602,7 @@ class TicketsSection extends modResource
 	public function updateAuthorsActions()
 	{
 		$ratings = $this->getProperties('ratings');
-		$table = $this->xpdo->getTableName(TicketAuthorAction::class);
+		$table   = $this->xpdo->getTableName(TicketAuthorAction::class);
 		foreach ($ratings as $action => $rating) {
 			$sql = "UPDATE {$table} SET `rating` = `multiplier` * {$rating} WHERE `section` = {$this->id} AND `action` = '{$action}';";
 			$this->xpdo->exec($sql);

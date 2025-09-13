@@ -13,8 +13,8 @@ use Tickets\Model\TicketComment;
 
 class Get extends GetProcessor
 {
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = TicketComment::class;
+	public $objectType     = 'Tickets\Model\TicketComment';
+	public $classKey       = TicketComment::class;
 	public $languageTopics = ['tickets:default'];
 
 	/**
@@ -22,11 +22,11 @@ class Get extends GetProcessor
 	 */
 	public function cleanup()
 	{
-		$comment = $this->object->toArray();
+		$comment              = $this->object->toArray();
 		$comment['createdon'] = $this->formatDate($comment['createdon']);
-		$comment['editedon'] = $this->formatDate($comment['editedon']);
+		$comment['editedon']  = $this->formatDate($comment['editedon']);
 		$comment['deletedon'] = $this->formatDate($comment['deletedon']);
-		$comment['text'] = !empty($comment['raw'])
+		$comment['text']      = !empty($comment['raw'])
 			? html_entity_decode($comment['raw'])
 			: html_entity_decode($comment['text']);
 

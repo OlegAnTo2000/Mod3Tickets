@@ -4,7 +4,10 @@ namespace Tickets\Processors\Mgr\Subscribe;
 
 use function intval;
 use function json_decode;
+
 use MODX\Revolution\Processors\ProcessorResponse;
+
+use function tickets_service;
 
 class Multiple extends \MODX\Revolution\Processors\Processor
 {
@@ -16,7 +19,7 @@ class Multiple extends \MODX\Revolution\Processors\Processor
 		if (!$method = $this->getProperty('method', false)) {
 			return $this->failure();
 		}
-		$ids = json_decode($this->getProperty('ids'), true);
+		$ids     = json_decode($this->getProperty('ids'), true);
 		$parents = intval($this->getProperty('parents'));
 
 		if (empty($ids) || empty($parents)) {

@@ -1,10 +1,10 @@
 <?php
 
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketFile;
-use Tickets\Model\TicketAuthor;
-use Tickets\Model\TicketsSection;
 use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketFile;
+use Tickets\Model\TicketsSection;
 
 class Create extends ResourceCreateProcessor
 {
@@ -39,8 +39,8 @@ class Create extends ResourceCreateProcessor
 			}
 		}
 		$content = $this->getProperty('content');
-		$length = \mb_strlen(\strip_tags($content), $this->modx->getOption('modx_charset', null, 'UTF-8', true));
-		$max = $this->modx->getOption('tickets.ticket_max_cut', null, 1000, true);
+		$length  = \mb_strlen(\strip_tags($content), $this->modx->getOption('modx_charset', null, 'UTF-8', true));
+		$max     = $this->modx->getOption('tickets.ticket_max_cut', null, 1000, true);
 		if (empty($content) && 'mgr' != $this->modx->context->key) {
 			return $this->modx->lexicon('ticket_err_empty');
 		} elseif ('mgr' != $this->modx->context->key && !\preg_match('#<cut\b.*?>#', $content) && $length > $max) {
@@ -151,7 +151,7 @@ class Create extends ResourceCreateProcessor
 	 */
 	public function checkParentPermissions()
 	{
-		$parent = null;
+		$parent   = null;
 		$parentId = \intval($this->getProperty('parent'));
 		if ($parentId > 0) {
 			$sections = $this->getProperty('sections');
@@ -180,13 +180,13 @@ class Create extends ResourceCreateProcessor
 	 */
 	public function beforeSave()
 	{
-		/** @var TicketsSection $section */
+		/* @var TicketsSection $section */
 		if ($this->getProperty('published')) {
 			if ($section = $this->modx->getObject(TicketsSection::class, $this->object->get('parent'))) {
 				$ratings = $section->getProperties('ratings');
 				if (isset($ratings['min_ticket_create']) && '' !== $ratings['min_ticket_create']) {
 					if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
-						$min = (float) $ratings['min_ticket_create'];
+						$min    = (float) $ratings['min_ticket_create'];
 						$rating = $profile->get('rating');
 						if ($rating < $min) {
 							return $this->modx->lexicon('ticket_err_rating_ticket', ['rating' => $min]);
@@ -201,7 +201,7 @@ class Create extends ResourceCreateProcessor
 
 	public function afterSave()
 	{
-		$uri = $this->object->get('uri');
+		$uri     = $this->object->get('uri');
 		$new_uri = \str_replace('%id', $this->object->get('id'), $uri);
 		if ($uri != $new_uri) {
 			$this->object->set('uri', $new_uri);
@@ -214,7 +214,7 @@ class Create extends ResourceCreateProcessor
 			['cache_context_settings' => false]
 		);
 		$this->modx->context->resourceMap = $results['resourceMap'];
-		$this->modx->context->aliasMap = $results['aliasMap'];
+		$this->modx->context->aliasMap    = $results['aliasMap'];
 
 		if ($this->_sendEmails && 'mgr' == $this->modx->context->key) {
 			$this->sendTicketMails();
@@ -229,8 +229,8 @@ class Create extends ResourceCreateProcessor
 	protected function sendTicketMails()
 	{
 		/** @var Tickets $Tickets */
-		if ($Tickets = tickets_service()) {
-			$Tickets->config['tplTicketEmailBcc'] = 'tpl.Tickets.ticket.email.bcc';
+		if ($Tickets = \tickets_service()) {
+			$Tickets->config['tplTicketEmailBcc']          = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->sendTicketMails($this->object->toArray());
 		}
@@ -271,7 +271,7 @@ class Create extends ResourceCreateProcessor
 	{
 		if ('mgr' != $this->modx->context->key) {
 			$values = [];
-			$tvs = $this->object->getMany('TemplateVars');
+			$tvs    = $this->object->getMany('TemplateVars');
 
 			/** @var modTemplateVarResource $tv */
 			foreach ($tvs as $tv) {
@@ -308,7 +308,7 @@ class Create extends ResourceCreateProcessor
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
 		$replace = [];
-		$count = 0;
+		$count   = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
 			if ($item->get('deleted')) {
@@ -319,8 +319,8 @@ class Create extends ResourceCreateProcessor
 				$item->set('parent', $this->object->get('id'));
 				$item->save();
 				$replace[$old_url] = [
-					'url' => $item->get('url'),
-					'thumb' => $item->get('thumb'),
+					'url'    => $item->get('url'),
+					'thumb'  => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
 				];
 				++$count;
@@ -331,7 +331,7 @@ class Create extends ResourceCreateProcessor
 		if (!empty($replace)) {
 			$array = [
 				'introtext' => $this->object->get('introtext'),
-				'content' => $this->object->get('content'),
+				'content'   => $this->object->get('content'),
 			];
 			$update = false;
 			foreach ($array as $field => $text) {

@@ -2,11 +2,11 @@
 
 class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\GetListProcessor
 {
-	public $classKey = 'TicketsSection';
-	public $defaultSortField = 'pagetitle';
+	public $classKey             = 'TicketsSection';
+	public $defaultSortField     = 'pagetitle';
 	public $defaultSortDirection = 'ASC';
-	public $checkListPermission = true;
-	public $item_id = 0;
+	public $checkListPermission  = true;
+	public $item_id              = 0;
 
 	/**
 	 * @return bool
@@ -19,8 +19,8 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 		$this->setDefaultProperties([
 			'start' => 0,
 			'limit' => 20,
-			'sort' => $this->defaultSortField,
-			'dir' => $this->defaultSortDirection,
+			'sort'  => $this->defaultSortField,
+			'dir'   => $this->defaultSortDirection,
 			'combo' => false,
 			'query' => '',
 		]);
@@ -50,18 +50,18 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 	 */
 	public function getData()
 	{
-		$data = [];
+		$data  = [];
 		$limit = \intval($this->getProperty('limit'));
 		$start = \intval($this->getProperty('start'));
 
 		// query for chunks
-		$c = $this->modx->newQuery($this->classKey);
-		$c = $this->prepareQueryBeforeCount($c);
+		$c             = $this->modx->newQuery($this->classKey);
+		$c             = $this->prepareQueryBeforeCount($c);
 		$data['total'] = $this->modx->getCount($this->classKey, $c);
-		$c = $this->prepareQueryAfterCount($c);
+		$c             = $this->prepareQueryAfterCount($c);
 
 		$sortClassKey = $this->getSortClassKey();
-		$sortKey = $this->modx->getSelectColumns(
+		$sortKey      = $this->modx->getSelectColumns(
 			$sortClassKey,
 			$this->getProperty('sortAlias', $sortClassKey),
 			'',
@@ -110,10 +110,10 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 	 */
 	public function iterate(array $data)
 	{
-		$list = [];
-		$list = $this->beforeIteration($list);
+		$list               = [];
+		$list               = $this->beforeIteration($list);
 		$this->currentIndex = 0;
-		/** @var \xPDO\Om\xPDOObject|modAccessibleObject $object */
+		/* @var \xPDO\Om\xPDOObject|modAccessibleObject $object */
 		foreach ($data['results'] as $array) {
 			$objectArray = $this->prepareResult($array);
 			if (!empty($objectArray) && \is_array($objectArray)) {
@@ -132,7 +132,7 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 	public function prepareResult(array $resourceArray)
 	{
 		$resourceArray['parents'] = [];
-		$parents = $this->modx->getParentIds(
+		$parents                  = $this->modx->getParentIds(
 			$resourceArray['id'],
 			2,
 			['context' => $resourceArray['context_key']]

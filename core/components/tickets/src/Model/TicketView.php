@@ -16,7 +16,7 @@ class TicketView extends xPDOObject
 	 */
 	public function save($cacheFlag = null)
 	{
-		$new = $this->isNew();
+		$new    = $this->isNew();
 		$parent = parent::save($cacheFlag);
 
 		if ($new) {

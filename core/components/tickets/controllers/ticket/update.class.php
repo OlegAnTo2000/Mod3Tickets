@@ -40,12 +40,12 @@ class TicketUpdateManagerController extends ResourceUpdateManagerController
 		$this->resourceArray['properties']['tickets'] = $this->resource->getProperties('tickets');
 
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 		$Tickets->loadManagerFiles($this, [
-			'config' => true,
-			'utils' => true,
-			'css' => true,
-			'ticket' => true,
+			'config'   => true,
+			'utils'    => true,
+			'css'      => true,
+			'ticket'   => true,
 			'comments' => true,
 		]);
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/ticket/update.js');
@@ -56,27 +56,27 @@ class TicketUpdateManagerController extends ResourceUpdateManagerController
 			$neighborhood = $this->resource->getNeighborhood();
 		}
 		$ready = [
-			'xtype' => 'tickets-page-ticket-update',
-			'resource' => $this->resource->get('id'),
-			'record' => $this->resourceArray,
+			'xtype'            => 'tickets-page-ticket-update',
+			'resource'         => $this->resource->get('id'),
+			'record'           => $this->resourceArray,
 			'publish_document' => (int) $this->canPublish,
-			'preview_url' => $this->previewUrl,
-			'locked' => (int) $this->locked,
-			'lockedText' => $this->lockedText,
-			'canSave' => (int) $this->canSave,
-			'canEdit' => (int) $this->canEdit,
-			'canCreate' => (int) $this->canCreate,
-			'canDuplicate' => (int) $this->canDuplicate,
-			'canDelete' => (int) $this->canDelete,
-			'show_tvs' => (int) !empty($this->tvCounts),
-			'next_page' => !empty($neighborhood['right'][0])
+			'preview_url'      => $this->previewUrl,
+			'locked'           => (int) $this->locked,
+			'lockedText'       => $this->lockedText,
+			'canSave'          => (int) $this->canSave,
+			'canEdit'          => (int) $this->canEdit,
+			'canCreate'        => (int) $this->canCreate,
+			'canDuplicate'     => (int) $this->canDuplicate,
+			'canDelete'        => (int) $this->canDelete,
+			'show_tvs'         => (int) !empty($this->tvCounts),
+			'next_page'        => !empty($neighborhood['right'][0])
 				? $neighborhood['right'][0]
 				: 0,
 			'prev_page' => !empty($neighborhood['left'][0])
 				? $neighborhood['left'][0]
 				: 0,
 			'up_page' => $this->resource->parent,
-			'mode' => 'update',
+			'mode'    => 'update',
 		];
 		$this->addHtml('
         <script type="text/javascript">

@@ -22,12 +22,12 @@ class Vote extends CreateProcessor
 {
 	/** @var TicketVote */
 	public $object;
-	public $objectType = 'TicketVote';
-	public $classKey = TicketVote::class;
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = 'TicketVote';
+	public $classKey        = TicketVote::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketVote';
-	public $afterSaveEvent = 'OnTicketVote';
-	public $permission = 'ticket_vote';
+	public $afterSaveEvent  = 'OnTicketVote';
+	public $permission      = 'ticket_vote';
 	/** @var Ticket|modResource */
 	private $ticket;
 
@@ -45,7 +45,7 @@ class Vote extends CreateProcessor
 		} elseif ($this->ticket->createdby == $this->modx->user->id) {
 			return $this->modx->lexicon('ticket_err_vote_own');
 		}
-		/** @var TicketVote $vote */
+		/* @var TicketVote $vote */
 		elseif ($this->modx->getCount(
 			$this->classKey,
 			['id' => $id, 'createdby' => $this->modx->user->id, 'class' => Ticket::class]

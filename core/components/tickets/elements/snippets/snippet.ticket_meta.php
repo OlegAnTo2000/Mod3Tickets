@@ -1,13 +1,13 @@
 <?php
 
-use Tickets\Model\Ticket;
+use MODX\Revolution\modResource;
 use MODX\Revolution\modUser;
+use MODX\Revolution\modUserProfile;
+use Tickets\Model\Ticket;
 use Tickets\Model\TicketFile;
+use Tickets\Model\TicketsSection;
 use Tickets\Model\TicketStar;
 use Tickets\Model\TicketVote;
-use MODX\Revolution\modResource;
-use Tickets\Model\TicketsSection;
-use MODX\Revolution\modUserProfile;
 
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
@@ -41,14 +41,14 @@ if ('Ticket' == $class && $total = $ticket->getOne('Total')) {
 	$total->fetchValues();
 	$total->save();
 }
-$data = $ticket->toArray();
+$data             = $ticket->toArray();
 $data['date_ago'] = $Tickets->dateFormat($data['createdon']);
 
 $vote = $pdoFetch->getObject(
 	TicketVote::class,
 	[
-		'id' => $ticket->id,
-		'class' => Ticket::class,
+		'id'        => $ticket->id,
+		'class'     => Ticket::class,
 		'createdby' => $modx->user->id,
 	],
 	[
@@ -60,8 +60,8 @@ if (!empty($vote)) {
 	$data['vote'] = $vote['value'];
 }
 
-$star = $modx->getCount(TicketStar::class, ['id' => $ticket->id, 'class' => Ticket::class, 'createdby' => $modx->user->id]);
-$data['stared'] = !empty($star);
+$star             = $modx->getCount(TicketStar::class, ['id' => $ticket->id, 'class' => Ticket::class, 'createdby' => $modx->user->id]);
+$data['stared']   = !empty($star);
 $data['unstared'] = empty($star);
 
 if ('Ticket' != $class) {
@@ -86,7 +86,7 @@ if ('Ticket' != $class) {
 		}
 	}
 	$data['can_vote'] = false === $data['voted'] && $Tickets->authenticated && $modx->user->id != $ticket->createdby;
-	$data = \array_merge($ticket->getProperties('tickets'), $data);
+	$data             = \array_merge($ticket->getProperties('tickets'), $data);
 	if (!isset($data['rating'])) {
 		$data['rating'] = $data['rating_total'] = $data['rating_plus'] = $data['rating_minus'] = 0;
 	}
@@ -96,7 +96,7 @@ if ('Ticket' != $class) {
 
 	// Comments
 	$data['comments'] = 0;
-	$thread = empty($thread)
+	$thread           = empty($thread)
 		? 'resource-' . $ticket->id
 		: $thread;
 	$q = $modx->newQuery('TicketThread', ['name' => $thread]);
@@ -118,7 +118,7 @@ if ('Ticket' != $class) {
 }
 
 if ($data['rating'] > 0) {
-	$data['rating'] = '+' . $data['rating'];
+	$data['rating']          = '+' . $data['rating'];
 	$data['rating_positive'] = 1;
 } elseif ($data['rating'] < 0) {
 	$data['rating_negative'] = 1;
@@ -145,32 +145,32 @@ if (!isset($data['cant_vote'])) {
 			$data['can_vote'] = 1;
 		} elseif ($data['vote'] > 0) {
 			$data['voted_plus'] = 1;
-			$data['cant_vote'] = 1;
+			$data['cant_vote']  = 1;
 		} elseif ($data['vote'] < 0) {
 			$data['voted_minus'] = 1;
-			$data['cant_vote'] = 1;
+			$data['cant_vote']   = 1;
 		} else {
 			$data['voted_none'] = 1;
-			$data['cant_vote'] = 1;
+			$data['cant_vote']  = 1;
 		}
 	} else {
 		$data['can_vote'] = 1;
 	}
 }
 
-$data['active'] = (int) !empty($data['can_vote']);
+$data['active']   = (int) !empty($data['can_vote']);
 $data['inactive'] = (int) !empty($data['cant_vote']);
 $data['can_star'] = $Tickets->authenticated;
 
 if (!empty($getUser)) {
 	$fields = $modx->getFieldMeta(modUserProfile::class);
-	$user = $pdoFetch->getObject(modUserProfile::class, ['internalKey' => $ticket->createdby], [
+	$user   = $pdoFetch->getObject(modUserProfile::class, ['internalKey' => $ticket->createdby], [
 		'innerJoin' => [
 			'modUser' => ['class' => modUser::class, 'on' => 'modUserProfile.internalKey = modUser.id'],
 		],
 		'select' => [
 			'modUserProfile' => \implode(',', \array_keys($fields)),
-			'modUser' => 'username',
+			'modUser'        => 'username',
 		],
 	]);
 	if ($user) {
@@ -179,8 +179,8 @@ if (!empty($getUser)) {
 }
 
 if (!empty($getFiles)) {
-	$where = ['deleted' => 0, 'class' => Ticket::class, 'parent' => $ticket->id];
-	$collection = $pdoFetch->getCollection(TicketFile::class, $where, ['sortby' => 'createdon', 'sortdir' => 'ASC']);
+	$where         = ['deleted' => 0, 'class' => Ticket::class, 'parent' => $ticket->id];
+	$collection    = $pdoFetch->getCollection(TicketFile::class, $where, ['sortby' => 'createdon', 'sortdir' => 'ASC']);
 	$data['files'] = $content = '';
 	if (!empty($unusedFiles)) {
 		$content = $ticket->getContent();

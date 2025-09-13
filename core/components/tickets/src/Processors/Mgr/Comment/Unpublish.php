@@ -4,17 +4,19 @@ namespace Tickets\Processors\Mgr\Comment;
 
 use MODX\Revolution\Processors\Model\UpdateProcessor;
 
+use function tickets_service;
+
 class TicketCommentUnpublishProcessor extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = 'Tickets\Model\TicketComment';
+	public $classKey        = 'Tickets\Model\TicketComment';
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUnpublish';
-	public $afterSaveEvent = 'OnCommentUnpublish';
-	public $permission = 'comment_publish';
-	protected $_sendEmails = false;
+	public $afterSaveEvent  = 'OnCommentUnpublish';
+	public $permission      = 'comment_publish';
+	protected $_sendEmails  = false;
 
 	public function beforeSet()
 	{

@@ -24,6 +24,7 @@ use Tickets\Model\TicketAuthor;
 use Tickets\Model\TicketFile;
 use Tickets\Model\TicketsSection;
 
+use function tickets_service;
 use function time;
 use function trim;
 
@@ -31,8 +32,8 @@ class Update extends ResourceUpdate
 {
 	/** @var Ticket */
 	public $object;
-	public $classKey = Ticket::class;
-	public $permission = 'ticket_save';
+	public $classKey       = Ticket::class;
+	public $permission     = 'ticket_save';
 	public $languageTopics = ['resource', 'tickets:default'];
 	private $_published;
 	private $_sendEmails = false;
@@ -49,7 +50,7 @@ class Update extends ResourceUpdate
 
 		if (
 			!$this->modx->getCount($this->classKey, [
-				'id' => $primaryKey,
+				'id'        => $primaryKey,
 				'class_key' => $this->classKey,
 			]) && $res = $this->modx->getObject(modResource::class, ['id' => $primaryKey])
 		) {
@@ -85,8 +86,8 @@ class Update extends ResourceUpdate
 			}
 		}
 		$content = $this->getProperty('content');
-		$length = mb_strlen(strip_tags($content), $this->modx->getOption('modx_charset', null, 'UTF-8', true));
-		$max = $this->modx->getOption('tickets.ticket_max_cut', null, 1000, true);
+		$length  = mb_strlen(strip_tags($content), $this->modx->getOption('modx_charset', null, 'UTF-8', true));
+		$max     = $this->modx->getOption('tickets.ticket_max_cut', null, 1000, true);
 		if (empty($content) && 'mgr' != $this->modx->context->key) {
 			return $this->modx->lexicon('ticket_err_empty');
 		} elseif ('mgr' != $this->modx->context->key && !preg_match('#<cut\b.*?>#', $content) && $length > $max) {
@@ -127,7 +128,7 @@ class Update extends ResourceUpdate
 		if ('mgr' != $this->modx->context->key) {
 			$this->unsetProperty('properties');
 			$this->unsetProperty('published');
-			$tmp = $this->parentResource->getProperties();
+			$tmp      = $this->parentResource->getProperties();
 			$template = $tmp['template'];
 			if (empty($template)) {
 				$template = $this->modx->context->getOption(
@@ -139,7 +140,7 @@ class Update extends ResourceUpdate
 		}
 		$this->setProperties([
 			'class_key' => Ticket::class,
-			'syncsite' => 0,
+			'syncsite'  => 0,
 			'introtext' => $introtext,
 		]);
 		if ('mgr' != $this->modx->context->key && !is_null($this->_published)) {
@@ -147,7 +148,7 @@ class Update extends ResourceUpdate
 		}
 		if ('mgr' == $this->modx->context->key) {
 			$properties['disable_jevix'] = !empty($properties['disable_jevix']);
-			$properties['process_tags'] = !empty($properties['process_tags']);
+			$properties['process_tags']  = !empty($properties['process_tags']);
 			$this->object->setProperties($properties, 'tickets', true);
 		}
 
@@ -176,7 +177,7 @@ class Update extends ResourceUpdate
 					$ratings = $section->getProperties('ratings');
 					if (isset($ratings['min_ticket_create']) && '' !== $ratings['min_ticket_create']) {
 						if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
-							$min = (float) $ratings['min_ticket_create'];
+							$min    = (float) $ratings['min_ticket_create'];
 							$rating = $profile->get('rating');
 							if ($rating < $min) {
 								return $this->modx->lexicon('ticket_err_rating_ticket', ['rating' => $min]);
@@ -212,7 +213,7 @@ class Update extends ResourceUpdate
 	{
 		/** @var Tickets $Tickets */
 		if ($Tickets = tickets_service()) {
-			$Tickets->config['tplTicketEmailBcc'] = 'tpl.Tickets.ticket.email.bcc';
+			$Tickets->config['tplTicketEmailBcc']          = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->sendTicketMails($this->object->toArray());
 		}
@@ -245,7 +246,7 @@ class Update extends ResourceUpdate
 			return parent::handleParent();
 		}
 
-		$parent = null;
+		$parent   = null;
 		$parentId = intval($this->getProperty('parent'));
 		if ($parentId > 0) {
 			$sections = $this->getProperty('sections');
@@ -284,7 +285,7 @@ class Update extends ResourceUpdate
 		$this->object->clearCache();
 		/** @var TicketsSection $section */
 		if ($section = $this->object->getOne('Section')) {
-			/** @var TicketsSection $section */
+			/* @var TicketsSection $section */
 			$section->clearCache();
 		}
 	}
@@ -296,7 +297,7 @@ class Update extends ResourceUpdate
 	{
 		if ('mgr' != $this->modx->context->key) {
 			$values = [];
-			$tvs = $this->object->getMany('TemplateVariables');
+			$tvs    = $this->object->getMany('TemplateVariables');
 
 			/** @var modTemplateVarResource $tv */
 			foreach ($tvs as $tv) {
@@ -336,7 +337,7 @@ class Update extends ResourceUpdate
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
 		$replace = [];
-		$count = 0;
+		$count   = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
 			if ($item->get('deleted')) {
@@ -347,8 +348,8 @@ class Update extends ResourceUpdate
 				$item->set('parent', $this->object->id);
 				$item->save();
 				$replace[$old_url] = [
-					'url' => $item->get('url'),
-					'thumb' => $item->get('thumb'),
+					'url'    => $item->get('url'),
+					'thumb'  => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
 				];
 				++$count;
@@ -359,7 +360,7 @@ class Update extends ResourceUpdate
 		if (!empty($replace)) {
 			$array = [
 				'introtext' => $this->object->get('introtext'),
-				'content' => $this->object->get('content'),
+				'content'   => $this->object->get('content'),
 			];
 			$update = false;
 			foreach ($array as $field => $text) {

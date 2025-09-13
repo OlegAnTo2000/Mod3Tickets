@@ -5,6 +5,7 @@ namespace Tickets\Processors\Mgr\Comment;
 use MODX\Revolution\Processors\Model\UpdateProcessor;
 use Tickets\Model\TicketComment;
 
+use function tickets_service;
 use function time;
 use function trim;
 
@@ -12,13 +13,13 @@ class Update extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = TicketComment::class;
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentSave';
-	public $afterSaveEvent = 'OnCommentSave';
-	public $permission = 'comment_save';
-	protected $old_thread = 0;
+	public $afterSaveEvent  = 'OnCommentSave';
+	public $permission      = 'comment_save';
+	protected $old_thread   = 0;
 
 	/**
 	 * @return bool|string|null
@@ -36,7 +37,7 @@ class Update extends UpdateProcessor
 		}
 
 		$this->old_thread = $this->object->get('thread');
-		$parent = $this->getProperty('parent');
+		$parent           = $this->getProperty('parent');
 		// New parent is in other thread
 		if (0 != $parent && $parent != $this->object->get('parent')) {
 			if ($parent = $this->modx->getObject(TicketComment::class, ['id' => (int) $parent])) {
@@ -60,8 +61,8 @@ class Update extends UpdateProcessor
 			$this->object->fromArray([
 				'editedon' => time(),
 				'editedby' => $this->modx->user->id,
-				'text' => $Tickets->sanitizeText($text, true),
-				'raw' => $text,
+				'text'     => $Tickets->sanitizeText($text, true),
+				'raw'      => $text,
 			]);
 		}
 

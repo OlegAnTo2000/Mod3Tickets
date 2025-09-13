@@ -29,26 +29,26 @@ class TicketsSectionCreateManagerController extends ResourceCreateManagerControl
 		}
 		$this->resourceArray['properties']['tickets'] = $this->resource->getProperties('tickets');
 		$this->resourceArray['properties']['ratings'] = $this->resource->getProperties('ratings');
-		$this->resourceArray['syncsite'] = 0;
+		$this->resourceArray['syncsite']              = 0;
 
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 		$Tickets->loadManagerFiles($this, [
-			'config' => true,
-			'utils' => true,
-			'css' => true,
+			'config'  => true,
+			'utils'   => true,
+			'css'     => true,
 			'section' => true,
 		]);
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/section/create.js');
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
 
 		$ready = [
-			'xtype' => 'tickets-page-section-create',
-			'record' => $this->resourceArray,
+			'xtype'            => 'tickets-page-section-create',
+			'record'           => $this->resourceArray,
 			'publish_document' => (int) $this->canPublish,
-			'canSave' => (int) $this->canSave,
-			'show_tvs' => (int) !empty($this->tvCounts),
-			'mode' => 'create',
+			'canSave'          => (int) $this->canSave,
+			'show_tvs'         => (int) !empty($this->tvCounts),
+			'mode'             => 'create',
 		];
 		$this->addHtml('
         <script type="text/javascript">

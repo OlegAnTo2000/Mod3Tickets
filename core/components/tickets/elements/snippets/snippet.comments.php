@@ -1,10 +1,10 @@
 <?php
 
-use Tickets\Tickets;
-use Tickets\Model\TicketThread;
 use MODX\Revolution\Sources\modMediaSource;
+use Tickets\Model\TicketThread;
+use Tickets\Tickets;
 
-/** @var array $scriptProperties */
+/* @var array $scriptProperties */
 if (empty($thread)) {
 	$scriptProperties['thread'] = $modx->getOption(
 		'thread',
@@ -13,18 +13,18 @@ if (empty($thread)) {
 		true
 	);
 }
-$scriptProperties['resource'] = $modx->resource->get('id');
+$scriptProperties['resource']              = $modx->resource->get('id');
 $scriptProperties['snippetPrepareComment'] = $modx->getOption('tickets.snippet_prepare_comment');
-$scriptProperties['commentEditTime'] = $modx->getOption('tickets.comment_edit_time', null, 180);
+$scriptProperties['commentEditTime']       = $modx->getOption('tickets.comment_edit_time', null, 180);
 
-$depth = $modx->getOption('depth', $scriptProperties, 0);
-$tplComments = $modx->getOption('tplComments', $scriptProperties, 'tpl.Tickets.comment.wrapper');
-$tplCommentForm = $modx->getOption('tplCommentForm', $scriptProperties, 'tpl.Tickets.comment.form');
+$depth               = $modx->getOption('depth', $scriptProperties, 0);
+$tplComments         = $modx->getOption('tplComments', $scriptProperties, 'tpl.Tickets.comment.wrapper');
+$tplCommentForm      = $modx->getOption('tplCommentForm', $scriptProperties, 'tpl.Tickets.comment.form');
 $tplCommentFormGuest = $modx->getOption('tplCommentFormGuest', $scriptProperties, 'tpl.Tickets.comment.form.guest');
-$tplCommentAuth = $modx->getOption('tplCommentAuth', $scriptProperties, 'tpl.Tickets.comment.one.auth');
-$tplCommentGuest = $modx->getOption('tplCommentGuest', $scriptProperties, 'tpl.Tickets.comment.one.guest');
-$tplLoginToComment = $modx->getOption('tplLoginToComment', $scriptProperties, 'tpl.Tickets.comment.login');
-$outputSeparator = $modx->getOption('outputSeparator', $scriptProperties, "\n");
+$tplCommentAuth      = $modx->getOption('tplCommentAuth', $scriptProperties, 'tpl.Tickets.comment.one.auth');
+$tplCommentGuest     = $modx->getOption('tplCommentGuest', $scriptProperties, 'tpl.Tickets.comment.one.guest');
+$tplLoginToComment   = $modx->getOption('tplLoginToComment', $scriptProperties, 'tpl.Tickets.comment.login');
+$outputSeparator     = $modx->getOption('outputSeparator', $scriptProperties, "\n");
 
 /** @var Tickets $Tickets */
 $Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
@@ -35,7 +35,7 @@ $Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 $tplFiles = $Tickets->config['tplFiles'] = $modx->getOption('tplFiles', $scriptProperties, 'tpl.Tickets.comment.form.files');
-$tplFile = $Tickets->config['tplFile'] = $modx->getOption('tplFile', $scriptProperties, 'tpl.Tickets.form.file', true);
+$tplFile  = $Tickets->config['tplFile'] = $modx->getOption('tplFile', $scriptProperties, 'tpl.Tickets.form.file', true);
 $tplImage = $Tickets->config['tplImage'] = $modx->getOption(
 	'tplImage',
 	$scriptProperties,
@@ -53,10 +53,10 @@ $pdoFetch->addTime('pdoTools loaded');
 if (!$thread = $modx->getObject(TicketThread::class, ['name' => $scriptProperties['thread']])) {
 	$thread = $modx->newObject(TicketThread::class);
 	$thread->fromArray([
-		'name' => $scriptProperties['thread'],
-		'resource' => $modx->resource->get('id'),
-		'createdby' => $modx->user->id,
-		'createdon' => \date('Y-m-d H:i:s'),
+		'name'        => $scriptProperties['thread'],
+		'resource'    => $modx->resource->get('id'),
+		'createdby'   => $modx->user->id,
+		'createdon'   => \date('Y-m-d H:i:s'),
 		'subscribers' => [$modx->resource->get('createdby')],
 	]);
 } elseif ($thread->get('deleted')) {
@@ -95,29 +95,29 @@ if (empty($showUnpublished)) {
 $innerJoin = [
 	'Thread' => [
 		'class' => 'TicketThread',
-		'on' => '`Thread`.`id` = `TicketComment`.`thread` AND `Thread`.`name` = "' . $thread->get('name') . '"',
+		'on'    => '`Thread`.`id` = `TicketComment`.`thread` AND `Thread`.`name` = "' . $thread->get('name') . '"',
 	],
 ];
 $leftJoin = [
-	'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+	'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
 ];
 if ($Tickets->authenticated) {
 	$leftJoin['Vote'] = [
 		'class' => 'TicketVote',
-		'on' => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "TicketComment" AND `Vote`.`createdby` = ' . $modx->user->id,
+		'on'    => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "TicketComment" AND `Vote`.`createdby` = ' . $modx->user->id,
 	];
 	$leftJoin['Star'] = [
 		'class' => 'TicketStar',
-		'on' => '`Star`.`id` = `TicketComment`.`id` AND `Star`.`class` = "TicketComment" AND `Star`.`createdby` = ' . $modx->user->id,
+		'on'    => '`Star`.`id` = `TicketComment`.`id` AND `Star`.`class` = "TicketComment" AND `Star`.`createdby` = ' . $modx->user->id,
 	];
 }
 // Fields to select
 $select = [
 	'TicketComment' => $modx->getSelectColumns('TicketComment', 'TicketComment', '', ['raw'], true) .
 		', `parent` as `new_parent`',
-	'Thread' => '`Thread`.`resource`',
-	'User' => '`User`.`username`',
+	'Thread'  => '`Thread`.`resource`',
+	'User'    => '`User`.`username`',
 	'Profile' => $modx->getSelectColumns(
 		modUserProfile::class,
 		'Profile',
@@ -147,17 +147,17 @@ foreach (['where', 'select', 'leftJoin', 'innerJoin'] as $v) {
 $pdoFetch->addTime('Conditions prepared');
 
 $default = [
-	'class' => $class,
-	'where' => \json_encode($where),
-	'innerJoin' => \json_encode($innerJoin),
-	'leftJoin' => \json_encode($leftJoin),
-	'select' => \json_encode($select),
-	'sortby' => $class . '.id',
-	'sortdir' => 'ASC',
-	'groupby' => $class . '.id',
-	'limit' => 0,
-	'fastMode' => true,
-	'return' => 'data',
+	'class'             => $class,
+	'where'             => \json_encode($where),
+	'innerJoin'         => \json_encode($innerJoin),
+	'leftJoin'          => \json_encode($leftJoin),
+	'select'            => \json_encode($select),
+	'sortby'            => $class . '.id',
+	'sortdir'           => 'ASC',
+	'groupby'           => $class . '.id',
+	'limit'             => 0,
+	'fastMode'          => true,
+	'return'            => 'data',
 	'nestedChunkPrefix' => 'tickets_',
 ];
 
@@ -170,10 +170,10 @@ $rows = $pdoFetch->run();
 $output = $commentsThread = null;
 if (!empty($rows) && \is_array($rows)) {
 	$tmp = [];
-	$i = 1;
+	$i   = 1;
 	foreach ($rows as $row) {
-		$row['ratings'] = $ratings;
-		$row['idx'] = $i++;
+		$row['ratings']  = $ratings;
+		$row['idx']      = $i++;
 		$tmp[$row['id']] = $row;
 	}
 	$rows = $thread->buildTree($tmp, $depth);
@@ -195,8 +195,8 @@ if (!empty($rows) && \is_array($rows)) {
 }
 
 $commentsThread = $pdoFetch->getChunk($tplComments, [
-	'total' => $modx->getPlaceholder($pdoFetch->config['totalVar']),
-	'comments' => $output,
+	'total'      => $modx->getPlaceholder($pdoFetch->config['totalVar']),
+	'comments'   => $output,
 	'subscribed' => $thread->isSubscribed(),
 ]);
 
@@ -217,7 +217,7 @@ if (!empty($allowFiles)) {
 		/** @var modMediaSource $source */
 		if ($source = $modx->getObject(modMediaSource::class, ['id' => $source])) {
 			$properties = $source->getPropertyList();
-			$config = [
+			$config     = [
 				'size' => !empty($properties['maxUploadSize'])
 					? $properties['maxUploadSize']
 					: 3145728,
@@ -248,17 +248,17 @@ if (!empty($allowFiles)) {
 	}
 }
 
-$key = \md5(\json_encode($Tickets->config));
+$key                          = \md5(\json_encode($Tickets->config));
 $_SESSION['TicketForm'][$key] = $Tickets->config;
-$pls['formkey'] = $key;
+$pls['formkey']               = $key;
 
 if (!$Tickets->authenticated && empty($allowGuest)) {
 	$form = $pdoFetch->getChunk($tplLoginToComment);
 } elseif (!$Tickets->authenticated) {
-	$pls['name'] = $_SESSION['TicketComments']['name'];
+	$pls['name']  = $_SESSION['TicketComments']['name'];
 	$pls['email'] = $_SESSION['TicketComments']['email'];
 	if (!empty($enableCaptcha)) {
-		$tmp = $Tickets->getCaptcha();
+		$tmp            = $Tickets->getCaptcha();
 		$pls['captcha'] = $modx->lexicon('ticket_comment_captcha', $tmp);
 	}
 	$form = $pdoFetch->getChunk($tplCommentFormGuest, $pls);

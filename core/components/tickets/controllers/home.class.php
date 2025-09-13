@@ -24,7 +24,7 @@ class TicketsHomeManagerController extends modExtraManagerController
 	public function loadCustomCssJs()
 	{
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 
 		$Tickets->loadManagerFiles($this, [
 			'config'   => true,
@@ -51,7 +51,7 @@ class TicketsHomeManagerController extends modExtraManagerController
 	public function getTemplateFile()
 	{
 		/** @var Tickets $Tickets */
-		$Tickets = tickets_service();
+		$Tickets = \tickets_service();
 
 		return $Tickets->config['templatesPath'] . 'home.tpl';
 	}

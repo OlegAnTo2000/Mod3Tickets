@@ -12,12 +12,12 @@ class Delete extends UpdateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
+	public $objectType      = 'Tickets\Model\TicketComment';
+	public $classKey        = TicketComment::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentDelete';
-	public $afterSaveEvent = 'OnCommentDelete';
-	public $permission = 'comment_delete';
+	public $afterSaveEvent  = 'OnCommentDelete';
+	public $permission      = 'comment_delete';
 
 	public function beforeSet()
 	{
@@ -32,7 +32,7 @@ class Delete extends UpdateProcessor
 	public function beforeSave()
 	{
 		$this->object->fromArray([
-			'deleted' => 1,
+			'deleted'   => 1,
 			'deletedon' => time(),
 			'deletedby' => $this->modx->user->get('id'),
 		]);
@@ -47,7 +47,7 @@ class Delete extends UpdateProcessor
 	{
 		$this->object->clearTicketCache();
 		if ($thread = $this->object->getOne('Thread')) {
-			/** @var TicketThread $thread */
+			/* @var TicketThread $thread */
 			$thread->updateLastComment();
 		}
 		$this->modx->cacheManager->delete('tickets/latest.comments');

@@ -7,7 +7,7 @@ use Tickets\Model\TicketFile;
 
 class Delete extends ModelProcessor
 {
-	public $classKey = TicketFile::class;
+	public $classKey   = TicketFile::class;
 	public $permission = 'ticket_file_upload';
 
 	/**

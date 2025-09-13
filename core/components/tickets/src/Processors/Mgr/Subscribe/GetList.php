@@ -11,12 +11,12 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 {
-	public $objectType = modUser::class;
-	public $classKey = modUser::class;
-	public $languageTopics = ['tickets:default'];
-	public $defaultSortField = 'modUser.id';
+	public $objectType           = modUser::class;
+	public $classKey             = modUser::class;
+	public $languageTopics       = ['tickets:default'];
+	public $defaultSortField     = 'modUser.id';
 	public $defaultSortDirection = 'DESC';
-	public $subscribers = [];
+	public $subscribers          = [];
 
 	public function beforeQuery()
 	{
@@ -50,9 +50,9 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 					$where[]['modUser.id:='] = $query;
 				} else {
 					$where[] = [
-						'Profile.fullname:LIKE' => '%' . $query . '%',
+						'Profile.fullname:LIKE'    => '%' . $query . '%',
 						'OR:modUser.username:LIKE' => '%' . $query . '%',
-						'OR:Profile.email:LIKE' => '%' . $query . '%',
+						'OR:Profile.email:LIKE'    => '%' . $query . '%',
 					];
 				}
 			}
@@ -83,13 +83,13 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 		$start = intval($this->getProperty('start'));
 
 		/* query for chunks */
-		$c = $this->modx->newQuery($this->classKey);
-		$c = $this->prepareQueryBeforeCount($c);
+		$c             = $this->modx->newQuery($this->classKey);
+		$c             = $this->prepareQueryBeforeCount($c);
 		$data['total'] = $this->modx->getCount($this->classKey, $c);
-		$c = $this->prepareQueryAfterCount($c);
+		$c             = $this->prepareQueryAfterCount($c);
 
 		$sortClassKey = $this->getSortClassKey();
-		$sortKey = $this->modx->getSelectColumns($sortClassKey, $this->getProperty('sortAlias', $sortClassKey), '', [$this->getProperty('sort')]);
+		$sortKey      = $this->modx->getSelectColumns($sortClassKey, $this->getProperty('sortAlias', $sortClassKey), '', [$this->getProperty('sort')]);
 		if (empty($sortKey)) {
 			$sortKey = $this->getProperty('sort');
 		}
@@ -112,15 +112,15 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 
 		unset($array['properties']);
 
-		$array['actions'] = [];
+		$array['actions']   = [];
 		$array['actions'][] = [
-			'cls' => '',
-			'icon' => 'icon icon-trash-o action-gray',
-			'title' => $this->modx->lexicon('tickets_action_unsubscribe'),
+			'cls'      => '',
+			'icon'     => 'icon icon-trash-o action-gray',
+			'title'    => $this->modx->lexicon('tickets_action_unsubscribe'),
 			'multiple' => $this->modx->lexicon('tickets_action_unsubscribe'),
-			'action' => 'unsubscribeSection',
-			'button' => true,
-			'menu' => false,
+			'action'   => 'unsubscribeSection',
+			'button'   => true,
+			'menu'     => false,
 		];
 
 		return $array;

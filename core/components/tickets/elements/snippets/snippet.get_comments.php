@@ -1,17 +1,17 @@
 <?php
 
-use Tickets\Model\Ticket;
 use MODX\Revolution\modUser;
-use Tickets\Model\TicketStar;
-use Tickets\Model\TicketVote;
-use Tickets\Model\TicketThread;
+use MODX\Revolution\modUserProfile;
+use Tickets\Model\Ticket;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketsSection;
-use MODX\Revolution\modUserProfile;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketVote;
 
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = tickets_service($modx, $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 /** @var pdoFetch $pdoFetch */
@@ -19,17 +19,17 @@ $pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
-$tpl = $modx->getOption('tpl', $scriptProperties, 'tpl.Tickets.comment.list.row');
+$tpl             = $modx->getOption('tpl', $scriptProperties, 'tpl.Tickets.comment.list.row');
 $outputSeparator = $modx->getOption('outputSeparator', $scriptProperties, "\n");
 
 // Define threads of comments
 if (!empty($parents) || !empty($resources) || !empty($threads)) {
-	$where = [];
+	$where   = [];
 	$options = [
 		'innerJoin' => [
 			'Thread' => [
 				'class' => TicketThread::class,
-				'on' => '`Ticket`.`id` = `Thread`.`resource`',
+				'on'    => '`Ticket`.`id` = `Thread`.`resource`',
 			],
 		],
 		'groupby'         => '`Ticket`.`id`',
@@ -45,7 +45,7 @@ if (!empty($parents) || !empty($resources) || !empty($threads)) {
 		$options['resources'] = $resources;
 	}
 	if (!empty($threads)) {
-		$threads = \array_map('trim', \explode(',', $threads));
+		$threads    = \array_map('trim', \explode(',', $threads));
 		$threads_in = $threads_out = [];
 		foreach ($threads as $v) {
 			if (!\is_numeric($v)) {
@@ -65,7 +65,7 @@ if (!empty($parents) || !empty($resources) || !empty($threads)) {
 		}
 	}
 
-	$rows = $pdoFetch->getCollection(Ticket::class, $where, $options);
+	$rows    = $pdoFetch->getCollection(Ticket::class, $where, $options);
 	$threads = [];
 	foreach ($rows as $item) {
 		$threads[] = $item['id'];
@@ -87,7 +87,7 @@ if (empty($showDeleted)) {
 
 // Filter by user
 if (!empty($user)) {
-	$user = \array_map('trim', \explode(',', $user));
+	$user    = \array_map('trim', \explode(',', $user));
 	$user_id = $user_username = [];
 	foreach ($user as $v) {
 		if (\is_numeric($v)) {
@@ -113,7 +113,7 @@ if (!empty($threads)) {
 }
 // Filter by comments
 if (!empty($comments)) {
-	$comments = \array_map('trim', \explode(',', $comments));
+	$comments    = \array_map('trim', \explode(',', $comments));
 	$comments_in = $comments_out = [];
 	foreach ($comments as $v) {
 		if (!\is_numeric($v)) {
@@ -197,10 +197,10 @@ $pdoFetch->addTime('Conditions prepared');
 
 $default = [
 	'class'             => $class,
-	'where'             => json_encode($where),
-	'innerJoin'         => json_encode($innerJoin),
-	'leftJoin'          => json_encode($leftJoin),
-	'select'            => json_encode($select),
+	'where'             => \json_encode($where),
+	'innerJoin'         => \json_encode($innerJoin),
+	'leftJoin'          => \json_encode($leftJoin),
+	'select'            => \json_encode($select),
 	'sortby'            => $class . '.createdon',
 	'sortdir'           => 'DESC',
 	'groupby'           => $class . '.id',
@@ -218,15 +218,15 @@ $output = [];
 if (!empty($rows)) {
 	foreach ($rows as $row) {
 		$row['ratings'] = !empty($row['section.properties']['ratings']) ? $row['section.properties']['ratings'] : [];
-		$output[] = $Tickets->templateNode($row, $tpl);
+		$output[]       = $Tickets->templateNode($row, $tpl);
 	}
 }
 $pdoFetch->addTime('Returning processed chunks');
-$output = implode($outputSeparator, $output);
+$output = \implode($outputSeparator, $output);
 
 $log = '';
 if ($modx->user->hasSessionContext('mgr') && !empty($showLog)) {
-	$log .= '<pre class="getCommentsLog">' . print_r($pdoFetch->getTime(), 1) . '</pre>';
+	$log .= '<pre class="getCommentsLog">' . \print_r($pdoFetch->getTime(), 1) . '</pre>';
 }
 
 // Return output

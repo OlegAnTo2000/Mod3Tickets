@@ -31,13 +31,13 @@ switch ($modx->event->name) {
 
 	case 'OnPageNotFound':
 		// It is working only with friendly urls enabled
-		$q = \trim(@$_REQUEST[$modx->context->getOption('request_param_alias', 'q')]);
+		$q       = \trim(@$_REQUEST[$modx->context->getOption('request_param_alias', 'q')]);
 		$matches = \explode('/', \rtrim($q, '/'));
 		if (\count($matches) < 2) {
 			return;
 		}
 
-		$ticket_uri = \array_pop($matches);
+		$ticket_uri  = \array_pop($matches);
 		$section_uri = \implode('/', $matches) . '/';
 
 		if ($section_id = $modx->findResource($section_uri)) {
@@ -72,7 +72,7 @@ switch ($modx->event->name) {
 
 	case 'OnLoadWebDocument':
 		$authenticated = $modx->user->isAuthenticated($modx->context->get('key'));
-		$key = 'Tickets_User';
+		$key           = 'Tickets_User';
 
 		if (!$authenticated && !$modx->getOption('tickets.count_guests')) {
 			return;

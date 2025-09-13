@@ -47,7 +47,7 @@ class TicketThread extends xPDOSimpleObject
 	public function updateCommentsCount()
 	{
 		$comments = 0;
-		$q = $this->xpdo->newQuery(TicketComment::class, ['thread' => $this->id, 'published' => 1, 'deleted' => 0]);
+		$q        = $this->xpdo->newQuery(TicketComment::class, ['thread' => $this->id, 'published' => 1, 'deleted' => 0]);
 		$q->select('COUNT(`id`)');
 		if ($q->prepare() && $q->stmt->execute()) {
 			$comments = $q->stmt->fetch(PDO::FETCH_COLUMN);
@@ -74,14 +74,14 @@ class TicketThread extends xPDOSimpleObject
 			if (empty($row['parent']) || !isset($comments[$row['parent']])) {
 				$tree[$id] = &$row;
 			} else {
-				$parent = $row['parent'];
-				$level = $comments[$parent]['level'];
+				$parent                            = $row['parent'];
+				$level                             = $comments[$parent]['level'];
 				$comments[$parent]['has_children'] = 1;
 
 				if (!empty($depth) && $level >= $depth) {
-					$parent = $comments[$parent]['new_parent'];
+					$parent            = $comments[$parent]['new_parent'];
 					$row['new_parent'] = $parent;
-					$row['level'] = $level;
+					$row['level']      = $level;
 				} else {
 					$row['level'] = $level + 1;
 				}

@@ -44,7 +44,7 @@ class TicketFile extends xPDOSimpleObject
 			/** @var modMediaSource $mediaSource */
 			if ($mediaSource = $this->xpdo->getObject(modMediaSource::class, ['id' => $source])) {
 				/* @noinspection PhpUndefinedFieldInspection */
-				/** @var modMediaSource $mediaSource */
+				/* @var modMediaSource $mediaSource */
 				$mediaSource->set('ctx', $this->xpdo->context->key);
 				$mediaSource->initialize();
 				$this->mediaSource = $mediaSource;
@@ -71,8 +71,8 @@ class TicketFile extends xPDOSimpleObject
 		}
 
 		$this->mediaSource->errors = [];
-		$filename = $this->get('path') . $this->get('file');
-		$info = $this->mediaSource->getObjectContents($filename);
+		$filename                  = $this->get('path') . $this->get('file');
+		$info                      = $this->mediaSource->getObjectContents($filename);
 		if (!is_array($info)) {
 			return "[Tickets] Could not retrieve contents of file {$filename} from media source.";
 		} elseif (!empty($this->mediaSource->errors['file'])) {
@@ -90,12 +90,12 @@ class TicketFile extends xPDOSimpleObject
 		if (empty($thumbnails)) {
 			$thumbnails = [
 				'thumb' => [
-					'w' => 120,
-					'h' => 90,
-					'q' => 90,
+					'w'  => 120,
+					'h'  => 90,
+					'q'  => 90,
 					'zc' => 1,
 					'bg' => '000000',
-					'f' => !empty($properties['thumbnailType']['value'])
+					'f'  => !empty($properties['thumbnailType']['value'])
 						? $properties['thumbnailType']['value']
 						: 'jpg',
 				],
@@ -178,11 +178,11 @@ class TicketFile extends xPDOSimpleObject
 	public function saveThumbnail($raw_image, $options = [])
 	{
 		$filename = preg_replace('#\.[a-z]+$#i', '', $this->get('file')) . '.' . $options['f'];
-		$name = !empty($options['name'])
+		$name     = !empty($options['name'])
 			? $options['name']
 			: 'thumb';
 		$thumb_dir = preg_replace('#[^\w]#', '', $name);
-		$path = $this->get('path') . $thumb_dir . '/';
+		$path      = $this->get('path') . $thumb_dir . '/';
 
 		$this->mediaSource->createContainer($path, '/');
 		if ($file = $this->mediaSource->createObject($path, $filename, $raw_image)) {
@@ -215,7 +215,7 @@ class TicketFile extends xPDOSimpleObject
 		if ($this->isDirty('parent')) {
 			if ($this->prepareSource()) {
 				$old_path = $this->get('path');
-				$file = $this->get('file');
+				$file     = $this->get('file');
 				$new_path = $this->get('parent') . '/';
 
 				$this->mediaSource->createContainer($new_path, '/');
@@ -238,7 +238,7 @@ class TicketFile extends xPDOSimpleObject
 						$old_path_thumb = $old_path;
 						$new_path_thumb = $new_path;
 					}
-					$tmp = explode('/', $thumb);
+					$tmp   = explode('/', $thumb);
 					$thumb = end($tmp);
 					if ($this->mediaSource->moveObject($old_path_thumb . $thumb, $new_path_thumb)) {
 						$thumbs[$key] = $this->mediaSource->getObjectUrl($new_path_thumb . $thumb);
@@ -271,7 +271,7 @@ class TicketFile extends xPDOSimpleObject
 					$path = false !== strpos($thumb, '/' . $key . '/')
 						? $this->get('path') . $key . '/'
 						: $this->get('path');
-					$tmp = explode('/', $thumb);
+					$tmp      = explode('/', $thumb);
 					$filename = end($tmp);
 					$this->mediaSource->removeObject($path . $filename);
 				}

@@ -19,14 +19,14 @@ if (!empty($scriptProperties['TicketsInit'])) {
 if ($profile = $modx->getObject(TicketAuthor::class, ['id' => $scriptProperties['createdby']])) {
 	$properties = $profile->get('properties');
 	if (!empty($properties['subscribers'])) {
-		$found = \array_search($modx->user->id, $properties['subscribers'], true);
+		$found      = \array_search($modx->user->id, $properties['subscribers'], true);
 		$subscribed = (false === $found) ? 0 : 1;
 	}
 }
 
-$tpl = $modx->getOption('tpl', $scriptProperties, 'tpl.Tickets.author.subscribe');
+$tpl  = $modx->getOption('tpl', $scriptProperties, 'tpl.Tickets.author.subscribe');
 $data = [
-	'author_id' => $scriptProperties['createdby'],
+	'author_id'  => $scriptProperties['createdby'],
 	'subscribed' => $subscribed,
 ];
 $output = $Tickets->getChunk($tpl, $data);

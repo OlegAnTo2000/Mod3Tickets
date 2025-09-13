@@ -1,3 +1,4 @@
 .idea
 core/components/tickets/vendor
 vendor
+.php-cs-fixer.cache

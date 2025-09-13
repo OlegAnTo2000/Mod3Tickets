@@ -1,11 +1,11 @@
 <?php
 
-use xPDO\Om\xPDOQuery;
-use xPDO\Om\xPDOObject;
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketThread;
-use Tickets\Model\TicketComment;
 use MODX\Revolution\Processors\Model\GetListProcessor;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketThread;
+use xPDO\Om\xPDOObject;
+use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
@@ -33,12 +33,12 @@ class GetList extends GetListProcessor
 			$query = \trim($query);
 			if (\is_numeric($query)) {
 				$c->where([
-					'TicketThread.id:=' => $query,
+					'TicketThread.id:='          => $query,
 					'OR:TicketThread.resource:=' => $query,
 				]);
 			} else {
 				$c->where([
-					'Ticket.pagetitle:LIKE' => "%{$query}%",
+					'Ticket.pagetitle:LIKE'     => "%{$query}%",
 					'OR:TicketThread.name:LIKE' => "%{$query}%",
 				]);
 			}
@@ -49,10 +49,6 @@ class GetList extends GetListProcessor
 
 	/**
 	 * Prepare the row for iteration.
-	 *
-	 * @param xPDO\Om\xPDOObject $object
-	 *
-	 * @return array
 	 */
 	public function prepareRow(xPDOObject $object): array
 	{

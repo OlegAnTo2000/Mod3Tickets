@@ -19,10 +19,10 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
-	public $classKey = TicketsSection::class;
-	public $defaultSortField = 'pagetitle';
+	public $classKey             = TicketsSection::class;
+	public $defaultSortField     = 'pagetitle';
 	public $defaultSortDirection = 'ASC';
-	private $current_category = 0;
+	private $current_category    = 0;
 
 	/**
 	 * @return xPDOQuery
@@ -32,13 +32,13 @@ class GetList extends GetListProcessor
 		$context = array_map('trim', explode(',', $this->getProperty('context', $this->modx->context->key)));
 
 		$c->where([
-			'class_key' => TicketsSection::class,
-			'published' => 1,
-			'deleted' => 0,
+			'class_key'      => TicketsSection::class,
+			'published'      => 1,
+			'deleted'        => 0,
 			'context_key:IN' => $context,
 		]);
 
-		$sortby = $this->getProperty('sortby');
+		$sortby  = $this->getProperty('sortby');
 		$sortdir = $this->getProperty('sortdir');
 		if ($sortby && $sortdir) {
 			$c->sortby($sortby, $sortdir);
@@ -49,8 +49,8 @@ class GetList extends GetListProcessor
 		}
 
 		if ($parents = $this->getProperty('parents')) {
-			$depth = $this->getProperty('depth', 0);
-			$parents = array_map('trim', explode(',', $parents));
+			$depth      = $this->getProperty('depth', 0);
+			$parents    = array_map('trim', explode(',', $parents));
 			$parents_in = $parents_out = [];
 			foreach ($parents as $v) {
 				if (!is_numeric($v)) {
@@ -81,7 +81,7 @@ class GetList extends GetListProcessor
 			}
 		}
 		if ($resources = $this->getProperty('resources')) {
-			$resources = array_map('trim', explode(',', $resources));
+			$resources    = array_map('trim', explode(',', $resources));
 			$resources_in = $resources_out = [];
 			foreach ($resources as $r) {
 				if (!is_numeric($r)) {

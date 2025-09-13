@@ -15,12 +15,12 @@ class Create extends CreateProcessor
 {
 	/** @var TicketComment */
 	public $object;
-	public $objectType = TicketComment::class;
-	public $classKey = TicketComment::class;
-	public $languageTopics = ['tickets:default'];
-	public $permission = 'comment_save';
+	public $objectType      = TicketComment::class;
+	public $classKey        = TicketComment::class;
+	public $languageTopics  = ['tickets:default'];
+	public $permission      = 'comment_save';
 	public $beforeSaveEvent = 'OnBeforeCommentSave';
-	public $afterSaveEvent = 'OnCommentSave';
+	public $afterSaveEvent  = 'OnCommentSave';
 	/** @var TicketThread */
 	private $thread;
 
@@ -53,11 +53,11 @@ class Create extends CreateProcessor
 		// Comment values
 		$ip = $this->modx->request->getClientIp();
 		$this->setProperties([
-			'parent' => (int) $this->getProperty('parent'),
-			'thread' => $this->thread->id,
-			'ip' => $ip['ip'],
-			'email' => $this->modx->user->Profile->email,
-			'name' => $this->modx->user->Profile->fullname,
+			'parent'    => (int) $this->getProperty('parent'),
+			'thread'    => $this->thread->id,
+			'ip'        => $ip['ip'],
+			'email'     => $this->modx->user->Profile->email,
+			'name'      => $this->modx->user->Profile->fullname,
 			'createdon' => date('Y-m-d H:i:s'),
 			'createdby' => $this->modx->user->id,
 			'published' => true,
@@ -78,7 +78,7 @@ class Create extends CreateProcessor
 		if ($Tickets = $this->modx->services->get('Tickets')) {
 			$this->object->fromArray([
 				'text' => $Tickets->sanitizeText($text, true),
-				'raw' => $text,
+				'raw'  => $text,
 			]);
 		}
 

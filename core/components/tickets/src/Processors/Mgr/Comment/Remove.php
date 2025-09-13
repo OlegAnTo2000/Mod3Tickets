@@ -11,13 +11,13 @@ class Remove extends RemoveProcessor
 	/** @var TicketComment */
 	public $object;
 	public $checkRemovePermission = true;
-	public $objectType = 'Tickets\Model\TicketComment';
-	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = ['tickets'];
-	public $beforeRemoveEvent = 'OnBeforeCommentRemove';
-	public $afterRemoveEvent = 'OnCommentRemove';
-	public $permission = 'comment_remove';
-	private $children = [];
+	public $objectType            = 'Tickets\Model\TicketComment';
+	public $classKey              = 'Tickets\Model\TicketComment';
+	public $languageTopics        = ['tickets'];
+	public $beforeRemoveEvent     = 'OnBeforeCommentRemove';
+	public $afterRemoveEvent      = 'OnCommentRemove';
+	public $permission            = 'comment_remove';
+	private $children             = [];
 
 	/**
 	 * @return bool|string|null

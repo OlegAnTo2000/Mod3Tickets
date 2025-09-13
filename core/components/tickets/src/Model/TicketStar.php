@@ -14,11 +14,11 @@ class TicketStar extends \xPDO\Om\xPDOObject
 	 */
 	public function save($cacheFlag = null)
 	{
-		$new = $this->isNew();
+		$new   = $this->isNew();
 		$class = $this->get('class');
-		$save = parent::save($cacheFlag);
+		$save  = parent::save($cacheFlag);
 		if ($new) {
-			$type = '';
+			$type      = '';
 			$ticket_id = 0;
 			if (TicketComment::class == $class) {
 				$type = 'star_comment';
@@ -30,7 +30,7 @@ class TicketStar extends \xPDO\Om\xPDOObject
 					}
 				}
 			} elseif (Ticket::class == $class) {
-				$type = 'star_ticket';
+				$type      = 'star_ticket';
 				$ticket_id = $this->id;
 			}
 			if (!empty($type) && !empty($ticket_id)) {
@@ -49,7 +49,7 @@ class TicketStar extends \xPDO\Om\xPDOObject
 	 */
 	public function remove(array $ancestors = [])
 	{
-		$type = '';
+		$type  = '';
 		$class = $this->get('class');
 		if (TicketComment::class == $class) {
 			$type = 'star_comment';

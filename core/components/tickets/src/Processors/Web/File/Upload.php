@@ -40,14 +40,14 @@ use function unlink;
 
 class Upload extends ModelProcessor
 {
-	public $classKey = TicketFile::class;
+	public $classKey       = TicketFile::class;
 	public $languageTopics = ['tickets:default'];
-	public $permission = 'ticket_file_upload';
+	public $permission     = 'ticket_file_upload';
 	/** @var modMediaSource */
 	public $mediaSource;
 	/** @var Ticket */
 	protected $ticket = 0;
-	protected $class = Ticket::class;
+	protected $class  = Ticket::class;
 
 	public function initialize()
 	{
@@ -86,8 +86,8 @@ class Upload extends ModelProcessor
 		}
 
 		$properties = $this->mediaSource->getPropertyList();
-		$tmp = explode('.', $data['name']);
-		$extension = strtolower(end($tmp));
+		$tmp        = explode('.', $data['name']);
+		$extension  = strtolower(end($tmp));
 
 		$image_extensions = $allowed_extensions = [];
 		if (!empty($properties['imageExtensions'])) {
@@ -106,7 +106,7 @@ class Upload extends ModelProcessor
 			$type = $extension;
 		}
 
-		$path = '0/';
+		$path     = '0/';
 		$filename = !empty($properties['imageNameType']) && 'friendly' == $properties['imageNameType'] && 'Ticket' == $this->class
 			? $this->ticket->cleanAlias($data['name'])
 			: $data['hash'] . '.' . $extension;
@@ -145,18 +145,18 @@ class Upload extends ModelProcessor
 
 		/** @var TicketFile $uploaded_file */
 		$uploaded_file = $this->modx->newObject(TicketFile::class, [
-			'parent' => empty($this->ticket->id) ? 0 : $this->ticket->id,
-			'name' => $data['name'],
-			'file' => $filename,
-			'path' => $path,
-			'source' => $this->mediaSource->get('id'),
-			'type' => $type,
-			'createdon' => date('Y-m-d H:i:s'),
-			'createdby' => $this->modx->user->id,
-			'deleted' => 0,
-			'hash' => $data['hash'],
-			'size' => $data['size'],
-			'class' => $this->class,
+			'parent'     => empty($this->ticket->id) ? 0 : $this->ticket->id,
+			'name'       => $data['name'],
+			'file'       => $filename,
+			'path'       => $path,
+			'source'     => $this->mediaSource->get('id'),
+			'type'       => $type,
+			'createdon'  => date('Y-m-d H:i:s'),
+			'createdby'  => $this->modx->user->id,
+			'deleted'    => 0,
+			'hash'       => $data['hash'],
+			'size'       => $data['size'],
+			'class'      => $this->class,
 			'properties' => $data['properties'],
 		]);
 
@@ -166,7 +166,7 @@ class Upload extends ModelProcessor
 			$upload = $this->mediaSource->createObject($uploaded_file->get('path'), $uploaded_file->get('file'), file_get_contents($data['tmp_name']));
 		} else {
 			$data['name'] = $filename;
-			$upload = $this->mediaSource->uploadObjectsToContainer($uploaded_file->get('path'), [$data]);
+			$upload       = $this->mediaSource->uploadObjectsToContainer($uploaded_file->get('path'), [$data]);
 		}
 		@unlink($data['tmp_name']);
 
@@ -197,7 +197,7 @@ class Upload extends ModelProcessor
 		} else {
 			$file = $this->getProperty('file');
 			if (!empty($file) && (false !== strpos($file, '://') || file_exists($file))) {
-				$tmp = explode('/', $file);
+				$tmp  = explode('/', $file);
 				$name = end($tmp);
 				if ($stream = fopen($file, 'r')) {
 					if ($res = fopen($tf, 'w')) {
@@ -213,14 +213,14 @@ class Upload extends ModelProcessor
 
 		clearstatcache(true, $tf);
 		if (file_exists($tf) && !empty($name) && $size = filesize($tf)) {
-			$res = fopen($tf, 'r');
+			$res  = fopen($tf, 'r');
 			$hash = sha1(fread($res, 8192));
 			fclose($res);
 			$data = [
-				'name' => $name,
-				'tmp_name' => $tf,
-				'hash' => $hash,
-				'size' => $size,
+				'name'       => $name,
+				'tmp_name'   => $tf,
+				'hash'       => $hash,
+				'size'       => $size,
 				'properties' => [
 					'size' => $size,
 				],
@@ -230,10 +230,10 @@ class Upload extends ModelProcessor
 				$data['properties'] = array_merge(
 					$data['properties'],
 					[
-						'width' => $info[0],
+						'width'  => $info[0],
 						'height' => $info[1],
-						'bits' => $info['bits'],
-						'mime' => $info['mime'],
+						'bits'   => $info['bits'],
+						'mime'   => $info['mime'],
 					]
 				);
 			}

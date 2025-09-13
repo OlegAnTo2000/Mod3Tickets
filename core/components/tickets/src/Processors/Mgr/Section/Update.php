@@ -21,7 +21,7 @@ class TicketsSectionUpdateProcessor extends modResourceUpdateProcessor
 
 		if (
 			!$this->modx->getCount($this->classKey, [
-				'id' => $primaryKey,
+				'id'        => $primaryKey,
 				'class_key' => $this->classKey,
 			]) && $res = $this->modx->getObject(modResource::class, ['id' => $primaryKey])
 		) {
@@ -53,7 +53,7 @@ class TicketsSectionUpdateProcessor extends modResourceUpdateProcessor
 	public function beforeSet()
 	{
 		$this->setProperties([
-			'isfolder' => 1,
+			'isfolder'              => 1,
 			'hide_children_in_tree' => 0,
 		]);
 
@@ -83,7 +83,7 @@ class TicketsSectionUpdateProcessor extends modResourceUpdateProcessor
 			$properties['subscribers'] = $old_properties['subscribers'];
 		}
 		$properties['syncsite'] = $this->getProperty('syncsite');
-		$properties = \array_merge($this->object->getProperties(), $properties);
+		$properties             = \array_merge($this->object->getProperties(), $properties);
 		$this->setProperty('properties', $properties);
 	}
 }
