@@ -2,27 +2,43 @@
 
 namespace Tickets\Processors\Mgr\Ticket;
 
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketFile;
-use Tickets\Model\TicketAuthor;
-use Tickets\Model\TicketsSection;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_null;
+use function mb_strlen;
+
 use MODX\Revolution\modResource;
 use MODX\Revolution\modTemplateVarResource;
 use MODX\Revolution\Processors\Resource\Update as ResourceUpdate;
 
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function str_replace;
+use function strip_tags;
+use function strpos;
+
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketFile;
+use Tickets\Model\TicketsSection;
+
+use function time;
+use function trim;
+
 class Update extends ResourceUpdate
 {
-	/** @var Ticket $object */
+	/** @var Ticket */
 	public $object;
-	public  $classKey       = Ticket::class;
-	public  $permission     = 'ticket_save';
-	public  $languageTopics = array('resource', 'tickets:default');
-	private $_published     = null;
-	private $_sendEmails    = false;
-
+	public $classKey = Ticket::class;
+	public $permission = 'ticket_save';
+	public $languageTopics = ['resource', 'tickets:default'];
+	private $_published;
+	private $_sendEmails = false;
 
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function initialize()
 	{
@@ -32,10 +48,10 @@ class Update extends ResourceUpdate
 		}
 
 		if (
-			!$this->modx->getCount($this->classKey, array(
+			!$this->modx->getCount($this->classKey, [
 				'id' => $primaryKey,
 				'class_key' => $this->classKey,
-			)) && $res = $this->modx->getObject(modResource::class, array('id' => $primaryKey))
+			]) && $res = $this->modx->getObject(modResource::class, ['id' => $primaryKey])
 		) {
 			$res->set('class_key', $this->classKey);
 			$res->save();
@@ -44,9 +60,8 @@ class Update extends ResourceUpdate
 		return parent::initialize();
 	}
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSet()
 	{
@@ -60,10 +75,10 @@ class Update extends ResourceUpdate
 		}
 
 		// Required fields
-		$requiredFields = $this->getProperty('requiredFields', array('parent', 'pagetitle', 'content'));
+		$requiredFields = $this->getProperty('requiredFields', ['parent', 'pagetitle', 'content']);
 		foreach ($requiredFields as $field) {
 			$value = trim($this->getProperty($field));
-			if (empty($value) && $this->modx->context->key != 'mgr') {
+			if (empty($value) && 'mgr' != $this->modx->context->key) {
 				$this->addFieldError($field, $this->modx->lexicon('field_required'));
 			} else {
 				$this->setProperty($field, $value);
@@ -72,10 +87,10 @@ class Update extends ResourceUpdate
 		$content = $this->getProperty('content');
 		$length = mb_strlen(strip_tags($content), $this->modx->getOption('modx_charset', null, 'UTF-8', true));
 		$max = $this->modx->getOption('tickets.ticket_max_cut', null, 1000, true);
-		if (empty($content) && $this->modx->context->key != 'mgr') {
+		if (empty($content) && 'mgr' != $this->modx->context->key) {
 			return $this->modx->lexicon('ticket_err_empty');
-		} elseif ($this->modx->context->key != 'mgr' && !preg_match('#<cut\b.*?>#', $content) && $length > $max) {
-			return $this->modx->lexicon('ticket_err_cut', array('length' => $length, 'max_cut' => $max));
+		} elseif ('mgr' != $this->modx->context->key && !preg_match('#<cut\b.*?>#', $content) && $length > $max) {
+			return $this->modx->lexicon('ticket_err_cut', ['length' => $length, 'max_cut' => $max]);
 		}
 
 		$set = parent::beforeSet();
@@ -88,14 +103,13 @@ class Update extends ResourceUpdate
 		return $set;
 	}
 
-
 	/**
 	 * @return bool
 	 */
 	public function setFieldDefault()
 	{
 		// Ticket properties
-		$properties = $this->modx->context->key == 'mgr'
+		$properties = 'mgr' == $this->modx->context->key
 			? $this->getProperty('properties')
 			: $this->object->getProperties();
 		$this->unsetProperty('properties');
@@ -110,7 +124,7 @@ class Update extends ResourceUpdate
 		}
 
 		// Set properties
-		if ($this->modx->context->key != 'mgr') {
+		if ('mgr' != $this->modx->context->key) {
 			$this->unsetProperty('properties');
 			$this->unsetProperty('published');
 			$tmp = $this->parentResource->getProperties();
@@ -123,15 +137,15 @@ class Update extends ResourceUpdate
 			}
 			$this->setProperty('template', $template);
 		}
-		$this->setProperties(array(
+		$this->setProperties([
 			'class_key' => Ticket::class,
-			'syncsite'  => 0,
+			'syncsite' => 0,
 			'introtext' => $introtext,
-		));
-		if ($this->modx->context->key != 'mgr' && !is_null($this->_published)) {
+		]);
+		if ('mgr' != $this->modx->context->key && !is_null($this->_published)) {
 			$this->setProperty('published', $this->_published);
 		}
-		if ($this->modx->context->key == 'mgr') {
+		if ('mgr' == $this->modx->context->key) {
 			$properties['disable_jevix'] = !empty($properties['disable_jevix']);
 			$properties['process_tags'] = !empty($properties['process_tags']);
 			$this->object->setProperties($properties, 'tickets', true);
@@ -139,7 +153,6 @@ class Update extends ResourceUpdate
 
 		return true;
 	}
-
 
 	/**
 	 * @return bool
@@ -161,11 +174,13 @@ class Update extends ResourceUpdate
 				if ($section = $this->object->getOne('Section')) {
 					/** @var TicketsSection $section */
 					$ratings = $section->getProperties('ratings');
-					if (isset($ratings['min_ticket_create']) && $ratings['min_ticket_create'] !== '') {
+					if (isset($ratings['min_ticket_create']) && '' !== $ratings['min_ticket_create']) {
 						if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
-							$min = (float)$ratings['min_ticket_create'];
+							$min = (float) $ratings['min_ticket_create'];
 							$rating = $profile->get('rating');
-							if ($rating < $min) return $this->modx->lexicon('ticket_err_rating_ticket', array('rating' => $min));
+							if ($rating < $min) {
+								return $this->modx->lexicon('ticket_err_rating_ticket', ['rating' => $min]);
+							}
 						}
 					}
 				}
@@ -177,23 +192,21 @@ class Update extends ResourceUpdate
 		return !$this->hasErrors();
 	}
 
-
 	/**
 	 * @return bool
 	 */
 	public function afterSave()
 	{
 		$parent = parent::afterSave();
-		if ($this->_sendEmails && $this->modx->context->key == 'mgr') {
+		if ($this->_sendEmails && 'mgr' == $this->modx->context->key) {
 			$this->sendTicketMails();
 		}
 
 		return $parent;
 	}
 
-
 	/**
-	 * Call method for notify users about new ticket in section
+	 * Call method for notify users about new ticket in section.
 	 */
 	protected function sendTicketMails()
 	{
@@ -205,7 +218,6 @@ class Update extends ResourceUpdate
 		}
 	}
 
-
 	/**
 	 * @return mixed|string
 	 */
@@ -213,9 +225,9 @@ class Update extends ResourceUpdate
 	{
 		$alias = parent::checkFriendlyAlias();
 
-		if ($this->modx->context->key != 'mgr') {
+		if ('mgr' != $this->modx->context->key) {
 			foreach ($this->modx->error->errors as $k => $v) {
-				if ($v['id'] == 'alias' || $v['id'] == 'uri') {
+				if ('alias' == $v['id'] || 'uri' == $v['id']) {
 					unset($this->modx->error->errors[$k]);
 				}
 			}
@@ -224,13 +236,12 @@ class Update extends ResourceUpdate
 		return $alias;
 	}
 
-
 	/**
-	 * @return int|mixed|null|string
+	 * @return int|mixed|string|null
 	 */
 	public function handleParent()
 	{
-		if ($this->modx->context->key == 'manager') {
+		if ('manager' == $this->modx->context->key) {
 			return parent::handleParent();
 		}
 
@@ -238,41 +249,36 @@ class Update extends ResourceUpdate
 		$parentId = intval($this->getProperty('parent'));
 		if ($parentId > 0) {
 			$sections = $this->getProperty('sections');
-			if (!empty($sections) && !in_array($parentId, $sections)) {
+			if (!empty($sections) && !in_array($parentId, $sections, true)) {
 				return $this->modx->lexicon('ticket_err_wrong_parent');
 			}
 			$this->parentResource = $this->modx->getObject(TicketsSection::class, $parentId);
 			if ($this->parentResource) {
-				if ($this->parentResource->get('class_key') != TicketsSection::class) {
+				if (TicketsSection::class != $this->parentResource->get('class_key')) {
 					$this->addFieldError('parent', $this->modx->lexicon('ticket_err_wrong_parent'));
-				} elseif (!$this->parentResource->checkPolicy(array('section_add_children' => true))) {
+				} elseif (!$this->parentResource->checkPolicy(['section_add_children' => true])) {
 					$this->addFieldError('parent', $this->modx->lexicon('ticket_err_wrong_parent'));
 				}
 			} else {
-				$this->addFieldError('parent', $this->modx->lexicon('resource_err_nfs', array('id' => $parentId)));
+				$this->addFieldError('parent', $this->modx->lexicon('resource_err_nfs', ['id' => $parentId]));
 			}
 		}
 
 		return $parent;
 	}
 
-
 	/**
 	 * @return bool
 	 */
 	public function checkPublishingPermissions()
 	{
-		if ($this->modx->context->key == 'mgr') {
+		if ('mgr' == $this->modx->context->key) {
 			return parent::checkPublishingPermissions();
 		}
 
 		return true;
 	}
 
-
-	/**
-	 *
-	 */
 	public function clearCache()
 	{
 		$this->object->clearCache();
@@ -283,14 +289,13 @@ class Update extends ResourceUpdate
 		}
 	}
 
-
 	/**
 	 * @return array|mixed
 	 */
 	public function saveTemplateVariables()
 	{
-		if ($this->modx->context->key != 'mgr') {
-			$values = array();
+		if ('mgr' != $this->modx->context->key) {
+			$values = [];
 			$tvs = $this->object->getMany('TemplateVariables');
 
 			/** @var modTemplateVarResource $tv */
@@ -307,7 +312,6 @@ class Update extends ResourceUpdate
 		return parent::saveTemplateVariables();
 	}
 
-
 	/**
 	 * @return array
 	 */
@@ -318,21 +322,20 @@ class Update extends ResourceUpdate
 		return parent::cleanup();
 	}
 
-
 	/**
-	 * Add uploaded files to ticket
+	 * Add uploaded files to ticket.
 	 *
 	 * @return bool|int
 	 */
 	public function processFiles()
 	{
 		$q = $this->modx->newQuery(TicketFile::class);
-		$q->where(array('class' => Ticket::class));
-		$q->andCondition(array('parent' => $this->object->id, 'createdby' => $this->modx->user->id), null, 1);
+		$q->where(['class' => Ticket::class]);
+		$q->andCondition(['parent' => $this->object->id, 'createdby' => $this->modx->user->id], null, 1);
 		$q->sortby('createdon', 'ASC');
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
-		$replace = array();
+		$replace = [];
 		$count = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
@@ -343,37 +346,37 @@ class Update extends ResourceUpdate
 				$old_url = $item->get('url');
 				$item->set('parent', $this->object->id);
 				$item->save();
-				$replace[$old_url] = array(
-					'url'    => $item->get('url'),
-					'thumb'  => $item->get('thumb'),
+				$replace[$old_url] = [
+					'url' => $item->get('url'),
+					'thumb' => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
-				);
-				$count++;
+				];
+				++$count;
 			}
 		}
 
 		// Update ticket links
 		if (!empty($replace)) {
-			$array = array(
+			$array = [
 				'introtext' => $this->object->get('introtext'),
 				'content' => $this->object->get('content'),
-			);
+			];
 			$update = false;
 			foreach ($array as $field => $text) {
 				$pcre = '#<a.*?>.*?</a>|<img.*?>#s';
 				preg_match_all($pcre, $text, $matches);
-				$src = $dst = array();
+				$src = $dst = [];
 				foreach ($matches[0] as $tag) {
 					foreach ($replace as $from => $to) {
-						if (strpos($tag, $from) !== false) {
+						if (false !== strpos($tag, $from)) {
 							if (is_array($to)) {
 								$src[] = $from;
 								$dst[] = $to['url'];
 								if (empty($to['thumbs'])) {
-									$to['thumbs'] = array($to['thumb']);
+									$to['thumbs'] = [$to['thumb']];
 								}
 								foreach ($to['thumbs'] as $key => $thumb) {
-									if (strpos($thumb, '/' . $key . '/') === false) {
+									if (false === strpos($thumb, '/' . $key . '/')) {
 										// Old thumbnails
 										$src[] = preg_replace('#\.[a-z]+$#i', '_thumb$0', $from);
 										$dst[] = preg_replace('#\.[a-z]+$#i', '_thumb$0', $thumb);
@@ -393,7 +396,7 @@ class Update extends ResourceUpdate
 				}
 				if (!empty($src)) {
 					$text = str_replace($src, $dst, $text);
-					if ($text != $this->object->$field) {
+					if ($this->object->$field != $text) {
 						$this->object->set($field, $text);
 						$update = true;
 					}

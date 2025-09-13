@@ -2,26 +2,25 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use \MODX\Revolution\modX;
-use \MODX\Revolution\Processors\Model\UpdateProcessor;
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+use function time;
+use function trim;
 
 class Update extends UpdateProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
 	public $objectType = 'Tickets\Model\TicketComment';
 	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = array('tickets:default');
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentSave';
 	public $afterSaveEvent = 'OnCommentSave';
 	public $permission = 'comment_save';
 	protected $old_thread = 0;
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSet()
 	{
@@ -38,8 +37,8 @@ class Update extends UpdateProcessor
 		$this->old_thread = $this->object->get('thread');
 		$parent = $this->getProperty('parent');
 		// New parent is in other thread
-		if ($parent != 0 && $parent != $this->object->get('parent')) {
-			if ($parent = $this->modx->getObject('Tickets\Model\TicketComment', array('id' => (int)$parent))) {
+		if (0 != $parent && $parent != $this->object->get('parent')) {
+			if ($parent = $this->modx->getObject('Tickets\Model\TicketComment', ['id' => (int) $parent])) {
 				$this->setProperty('thread', $parent->get('thread'));
 			}
 		}
@@ -47,7 +46,6 @@ class Update extends UpdateProcessor
 
 		return parent::beforeSet();
 	}
-
 
 	/**
 	 * @return bool
@@ -58,17 +56,16 @@ class Update extends UpdateProcessor
 
 		/** @var Tickets $Tickets */
 		if ($Tickets = $this->modx->getService('Tickets')) {
-			$this->object->fromArray(array(
+			$this->object->fromArray([
 				'editedon' => time(),
 				'editedby' => $this->modx->user->id,
 				'text' => $Tickets->Jevix($text, 'Comment'),
 				'raw' => $text,
-			));
+			]);
 		}
 
 		return parent::beforeSave();
 	}
-
 
 	/**
 	 * @return bool

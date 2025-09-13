@@ -2,48 +2,39 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use \MODX\Revolution\modX;
-use \MODX\Revolution\Processors\Model\UpdateProcessor;
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
 
 class TicketCommentUndeleteProcessor extends UpdateProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
 	public $objectType = 'Tickets\Model\TicketComment';
 	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = array('tickets:default');
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUndelete';
 	public $afterSaveEvent = 'OnCommentUndelete';
 	public $permission = 'comment_delete';
 
-
-	/**
-	 *
-	 */
 	public function beforeSet()
 	{
-		$this->properties = array();
+		$this->properties = [];
 
 		return true;
 	}
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSave()
 	{
-		$this->object->fromArray(array(
+		$this->object->fromArray([
 			'deleted' => 0,
 			'deletedon' => null,
 			'deletedby' => 0,
-		));
+		]);
 
 		return parent::beforeSave();
 	}
-
 
 	/**
 	 * @return bool
@@ -61,10 +52,6 @@ class TicketCommentUndeleteProcessor extends UpdateProcessor
 		return parent::afterSave();
 	}
 
-
-	/**
-	 *
-	 */
 	public function logManagerAction()
 	{
 		$this->modx->logManagerAction(

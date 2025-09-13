@@ -2,33 +2,40 @@
 
 namespace Tickets\Processors\Web\Comment;
 
+use function compact;
+use function date;
+
+use MODX\Revolution\Processors\Model\CreateProcessor;
+
+use function strtotime;
+
 use Tickets\Model\Ticket;
-use Tickets\Model\TicketVote;
-use Tickets\Model\TicketThread;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketsSection;
-use MODX\Revolution\Processors\Model\CreateProcessor;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketVote;
+
+use function time;
 
 class Vote extends CreateProcessor
 {
-	/** @var TicketVote $object */
+	/** @var TicketVote */
 	public $object;
-	public $objectType      = TicketVote::class;
-	public $classKey        = TicketVote::class;
-	public $languageTopics  = array('tickets:default');
+	public $objectType = TicketVote::class;
+	public $classKey = TicketVote::class;
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentVote';
-	public $afterSaveEvent  = 'OnCommentVote';
-	public $permission      = 'comment_vote';
-	/** @var TicketComment $comment */
+	public $afterSaveEvent = 'OnCommentVote';
+	public $permission = 'comment_vote';
+	/** @var TicketComment */
 	private $comment;
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSet()
 	{
-		$id = (int)$this->getProperty('id');
+		$id = (int) $this->getProperty('id');
 
 		if (!$this->modx->user->isAuthenticated($this->modx->context->key)) {
 			return $this->modx->lexicon('permission_denied');
@@ -36,13 +43,12 @@ class Vote extends CreateProcessor
 			return $this->modx->lexicon('ticket_comment_err_comment');
 		} elseif ($this->comment->createdby == $this->modx->user->id) {
 			return $this->modx->lexicon('ticket_comment_err_vote_own');
-		} elseif ($this->modx->getCount($this->classKey, array('id' => $id, 'createdby' => $this->modx->user->get('id'), 'class' => TicketComment::class))) {
+		} elseif ($this->modx->getCount($this->classKey, ['id' => $id, 'createdby' => $this->modx->user->get('id'), 'class' => TicketComment::class])) {
 			return $this->modx->lexicon('ticket_comment_err_vote_already');
 		}
 
 		return true;
 	}
-
 
 	/**
 	 * @return bool
@@ -56,9 +62,11 @@ class Vote extends CreateProcessor
 				if ($section = $ticket->getOne('Section')) {
 					/** @var TicketsSection $section */
 					$ratings = $section->getProperties('ratings');
-					if (isset($ratings['days_comment_vote']) && $ratings['days_comment_vote'] !== '') {
-						$max = strtotime($this->comment->get('createdon')) + ((float)$ratings['days_comment_vote'] * 86400);
-						if (time() > $max) return $this->modx->lexicon('ticket_err_vote_comment_days');
+					if (isset($ratings['days_comment_vote']) && '' !== $ratings['days_comment_vote']) {
+						$max = strtotime($this->comment->get('createdon')) + ((float) $ratings['days_comment_vote'] * 86400);
+						if (time() > $max) {
+							return $this->modx->lexicon('ticket_err_vote_comment_days');
+						}
 					}
 				}
 			}
@@ -81,13 +89,13 @@ class Vote extends CreateProcessor
 		return true;
 	}
 
-
 	/**
 	 * @return array|string
 	 */
 	public function cleanup()
 	{
 		$rating = $this->comment->updateRating();
+
 		return $this->success('', $rating);
 	}
 }

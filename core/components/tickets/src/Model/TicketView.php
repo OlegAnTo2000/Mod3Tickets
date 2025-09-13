@@ -2,20 +2,13 @@
 
 namespace Tickets\Model;
 
-use \PDO;
-use \xPDO\xPDO;
-use \xPDO\Om\xPDOObject;
-use \Tickets\Model\Ticket;
-use \Tickets\Model\TicketTotal;
-use \Tickets\Model\TicketAuthor;
-use \Tickets\Model\TicketsSection;
+use xPDO\Om\xPDOObject;
 
 /**
  * @property int $id
  */
-class TicketView extends \xPDO\Om\xPDOObject
+class TicketView extends xPDOObject
 {
-
 	/**
 	 * @param null $cacheFlag
 	 *
@@ -54,13 +47,10 @@ class TicketView extends \xPDO\Om\xPDOObject
 		return $parent;
 	}
 
-
 	/**
-	 * @param array $ancestors
-	 *
 	 * @return bool
 	 */
-	public function remove(array $ancestors = array())
+	public function remove(array $ancestors = [])
 	{
 		/** @var TicketAuthor $profile */
 		if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('uid'))) {

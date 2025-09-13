@@ -2,34 +2,26 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use \MODX\Revolution\modX;
-use \MODX\Revolution\Processors\Model\UpdateProcessor;
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
 
 class TicketCommentUnpublishProcessor extends UpdateProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
 	public $objectType = 'Tickets\Model\TicketComment';
 	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = array('tickets:default');
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentUnpublish';
 	public $afterSaveEvent = 'OnCommentUnpublish';
 	public $permission = 'comment_publish';
 	protected $_sendEmails = false;
 
-
-	/**
-	 *
-	 */
 	public function beforeSet()
 	{
-		$this->properties = array();
+		$this->properties = [];
 
 		return true;
 	}
-
 
 	/**
 	 * @return bool
@@ -40,7 +32,6 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 
 		return parent::beforeSave();
 	}
-
 
 	/**
 	 * @return bool
@@ -63,10 +54,6 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 		return parent::afterSave();
 	}
 
-
-	/**
-	 *
-	 */
 	protected function sendCommentMails()
 	{
 		/** @var TicketThread $thread */
@@ -78,7 +65,6 @@ class TicketCommentUnpublishProcessor extends UpdateProcessor
 			}
 		}
 	}
-
 
 	/**
 	 * @param string $action

@@ -2,8 +2,8 @@
 
 namespace Tickets\Processors\Web\File;
 
-use Tickets\Model\TicketFile;
 use MODX\Revolution\Processors\ModelProcessor;
+use Tickets\Model\TicketFile;
 
 class Delete extends ModelProcessor
 {
@@ -11,7 +11,7 @@ class Delete extends ModelProcessor
 	public $permission = 'ticket_file_upload';
 
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function initialize()
 	{
@@ -22,13 +22,12 @@ class Delete extends ModelProcessor
 		return true;
 	}
 
-
 	/**
 	 * @return array|string
 	 */
 	public function process()
 	{
-		$id = (int)$this->getProperty('id');
+		$id = (int) $this->getProperty('id');
 		/** @var TicketFile $file */
 		if (!$file = $this->modx->getObject($this->classKey, $id)) {
 			return $this->failure($this->modx->lexicon('ticket_err_file_ns'));

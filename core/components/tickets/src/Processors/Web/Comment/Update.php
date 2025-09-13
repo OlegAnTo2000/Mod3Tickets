@@ -2,46 +2,60 @@
 
 namespace Tickets\Processors\Web\Comment;
 
+use function array_map;
+use function explode;
+use function is_array;
+
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+use function preg_match;
+use function preg_match_all;
+use function preg_replace;
+use function str_replace;
+use function strpos;
+use function strtolower;
+use function strtotime;
+
+use Tickets\Model\TicketComment;
 use Tickets\Model\TicketFile;
 use Tickets\Model\TicketThread;
-use Tickets\Model\TicketComment;
-use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+use function time;
+use function trim;
 
 class Update extends UpdateProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
-	public  $objectType      = TicketComment::class;
-	public  $classKey        = TicketComment::class;
-	public  $languageTopics  = array('tickets:default');
-	public  $permission      = 'comment_save';
-	public  $beforeSaveEvent = 'OnBeforeCommentSave';
-	public  $afterSaveEvent  = 'OnCommentSave';
-	private $guest           = false;
-
+	public $objectType = TicketComment::class;
+	public $classKey = TicketComment::class;
+	public $languageTopics = ['tickets:default'];
+	public $permission = 'comment_save';
+	public $beforeSaveEvent = 'OnBeforeCommentSave';
+	public $afterSaveEvent = 'OnCommentSave';
+	private $guest = false;
 
 	/**
 	 * @return bool
 	 */
 	public function checkPermissions()
 	{
-		$this->guest = (bool)$this->getProperty('allowGuest', false);
+		$this->guest = (bool) $this->getProperty('allowGuest', false);
 
 		return !empty($this->permission) && !$this->guest
 			? $this->modx->hasPermission($this->permission)
 			: true;
 	}
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSet()
 	{
 		$time = time() - strtotime($this->object->get('createdon'));
 		$ip = $this->modx->request->getClientIp();
 
-		if (!$this->modx->getCount(TicketThread::class, array('name' => $this->getProperty('thread'), 'deleted' => 0, 'closed' => 0))) {
+		if (!$this->modx->getCount(TicketThread::class, ['name' => $this->getProperty('thread'), 'deleted' => 0, 'closed' => 0])) {
 			return $this->modx->lexicon('ticket_err_wrong_thread');
 		} elseif ($this->modx->user->isAuthenticated($this->modx->context->key) && $this->object->get('createdby') != $this->modx->user->id) {
 			return $this->modx->lexicon('ticket_comment_err_wrong_user');
@@ -51,7 +65,7 @@ class Update extends UpdateProcessor
 			} elseif ($this->object->get('ip') != $ip['ip']) {
 				return $this->modx->lexicon('ticket_comment_err_wrong_guest_ip');
 			}
-		} elseif ($this->modx->getCount(TicketComment::class, array('parent' => $this->object->get('id')))) {
+		} elseif ($this->modx->getCount(TicketComment::class, ['parent' => $this->object->get('id')])) {
 			return $this->modx->lexicon('ticket_comment_err_has_replies');
 		} elseif ($time >= $this->modx->getOption('tickets.comment_edit_time', null, 600)) {
 			return $this->modx->lexicon('ticket_comment_err_no_time');
@@ -65,12 +79,16 @@ class Update extends UpdateProcessor
 		$requiredFields = array_map('trim', explode(',', $this->getProperty('requiredFields', 'name,email')));
 		foreach ($requiredFields as $field) {
 			$value = $this->modx->stripTags(trim($this->getProperty($field)));
-			if (empty($value)) $value = $this->object->get($field);
-			if ($field == 'email' && !preg_match('/.+@.+\..+/i', $value)) {
+			if (empty($value)) {
+				$value = $this->object->get($field);
+			}
+			if ('email' == $field && !preg_match('/.+@.+\..+/i', $value)) {
 				$this->setProperty('email', '');
 				$this->addFieldError($field, $this->modx->lexicon('ticket_comment_err_email'));
 			} else {
-				if ($field == 'email') $value = strtolower($value);
+				if ('email' == $field) {
+					$value = strtolower($value);
+				}
 				$this->setProperty($field, $value);
 			}
 		}
@@ -83,36 +101,37 @@ class Update extends UpdateProcessor
 		}
 
 		$properties = $this->getProperties();
-		$add        = array();
-		$meta       = $this->modx->getFieldMeta(TicketComment::class);
+		$add = [];
+		$meta = $this->modx->getFieldMeta(TicketComment::class);
 		foreach ($properties as $k => $v) {
-			if (!isset($meta[$k])) $add[$k] = $this->modx->stripTags($v);
+			if (!isset($meta[$k])) {
+				$add[$k] = $this->modx->stripTags($v);
+			}
 		}
 
-		$this->properties = array(
-			'text'       => $text,
-			'raw'        => $this->getProperty('raw'),
-			'name'       => $this->getProperty('name'),
-			'email'      => $this->getProperty('email'),
+		$this->properties = [
+			'text' => $text,
+			'raw' => $this->getProperty('raw'),
+			'name' => $this->getProperty('name'),
+			'email' => $this->getProperty('email'),
 			'properties' => !empty($add) ? $add : $this->object->get('properties'),
-		);
+		];
 		$this->unsetProperty('action');
 
 		return parent::beforeSet();
 	}
-
 
 	/**
 	 * @return bool
 	 */
 	public function beforeSave()
 	{
-		$this->object->fromArray(array(
+		$this->object->fromArray([
 			'editedon' => time(),
 			'editedby' => $this->modx->user->isAuthenticated($this->modx->context->key)
 				? $this->modx->user->id
 				: 0,
-		));
+		]);
 
 		if ($this->guest) {
 			$_SESSION['TicketComments']['name'] = $this->object->get('name');
@@ -122,7 +141,6 @@ class Update extends UpdateProcessor
 		return parent::beforeSave();
 	}
 
-
 	/**
 	 * @return bool
 	 */
@@ -130,23 +148,24 @@ class Update extends UpdateProcessor
 	{
 		$this->object->clearTicketCache();
 		$this->processFiles();
+
 		return parent::afterSave();
 	}
 
 	/**
-	 * Add uploaded files to comment
+	 * Add uploaded files to comment.
 	 *
 	 * @return bool|int
 	 */
 	public function processFiles()
 	{
 		$q = $this->modx->newQuery(TicketFile::class);
-		$q->where(array('class' => TicketComment::class));
-		$q->andCondition(array('parent' => $this->object->id, 'createdby' => $this->modx->user->id), null, 1);
+		$q->where(['class' => TicketComment::class]);
+		$q->andCondition(['parent' => $this->object->id, 'createdby' => $this->modx->user->id], null, 1);
 		$q->sortby('createdon', 'ASC');
 		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
-		$replace = array();
+		$replace = [];
 		$count = 0;
 		/** @var TicketFile $item */
 		foreach ($collection as $item) {
@@ -157,37 +176,37 @@ class Update extends UpdateProcessor
 				$old_url = $item->get('url');
 				$item->set('parent', $this->object->id);
 				$item->save();
-				$replace[$old_url] = array(
-					'url'    => $item->get('url'),
-					'thumb'  => $item->get('thumb'),
+				$replace[$old_url] = [
+					'url' => $item->get('url'),
+					'thumb' => $item->get('thumb'),
 					'thumbs' => $item->get('thumbs'),
-				);
-				$count++;
+				];
+				++$count;
 			}
 		}
 
 		// Update ticket links
 		if (!empty($replace)) {
-			$array = array(
-				'raw'  => $this->object->get('raw'),
+			$array = [
+				'raw' => $this->object->get('raw'),
 				'text' => $this->object->get('text'),
-			);
+			];
 			$update = false;
 			foreach ($array as $field => $text) {
 				$pcre = '#<a.*?>.*?</a>|<img.*?>#s';
 				preg_match_all($pcre, $text, $matches);
-				$src = $dst = array();
+				$src = $dst = [];
 				foreach ($matches[0] as $tag) {
 					foreach ($replace as $from => $to) {
-						if (strpos($tag, $from) !== false) {
+						if (false !== strpos($tag, $from)) {
 							if (is_array($to)) {
 								$src[] = $from;
 								$dst[] = $to['url'];
 								if (empty($to['thumbs'])) {
-									$to['thumbs'] = array($to['thumb']);
+									$to['thumbs'] = [$to['thumb']];
 								}
 								foreach ($to['thumbs'] as $key => $thumb) {
-									if (strpos($thumb, '/' . $key . '/') === false) {
+									if (false === strpos($thumb, '/' . $key . '/')) {
 										// Old thumbnails
 										$src[] = preg_replace('#\.[a-z]+$#i', '_thumb$0', $from);
 										$dst[] = preg_replace('#\.[a-z]+$#i', '_thumb$0', $thumb);
@@ -207,7 +226,7 @@ class Update extends UpdateProcessor
 				}
 				if (!empty($src)) {
 					$text = str_replace($src, $dst, $text);
-					if ($text != $this->object->$field) {
+					if ($this->object->$field != $text) {
 						$this->object->set($field, $text);
 						$update = true;
 					}

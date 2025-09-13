@@ -2,27 +2,25 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use \MODX\Revolution\modX;
-use \MODX\Revolution\Processors\Model\RemoveProcessor;
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
+use function count;
+
+use MODX\Revolution\Processors\Model\RemoveProcessor;
 
 class Remove extends RemoveProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
 	public $checkRemovePermission = true;
 	public $objectType = 'Tickets\Model\TicketComment';
 	public $classKey = 'Tickets\Model\TicketComment';
-	public $languageTopics = array('tickets');
+	public $languageTopics = ['tickets'];
 	public $beforeRemoveEvent = 'OnBeforeCommentRemove';
 	public $afterRemoveEvent = 'OnCommentRemove';
 	public $permission = 'comment_remove';
-	private $children = array();
-
+	private $children = [];
 
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function initialize()
 	{
@@ -34,14 +32,13 @@ class Remove extends RemoveProcessor
 		return $parent;
 	}
 
-
 	/**
 	 * @return bool
 	 */
 	public function beforeRemove()
 	{
 		$this->getChildren($this->object);
-		$children = $this->modx->getIterator('Tickets\Model\TicketComment', array('id:IN' => $this->children));
+		$children = $this->modx->getIterator('Tickets\Model\TicketComment', ['id:IN' => $this->children]);
 		/** @var Tickets\Model\TicketComment $child */
 		foreach ($children as $child) {
 			$child->remove();
@@ -50,10 +47,6 @@ class Remove extends RemoveProcessor
 		return true;
 	}
 
-
-	/**
-	 * @param Tickets\Model\TicketComment $parent
-	 */
 	protected function getChildren(Tickets\Model\TicketComment $parent)
 	{
 		$children = $parent->getMany('Children');
@@ -65,7 +58,6 @@ class Remove extends RemoveProcessor
 			}
 		}
 	}
-
 
 	/**
 	 * @return bool
@@ -84,10 +76,6 @@ class Remove extends RemoveProcessor
 		return parent::afterRemove();
 	}
 
-
-	/**
-	 *
-	 */
 	public function logManagerAction()
 	{
 		$this->modx->logManagerAction(

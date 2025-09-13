@@ -2,13 +2,12 @@
 
 namespace Tickets\Processors\Mgr\Author;
 
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
-use \MODX\Revolution\modX;
-use \Tickets\Model\TicketAuthor;
 use MODX\Revolution\modUser;
 use MODX\Revolution\modUserProfile;
-use \MODX\Revolution\Processors\Model\GetListProcessor;
+use MODX\Revolution\Processors\Model\GetListProcessor;
+use Tickets\Model\TicketAuthor;
+use xPDO\Om\xPDOObject;
+use xPDO\Om\xPDOQuery;
 
 class GetList extends GetListProcessor
 {
@@ -23,7 +22,7 @@ class GetList extends GetListProcessor
 	{
 		$parent = parent::initialize();
 
-		if ($this->getProperty('sort') == 'stars') {
+		if ('stars' == $this->getProperty('sort')) {
 			$dir = $this->getProperty('dir', 'DESC');
 			$this->setProperty('sort', "stars_tickets {$dir}, stars_comments");
 		}
@@ -31,10 +30,7 @@ class GetList extends GetListProcessor
 		return $parent;
 	}
 
-
 	/**
-	 * @param xPDOQuery $c
-	 *
 	 * @return xPDOQuery
 	 */
 	public function prepareQueryBeforeCount(xPDOQuery $c)
@@ -42,27 +38,24 @@ class GetList extends GetListProcessor
 		$c->innerJoin(modUser::class, 'User');
 		$c->innerJoin(modUserProfile::class, 'UserProfile');
 		$c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
-		$c->select(array(
+		$c->select([
 			'username' => 'User.username',
 			'fullname' => 'UserProfile.fullname',
-			'active'   => 'User.active',
-			'blocked'  => 'UserProfile.blocked',
-		));
+			'active' => 'User.active',
+			'blocked' => 'UserProfile.blocked',
+		]);
 
 		if ($query = $this->getProperty('query', null)) {
-			$c->where(array(
+			$c->where([
 				'User.username:LIKE' => "%{$query}%",
 				'OR:UserProfile.fullname:LIKE' => "%{$query}%",
-			));
+			]);
 		}
 
 		return $c;
 	}
 
-
 	/**
-	 * @param \xPDO\Om\xPDOObject $object
-	 *
 	 * @return array
 	 */
 	public function prepareRow(xPDOObject $object)

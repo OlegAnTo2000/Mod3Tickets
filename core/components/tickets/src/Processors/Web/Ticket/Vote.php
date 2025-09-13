@@ -2,34 +2,41 @@
 
 namespace Tickets\Processors\Web\Ticket;
 
-use \PDO;
-use \Tickets\Model\Ticket;
-use \Tickets\Model\TicketVote;
-use \Tickets\Model\TicketsSection;
-use \MODX\Revolution\modUser;
-use \MODX\Revolution\modResource;
-use \MODX\Revolution\Processors\Model\CreateProcessor;
+use function date;
+use function microtime;
+
+use MODX\Revolution\modResource;
+use MODX\Revolution\modUser;
+use MODX\Revolution\Processors\Model\CreateProcessor;
+use PDO;
+
+use function strtotime;
+
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketsSection;
+use Tickets\Model\TicketVote;
+
+use function time;
 
 class Vote extends CreateProcessor
 {
-	/** @var TicketVote $object */
+	/** @var TicketVote */
 	public $object;
-	public $objectType      = 'TicketVote';
-	public $classKey        = TicketVote::class;
-	public $languageTopics  = array('tickets:default');
+	public $objectType = 'TicketVote';
+	public $classKey = TicketVote::class;
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketVote';
-	public $afterSaveEvent  = 'OnTicketVote';
-	public $permission      = 'ticket_vote';
-	/** @var Ticket|modResource $ticket */
+	public $afterSaveEvent = 'OnTicketVote';
+	public $permission = 'ticket_vote';
+	/** @var Ticket|modResource */
 	private $ticket;
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSet()
 	{
-		$id = (int)$this->getProperty('id');
+		$id = (int) $this->getProperty('id');
 
 		if (!$this->modx->user->isAuthenticated($this->modx->context->key)) {
 			return $this->modx->lexicon('permission_denied');
@@ -41,14 +48,13 @@ class Vote extends CreateProcessor
 		/** @var TicketVote $vote */
 		elseif ($this->modx->getCount(
 			$this->classKey,
-			array('id' => $id, 'createdby' => $this->modx->user->id, 'class' => Ticket::class)
+			['id' => $id, 'createdby' => $this->modx->user->id, 'class' => Ticket::class]
 		)) {
 			return $this->modx->lexicon('ticket_err_vote_already');
 		}
 
 		return true;
 	}
-
 
 	/**
 	 * @return bool
@@ -58,9 +64,11 @@ class Vote extends CreateProcessor
 		if ($section = $this->ticket->getOne('Section')) {
 			/** @var TicketsSection $section */
 			$ratings = $section->getProperties('ratings');
-			if (isset($ratings['days_ticket_vote']) && $ratings['days_ticket_vote'] !== '') {
-				$max = strtotime($this->ticket->get('createdon')) + ((float)$ratings['days_ticket_vote'] * 86400);
-				if (time() > $max) return $this->modx->lexicon('ticket_err_vote_ticket_days');
+			if (isset($ratings['days_ticket_vote']) && '' !== $ratings['days_ticket_vote']) {
+				$max = strtotime($this->ticket->get('createdon')) + ((float) $ratings['days_ticket_vote'] * 86400);
+				if (time() > $max) {
+					return $this->modx->lexicon('ticket_err_vote_ticket_days');
+				}
 			}
 		}
 
@@ -87,7 +95,6 @@ class Vote extends CreateProcessor
 		return true;
 	}
 
-
 	/**
 	 * @return array|string
 	 */
@@ -96,15 +103,15 @@ class Vote extends CreateProcessor
 		if ($this->ticket instanceof Ticket) {
 			$rating = $this->ticket->getRating();
 		} else {
-			$rating = array('rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0);
+			$rating = ['rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0];
 
-			$q = $this->modx->newQuery(TicketVote::class, array('id' => $this->ticket->id, 'class' => Ticket::class));
+			$q = $this->modx->newQuery(TicketVote::class, ['id' => $this->ticket->id, 'class' => Ticket::class]);
 			$q->innerJoin(modUser::class, 'modUser', '`modUser`.`id` = `TicketVote`.`createdby`');
 			$q->select('value');
 			$tstart = microtime(true);
 			if ($q->prepare() && $q->stmt->execute()) {
 				$this->modx->startTime += microtime(true) - $tstart;
-				$this->modx->executedQueries++;
+				++$this->modx->executedQueries;
 				$rows = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 				foreach ($rows as $value) {
 					$rating['rating'] += $value;

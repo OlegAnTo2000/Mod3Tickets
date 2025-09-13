@@ -2,216 +2,208 @@
 
 namespace Tickets\Model;
 
-use \PDO;
-use \xPDO\Om\xPDOSimpleObject;
-use \MODX\Revolution\modResource;
-use \Tickets\Model\TicketThread;
-use \Tickets\Model\TicketAuthor;
-use \Tickets\Model\Ticket;
+use function is_array;
+use function is_object;
+use function method_exists;
+
+use MODX\Revolution\modResource;
+use PDO;
+use xPDO\Om\xPDOSimpleObject;
 
 /**
  * @property int $id
  */
 class TicketComment extends xPDOSimpleObject
 {
-    public $class_key = self::class;
+	public $class_key = self::class;
 
-    /**
-     * @param string $alias
-     * @param null $criteria
-     * @param bool $cacheFlag
-     *
-     * @return array
-     */
-    public function & getMany($alias, $criteria = null, $cacheFlag = true)
-    {
-        if ($alias == 'Attachments' || $alias == 'Votes') {
-            $criteria = array('class' => $this->class_key);
-        }
+	/**
+	 * @param string $alias
+	 * @param null   $criteria
+	 * @param bool   $cacheFlag
+	 *
+	 * @return array
+	 */
+	public function &getMany($alias, $criteria = null, $cacheFlag = true)
+	{
+		if ('Attachments' == $alias || 'Votes' == $alias) {
+			$criteria = ['class' => $this->class_key];
+		}
 
-        return parent::getMany($alias, $criteria, $cacheFlag);
-    }
+		return parent::getMany($alias, $criteria, $cacheFlag);
+	}
 
+	/**
+	 * @param string $alias
+	 *
+	 * @return bool
+	 */
+	public function addMany(&$obj, $alias = '')
+	{
+		$added = false;
+		if (is_array($obj)) {
+			/** @var \xPDO\Om\xPDOObject $o */
+			foreach ($obj as $o) {
+				if (is_object($o)) {
+					$o->set('class', $this->class_key);
+					$added = parent::addMany($obj, $alias);
+				}
+			}
 
-    /**
-     * @param mixed $obj
-     * @param string $alias
-     *
-     * @return bool
-     */
-    public function addMany(& $obj, $alias = '')
-    {
-        $added = false;
-        if (is_array($obj)) {
-            /** @var \xPDO\Om\xPDOObject $o */
-            foreach ($obj as $o) {
-                if (is_object($o)) {
-                    $o->set('class', $this->class_key);
-                    $added = parent::addMany($obj, $alias);
-                }
-            }
+			return $added;
+		} else {
+			return parent::addMany($obj, $alias);
+		}
+	}
 
-            return $added;
-        } else {
-            return parent::addMany($obj, $alias);
-        }
-    }
+	/**
+	 * Try to clear cache of ticket.
+	 *
+	 * @return bool
+	 */
+	public function clearTicketCache()
+	{
+		$clear = $this->xpdo->getOption('tickets.clear_cache_on_comment_save');
+		if (!empty($clear) && 'false' != $clear) {
+			/** @var TicketThread $thread */
+			$thread = $this->getOne('Thread');
+			/** @var modResource|Ticket $ticket */
+			if ($ticket = $this->xpdo->getObject('modResource', $thread->get('resource'))) {
+				if (method_exists($ticket, 'clearCache')) {
+					/** @var modResource|Ticket $ticket */
+					$ticket->clearCache();
 
+					return true;
+				}
+			}
+		}
 
-    /**
-     * Try to clear cache of ticket
-     *
-     * @return bool
-     */
-    public function clearTicketCache()
-    {
-        $clear = $this->xpdo->getOption('tickets.clear_cache_on_comment_save');
-        if (!empty($clear) && $clear != 'false') {
-            /** @var TicketThread $thread */
-            $thread = $this->getOne('Thread');
-            /** @var modResource|Ticket $ticket */
-            if ($ticket = $this->xpdo->getObject('modResource', $thread->get('resource'))) {
-                if (method_exists($ticket, 'clearCache')) {
-                    /** @var modResource|Ticket $ticket */
-                    $ticket->clearCache();
-                    return true;
-                }
-            }
-        }
+		return false;
+	}
 
-        return false;
-    }
+	/**
+	 * Move comment from one thread to another and clear cache of its tickets.
+	 *
+	 * @param int $from
+	 * @param int $to
+	 *
+	 * @return bool
+	 */
+	public function changeThread($from, $to)
+	{
+		/** @var TicketThread $old_thread */
+		$old_thread = $this->xpdo->getObject('TicketThread', $from);
+		/** @var TicketThread $new_thread */
+		$new_thread = $this->xpdo->getObject('TicketThread', $to);
 
+		if ($new_thread && $old_thread) {
+			$this->set('thread', $to);
+			$this->save();
 
-    /**
-     * Move comment from one thread to another and clear cache of its tickets
-     *
-     * @param int $from
-     * @param int $to
-     *
-     * @return bool
-     */
-    public function changeThread($from, $to)
-    {
-        /** @var TicketThread $old_thread */
-        $old_thread = $this->xpdo->getObject('TicketThread', $from);
-        /** @var TicketThread $new_thread */
-        $new_thread = $this->xpdo->getObject('TicketThread', $to);
+			$children = $this->getMany('Children');
+			/** @var TicketComment $child */
+			foreach ($children as $child) {
+				$child->set('parent', $to);
+				$child->save();
+			}
 
-        if ($new_thread && $old_thread) {
-            $this->set('thread', $to);
-            $this->save();
+			$old_thread->updateLastComment();
+			/** @var modResource|Ticket $ticket */
+			if ($ticket = $this->xpdo->getObject('modResource', $old_thread->get('resource'))) {
+				if (method_exists($ticket, 'clearCache')) {
+					/** @var modResource|Ticket $ticket */
+					$ticket->clearCache();
+				}
+			}
 
-            $children = $this->getMany('Children');
-            /** @var TicketComment $child */
-            foreach ($children as $child) {
-                $child->set('parent', $to);
-                $child->save();
-            }
+			$new_thread->updateLastComment();
+			/** @var modResource|Ticket $ticket */
+			if ($ticket = $this->xpdo->getObject('modResource', $new_thread->get('resource'))) {
+				if (method_exists($ticket, 'clearCache')) {
+					/** @var modResource|Ticket $ticket */
+					$ticket->clearCache();
+				}
+			}
 
-            $old_thread->updateLastComment();
-            /** @var modResource|Ticket $ticket */
-            if ($ticket = $this->xpdo->getObject('modResource', $old_thread->get('resource'))) {
-                if (method_exists($ticket, 'clearCache')) {
-                    /** @var modResource|Ticket $ticket */
-                    $ticket->clearCache();
-                }
-            }
+			return true;
+		}
 
-            $new_thread->updateLastComment();
-            /** @var modResource|Ticket $ticket */
-            if ($ticket = $this->xpdo->getObject('modResource', $new_thread->get('resource'))) {
-                if (method_exists($ticket, 'clearCache')) {
-                    /** @var modResource|Ticket $ticket */
-                    $ticket->clearCache();
-                }
-            }
+		return false;
+	}
 
-            return true;
-        }
+	/**
+	 * Update comment rating.
+	 *
+	 * @return array
+	 */
+	public function updateRating()
+	{
+		$rating = ['rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0];
 
-        return false;
-    }
+		$q = $this->xpdo->newQuery('TicketVote', ['id' => $this->id, 'class' => 'TicketComment']);
+		$q->select('value');
+		if ($q->prepare() && $q->stmt->execute()) {
+			while ($value = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
+				$rating['rating'] += $value;
+				if ($value > 0) {
+					$rating['rating_plus'] += $value;
+				} else {
+					$rating['rating_minus'] += $value;
+				}
+			}
+			$this->fromArray($rating);
+			$this->save();
+		}
 
+		return $rating;
+	}
 
-    /**
-     * Update comment rating
-     *
-     * @return array
-     */
-    public function updateRating()
-    {
-        $rating = array('rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0);
+	/**
+	 * @param null $cacheFlag
+	 *
+	 * @return bool
+	 */
+	public function save($cacheFlag = null)
+	{
+		$action = $this->isNew() || $this->isDirty('deleted') || $this->isDirty('published');
+		$enabled = $this->get('published') && !$this->get('deleted');
+		$new_parent = $this->isDirty('thread');
+		$save = parent::save($cacheFlag);
 
-        $q = $this->xpdo->newQuery('TicketVote', array('id' => $this->id, 'class' => 'TicketComment'));
-        $q->select('value');
-        if ($q->prepare() && $q->stmt->execute()) {
-            while ($value = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
-                $rating['rating'] += $value;
-                if ($value > 0) {
-                    $rating['rating_plus'] += $value;
-                } else {
-                    $rating['rating_minus'] += $value;
-                }
-            }
-            $this->fromArray($rating);
-            $this->save();
-        }
+		/** @var TicketThread $thread */
+		$thread = $this->getOne('Thread');
 
-        return $rating;
-    }
+		/** @var TicketAuthor $profile */
+		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+			if ($action && $enabled) {
+				$profile->addAction('comment', $this->id, $thread->get('resource'), $this->get('createdby'));
+			} elseif (!$enabled) {
+				$profile->removeAction('comment', $this->id, $this->get('createdby'));
+			} elseif ($new_parent) {
+				$profile->removeAction('comment', $this->id, $this->get('createdby'));
+				$profile->addAction('comment', $this->id, $thread->get('resource'), $this->get('createdby'));
+			}
+		}
 
+		return $save;
+	}
 
-    /**
-     * @param null $cacheFlag
-     *
-     * @return bool
-     */
-    public function save($cacheFlag = null)
-    {
-        $action = $this->isNew() || $this->isDirty('deleted') || $this->isDirty('published');
-        $enabled = $this->get('published') && !$this->get('deleted');
-        $new_parent = $this->isDirty('thread');
-        $save = parent::save($cacheFlag);
+	/**
+	 * @return bool
+	 */
+	public function remove(array $ancestors = [])
+	{
+		$collection = $this->xpdo->getIterator('TicketComment', ['parent' => $this->id]);
+		/** @var TicketComment $item */
+		foreach ($collection as $item) {
+			$item->remove();
+		}
 
-        /** @var TicketThread $thread */
-        $thread = $this->getOne('Thread');
+		/** @var TicketAuthor $profile */
+		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+			$profile->removeAction('comment', $this->id, $this->get('createdby'));
+		}
 
-        /** @var TicketAuthor $profile */
-        if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
-            if ($action && $enabled) {
-                $profile->addAction('comment', $this->id, $thread->get('resource'), $this->get('createdby'));
-            } elseif (!$enabled) {
-                $profile->removeAction('comment', $this->id, $this->get('createdby'));
-            } elseif ($new_parent) {
-                $profile->removeAction('comment', $this->id, $this->get('createdby'));
-                $profile->addAction('comment', $this->id, $thread->get('resource'), $this->get('createdby'));
-            }
-        }
-
-        return $save;
-    }
-
-
-    /**
-     * @param array $ancestors
-     *
-     * @return bool
-     */
-    public function remove(array $ancestors = array())
-    {
-        $collection = $this->xpdo->getIterator('TicketComment', array('parent' => $this->id));
-        /** @var TicketComment $item */
-        foreach ($collection as $item) {
-            $item->remove();
-        }
-
-        /** @var TicketAuthor $profile */
-        if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
-            $profile->removeAction('comment', $this->id, $this->get('createdby'));
-        }
-
-        return parent::remove($ancestors);
-    }
-
+		return parent::remove($ancestors);
+	}
 }

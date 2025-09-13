@@ -2,50 +2,43 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use \MODX\Revolution\modX;
-use \MODX\Revolution\Processors\Model\UpdateProcessor;
-use \xPDO\Om\xPDOQuery;
-use \xPDO\Om\xPDOObject;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketThread;
 
+use function time;
+
 class Delete extends UpdateProcessor
 {
-	/** @var TicketComment $object */
+	/** @var TicketComment */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
-	public $classKey        = TicketComment::class;
-	public $languageTopics  = array('tickets:default');
+	public $objectType = 'Tickets\Model\TicketComment';
+	public $classKey = TicketComment::class;
+	public $languageTopics = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeCommentDelete';
-	public $afterSaveEvent  = 'OnCommentDelete';
-	public $permission      = 'comment_delete';
+	public $afterSaveEvent = 'OnCommentDelete';
+	public $permission = 'comment_delete';
 
-
-	/**
-	 *
-	 */
 	public function beforeSet()
 	{
-		$this->properties = array();
+		$this->properties = [];
 
 		return true;
 	}
 
-
 	/**
-	 * @return bool|null|string
+	 * @return bool|string|null
 	 */
 	public function beforeSave()
 	{
-		$this->object->fromArray(array(
-			'deleted'   => 1,
+		$this->object->fromArray([
+			'deleted' => 1,
 			'deletedon' => time(),
 			'deletedby' => $this->modx->user->get('id'),
-		));
+		]);
 
 		return parent::beforeSave();
 	}
-
 
 	/**
 	 * @return bool
@@ -63,9 +56,6 @@ class Delete extends UpdateProcessor
 		return parent::afterSave();
 	}
 
-	/**
-	 *
-	 */
 	public function logManagerAction()
 	{
 		$this->modx->logManagerAction(

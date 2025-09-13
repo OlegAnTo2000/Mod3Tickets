@@ -1,36 +1,33 @@
 <?php
 
-class TicketThreadMultipleProcessor extends \MODX\Revolution\Processors\Processor
+class TicketThreadMultipleProcessor extends MODX\Revolution\Processors\Processor
 {
+	/**
+	 * @return array|string
+	 */
+	public function process()
+	{
+		if (!$method = $this->getProperty('method', false)) {
+			return $this->failure();
+		}
+		$ids = \json_decode($this->getProperty('ids'), true);
+		if (empty($ids)) {
+			return $this->success();
+		}
 
+		/** @var Tickets $Tickets */
+		$Tickets = $this->modx->getService('Tickets');
 
-    /**
-     * @return array|string
-     */
-    public function process()
-    {
-        if (!$method = $this->getProperty('method', false)) {
-            return $this->failure();
-        }
-        $ids = json_decode($this->getProperty('ids'), true);
-        if (empty($ids)) {
-            return $this->success();
-        }
+		foreach ($ids as $id) {
+			/** @var modProcessorResponse $response */
+			$response = $Tickets->runProcessor('mgr/thread/' . $method, ['id' => $id]);
+			if ($response->isError()) {
+				return $response->getResponse();
+			}
+		}
 
-        /** @var Tickets $Tickets */
-        $Tickets = $this->modx->getService('Tickets');
-
-        foreach ($ids as $id) {
-            /** @var modProcessorResponse $response */
-            $response = $Tickets->runProcessor('mgr/thread/' . $method, array('id' => $id));
-            if ($response->isError()) {
-                return $response->getResponse();
-            }
-        }
-
-        return $this->success();
-    }
-
+		return $this->success();
+	}
 }
 
 return 'TicketThreadMultipleProcessor';

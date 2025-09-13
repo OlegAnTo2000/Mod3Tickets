@@ -2,14 +2,16 @@
 
 namespace Tickets\Processors\Web\Comment;
 
-use Tickets\Model\TicketComment;
+use function html_entity_decode;
+
 use MODX\Revolution\Processors\Model\GetProcessor;
+use Tickets\Model\TicketComment;
 
 class Get extends GetProcessor
 {
-	public $objectType     = TicketComment::class;
-	public $classKey       = TicketComment::class;
-	public $languageTopics = array('tickets:default');
+	public $objectType = TicketComment::class;
+	public $classKey = TicketComment::class;
+	public $languageTopics = ['tickets:default'];
 
 	/**
 	 * @return array|string

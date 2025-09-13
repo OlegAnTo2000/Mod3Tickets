@@ -6,6 +6,5 @@ use MODX\Revolution\Processors\Resource\Undelete as ResourceUndelete;
 
 class Undelete extends ResourceUndelete
 {
-    public $permission = 'ticket_delete';
-
+	public $permission = 'ticket_delete';
 }

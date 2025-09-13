@@ -2,17 +2,24 @@
 
 namespace Tickets\Model;
 
-use \PDO;
-use \xPDO\xPDO;
-use \Tickets\Model\Ticket;
-use \Tickets\Model\TicketVote;
-use \Tickets\Model\TicketTotal;
-use \Tickets\Model\TicketAuthor;
-use \Tickets\Model\TicketThread;
-use \Tickets\Model\TicketComment;
-use \Tickets\Model\TicketAuthorAction;
-use \MODX\Revolution\modResource;
-use \MODX\Revolution\modAccessibleObject;
+use function abs;
+use function array_key_exists;
+use function array_merge;
+use function array_search;
+use function array_values;
+use function implode;
+use function in_array;
+use function intval;
+use function is_array;
+use function is_numeric;
+use function is_object;
+use function is_string;
+use function microtime;
+
+use MODX\Revolution\modAccessibleObject;
+use MODX\Revolution\modResource;
+use PDO;
+use xPDO\xPDO;
 
 class TicketsSection extends modResource
 {
@@ -21,43 +28,35 @@ class TicketsSection extends modResource
 	private $_oldUri = '';
 	private $_oldRatings = '';
 
-
-	/**
-	 * @param xPDO $xpdo
-	 */
-	function __construct(xPDO &$xpdo)
+	public function __construct(xPDO &$xpdo)
 	{
 		parent::__construct($xpdo);
 
 		$this->set('class_key', TicketsSection::class);
 	}
 
-
 	/**
-	 * @param xPDO $xpdo
 	 * @param string $className
-	 * @param null $criteria
-	 * @param bool $cacheFlag
+	 * @param null   $criteria
+	 * @param bool   $cacheFlag
 	 *
-	 * @return modAccessibleObject|null|object
+	 * @return modAccessibleObject|object|null
 	 */
 	public static function load(xPDO &$xpdo, $className, $criteria = null, $cacheFlag = true)
 	{
 		if (!is_object($criteria)) {
 			$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
 		}
-		/** @noinspection PhpParamsInspection */
+		/* @noinspection PhpParamsInspection */
 		$xpdo->addDerivativeCriteria($className, $criteria);
 
 		return parent::load($xpdo, $className, $criteria, $cacheFlag);
 	}
 
-
 	/**
-	 * @param xPDO $xpdo
 	 * @param string $className
-	 * @param null $criteria
-	 * @param bool $cacheFlag
+	 * @param null   $criteria
+	 * @param bool   $cacheFlag
 	 *
 	 * @return array
 	 */
@@ -66,16 +65,13 @@ class TicketsSection extends modResource
 		if (!is_object($criteria)) {
 			$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
 		}
-		/** @noinspection PhpParamsInspection */
+		/* @noinspection PhpParamsInspection */
 		$xpdo->addDerivativeCriteria($className, $criteria);
 
 		return parent::loadCollection($xpdo, $className, $criteria, $cacheFlag);
 	}
 
-
 	/**
-	 * @param xPDO $modx
-	 *
 	 * @return string
 	 */
 	public static function getControllerPath(xPDO &$modx)
@@ -87,7 +83,6 @@ class TicketsSection extends modResource
 		) . 'controllers/section/';
 	}
 
-
 	/**
 	 * @return array
 	 */
@@ -95,35 +90,34 @@ class TicketsSection extends modResource
 	{
 		$this->xpdo->lexicon->load('tickets:default');
 
-		return array(
+		return [
 			'text_create' => $this->xpdo->lexicon('tickets_section'),
 			'text_create_here' => $this->xpdo->lexicon('tickets_section_create_here'),
-		);
+		];
 	}
 
-
 	/**
-	 * @return null|string
+	 * @return string|null
 	 */
 	public function getResourceTypeName()
 	{
 		$this->xpdo->lexicon->load('tickets:default');
+
 		return $this->xpdo->lexicon('tickets_section');
 	}
 
-
 	/**
 	 * @param string $k
-	 * @param null $v
+	 * @param null   $v
 	 * @param string $vType
 	 *
 	 * @return bool
 	 */
 	public function set($k, $v = null, $vType = '')
 	{
-		if (is_string($k) && ($k == 'alias' || $k == 'uri')) {
+		if (is_string($k) && ('alias' == $k || 'uri' == $k)) {
 			$this->_oldUri = parent::get('uri');
-		} elseif (is_string($k) && $k == 'properties' && empty($this->_oldRatings)) {
+		} elseif (is_string($k) && 'properties' == $k && empty($this->_oldRatings)) {
 			if ($properties = parent::get('properties')) {
 				if (!empty($properties['ratings'])) {
 					unset(
@@ -140,21 +134,21 @@ class TicketsSection extends modResource
 		return parent::set($k, $v, $vType);
 	}
 
-
 	/**
 	 * @param array|string $k
-	 * @param null $format
-	 * @param null $formatTemplate
+	 * @param null         $format
+	 * @param null         $formatTemplate
 	 *
 	 * @return int|mixed
 	 */
 	public function get($k, $format = null, $formatTemplate = null)
 	{
 		if (is_array($k)) {
-			$values = array();
+			$values = [];
 			foreach ($k as $v) {
 				$values[$v] = $this->get($v, $format, $formatTemplate);
 			}
+
 			return $values;
 		} else {
 			switch ($k) {
@@ -186,12 +180,11 @@ class TicketsSection extends modResource
 		return $value;
 	}
 
-
 	/**
 	 * @param string $keyPrefix
-	 * @param bool $rawValues
-	 * @param bool $excludeLazy
-	 * @param bool $includeRelated
+	 * @param bool   $rawValues
+	 * @param bool   $excludeLazy
+	 * @param bool   $includeRelated
 	 *
 	 * @return array
 	 */
@@ -213,22 +206,18 @@ class TicketsSection extends modResource
 		return $array;
 	}
 
-
 	/**
-	 * @param array $options
-	 *
 	 * @return string
 	 */
-	public function getContent(array $options = array())
+	public function getContent(array $options = [])
 	{
 		$content = parent::getContent($options);
 
 		return $content;
 	}
 
-
 	/**
-	 * Shorthand for get virtual Ticket fields
+	 * Shorthand for get virtual Ticket fields.
 	 *
 	 * @return array
 	 */
@@ -237,15 +226,15 @@ class TicketsSection extends modResource
 		/** @var TicketTotal $total */
 		if (!$total = $this->getOne('Total')) {
 			$total = $this->xpdo->newObject(TicketTotal::class);
-			$total->fromArray(array(
-				'id'    => $this->id,
+			$total->fromArray([
+				'id' => $this->id,
 				'class' => TicketsSection::class,
-			), '', true, true);
+			], '', true, true);
 			$total->fetchValues();
 			$total->save();
 		}
 
-		return $total->get(array(
+		return $total->get([
 			'comments',
 			'views',
 			'tickets',
@@ -253,37 +242,36 @@ class TicketsSection extends modResource
 			'rating',
 			'rating_plus',
 			'rating_minus',
-		));
+		]);
 	}
 
-
 	/**
-	 * Get rating
+	 * Get rating.
 	 *
 	 * @return array
 	 */
 	public function getRating()
 	{
-		$rating = array(
-			'rating'       => 0,
-			'rating_plus'  => 0,
-			'rating_minus' => 0
-		);
+		$rating = [
+			'rating' => 0,
+			'rating_plus' => 0,
+			'rating_minus' => 0,
+		];
 
 		$q = $this->xpdo->newQuery(TicketVote::class);
 		$q->innerJoin(Ticket::class, 'Ticket', 'Ticket.id = TicketVote.id');
 		$q->innerJoin(TicketsSection::class, 'Section', 'Section.id = Ticket.parent');
-		$q->where(array(
-			'class'            => Ticket::class,
-			'Section.id'       => $this->id,
-			'Ticket.deleted'   => 0,
+		$q->where([
+			'class' => Ticket::class,
+			'Section.id' => $this->id,
+			'Ticket.deleted' => 0,
 			'Ticket.published' => 1,
-		));
+		]);
 		$q->select('value');
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
 			$this->xpdo->startTime += microtime(true) - $tstart;
-			$this->xpdo->executedQueries++;
+			++$this->xpdo->executedQueries;
 			$rows = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 			foreach ($rows as $value) {
 				$rating['rating'] += $value;
@@ -298,149 +286,141 @@ class TicketsSection extends modResource
 		return $rating;
 	}
 
-
 	/**
-	 * Returns the number of views of Tickets in this Section
+	 * Returns the number of views of Tickets in this Section.
 	 *
-	 * @return integer $count Total count of views
+	 * @return int $count Total count of views
 	 */
 	public function getViewsCount()
 	{
-		$q = $this->xpdo->newQuery(Ticket::class, array('parent' => $this->id, 'published' => 1, 'deleted' => 0));
+		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->id, 'published' => 1, 'deleted' => 0]);
 		$q->leftJoin(TicketView::class, 'Views');
 		$q->select('COUNT(Views.parent) as views');
 
 		$count = 0;
 		if ($q->prepare() && $q->stmt->execute()) {
-			$count = (int)$q->stmt->fetch(PDO::FETCH_COLUMN);
+			$count = (int) $q->stmt->fetch(PDO::FETCH_COLUMN);
 		}
 
 		return $count;
 	}
 
-
 	/**
-	 * Returns the number of stars for Tickets in this Section
+	 * Returns the number of stars for Tickets in this Section.
 	 *
-	 * @return integer
+	 * @return int
 	 */
 	public function getStarsCount()
 	{
-		$q = $this->xpdo->newQuery(Ticket::class, array('parent' => $this->id, 'published' => 1, 'deleted' => 0));
+		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->id, 'published' => 1, 'deleted' => 0]);
 		$q->leftJoin(TicketStar::class, 'Stars');
 		$q->select('COUNT(Stars.owner) as views');
 
 		$count = 0;
 		if ($q->prepare() && $q->stmt->execute()) {
-			$count = (int)$q->stmt->fetch(PDO::FETCH_COLUMN);
+			$count = (int) $q->stmt->fetch(PDO::FETCH_COLUMN);
 		}
 
 		return $count;
 	}
 
-
 	/**
-	 * Returns count of comments to Tickets in this Section
+	 * Returns count of comments to Tickets in this Section.
 	 *
-	 * @return integer $count Total count of comment
+	 * @return int $count Total count of comment
 	 */
 	public function getCommentsCount()
 	{
-		$q = $this->xpdo->newQuery(Ticket::class, array('parent' => $this->id, 'published' => 1, 'deleted' => 0));
-		$q->leftJoin(TicketThread::class, 'TicketThread', "`TicketThread`.`resource` = `Ticket`.`id`");
-		$q->leftJoin(TicketComment::class, 'TicketComment', "`TicketThread`.`id` = `TicketComment`.`thread`");
+		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->id, 'published' => 1, 'deleted' => 0]);
+		$q->leftJoin(TicketThread::class, 'TicketThread', '`TicketThread`.`resource` = `Ticket`.`id`');
+		$q->leftJoin(TicketComment::class, 'TicketComment', '`TicketThread`.`id` = `TicketComment`.`thread`');
 		$q->select('COUNT(`TicketComment`.`id`) as `comments`');
 
 		$count = 0;
 		if ($q->prepare() && $q->stmt->execute()) {
-			$count = (int)$q->stmt->fetch(PDO::FETCH_COLUMN);
+			$count = (int) $q->stmt->fetch(PDO::FETCH_COLUMN);
 		}
 
 		return $count;
 	}
 
-
 	/**
-	 * Returns count of tickets in this Section
+	 * Returns count of tickets in this Section.
 	 *
-	 * @return integer $count Total sum of votes
+	 * @return int $count Total sum of votes
 	 */
 	public function getTicketsCount()
 	{
-		return $this->xpdo->getCount(Ticket::class, array('parent' => $this->id, 'published' => 1, 'deleted' => 0));
+		return $this->xpdo->getCount(Ticket::class, ['parent' => $this->id, 'published' => 1, 'deleted' => 0]);
 	}
 
-
 	/**
-	 * @param array $node
-	 *
 	 * @return array
 	 */
-	public function prepareTreeNode(array $node = array())
+	public function prepareTreeNode(array $node = [])
 	{
 		$this->xpdo->lexicon->load('tickets:default');
-		$menu = array();
+		$menu = [];
 
 		$idNote = $this->xpdo->hasPermission('tree_show_resource_ids')
 			? ' <span dir="ltr">(' . $this->id . ')</span>'
 			: '';
-		$menu[] = array(
+		$menu[] = [
 			'text' => '<b>' . $this->get('pagetitle') . '</b>' . $idNote,
 			'handler' => 'Ext.emptyFn',
-		);
+		];
 		$menu[] = '-';
-		$menu[] = array(
+		$menu[] = [
 			'text' => $this->xpdo->lexicon('tickets_section_management'),
 			'handler' => 'this.editResource',
-		);
-		$menu[] = array(
+		];
+		$menu[] = [
 			'text' => $this->xpdo->lexicon('ticket_create_here'),
 			'handler' => 'function(itm,e) { var tree = Ext.getCmp("modx-resource-tree"); itm.classKey = "' . Ticket::class . '"; tree.createResourceHere(itm,e); }',
-		);
+		];
 
 		$menu[] = '-';
-		$menu[] = array(
+		$menu[] = [
 			'text' => $this->xpdo->lexicon('tickets_section_duplicate'),
 			'handler' => 'function(itm,e) {itm.classKey = "' . TicketsSection::class . '"; this.duplicateResource(itm,e); }',
-		);
+		];
 
 		if ($this->get('published')) {
-			$menu[] = array(
+			$menu[] = [
 				'text' => $this->xpdo->lexicon('tickets_section_unpublish'),
 				'handler' => 'this.unpublishDocument',
-			);
+			];
 		} else {
-			$menu[] = array(
+			$menu[] = [
 				'text' => $this->xpdo->lexicon('tickets_section_publish'),
 				'handler' => 'this.publishDocument',
-			);
+			];
 		}
 		if ($this->get('deleted')) {
-			$menu[] = array(
+			$menu[] = [
 				'text' => $this->xpdo->lexicon('tickets_section_undelete'),
 				'handler' => 'this.undeleteDocument',
-			);
+			];
 		} else {
-			$menu[] = array(
+			$menu[] = [
 				'text' => $this->xpdo->lexicon('tickets_section_delete'),
 				'handler' => 'this.deleteDocument',
-			);
+			];
 		}
 		$menu[] = '-';
-		$menu[] = array(
+		$menu[] = [
 			'text' => $this->xpdo->lexicon('tickets_section_view'),
 			'handler' => 'this.preview',
-		);
+		];
 
-		$node['menu'] = array('items' => $menu);
+		$node['menu'] = ['items' => $menu];
 		$node['hasChildren'] = true;
 
 		return $node;
 	}
 
-
 	/**
-	 * Get the properties for the specific namespace for the Resource
+	 * Get the properties for the specific namespace for the Resource.
 	 *
 	 * @param string $namespace
 	 *
@@ -449,18 +429,18 @@ class TicketsSection extends modResource
 	public function getProperties($namespace = 'tickets')
 	{
 		$properties = parent::getProperties($namespace);
-		if ($namespace == 'tickets') {
-			$default_properties = array(
-				'template'     => $this->xpdo->context->getOption('tickets.default_template', 0),
-				'uri'          => '%id-%alias%ext',
+		if ('tickets' == $namespace) {
+			$default_properties = [
+				'template' => $this->xpdo->context->getOption('tickets.default_template', 0),
+				'uri' => '%id-%alias%ext',
 				'show_in_tree' => $this->xpdo->context->getOption('tickets.ticket_show_in_tree_default', false),
-				'hidemenu'     => $this->xpdo->context->getOption(
+				'hidemenu' => $this->xpdo->context->getOption(
 					'tickets.ticket_hidemenu_force',
 					$this->xpdo->context->getOption('hidemenu_default')
 				),
 				'disable_jevix' => $this->xpdo->context->getOption('tickets.disable_jevix_default', false),
 				'process_tags' => $this->xpdo->context->getOption('tickets.process_tags_default', false),
-			);
+			];
 
 			// Old default values
 			if (array_key_exists('tickets.ticket_id_as_alias', $this->xpdo->config)) {
@@ -475,28 +455,28 @@ class TicketsSection extends modResource
 			foreach ($default_properties as $key => $value) {
 				if (!isset($properties[$key])) {
 					$properties[$key] = $value;
-				} elseif ($properties[$key] === 'true') {
+				} elseif ('true' === $properties[$key]) {
 					$properties[$key] = true;
-				} elseif ($properties[$key] === 'false') {
+				} elseif ('false' === $properties[$key]) {
 					$properties[$key] = false;
-				} elseif (is_numeric($value) && ($key == 'disable_jevix' || $key == 'process_tags')) {
-					$properties[$key] = (bool)intval($value);
+				} elseif (is_numeric($value) && ('disable_jevix' == $key || 'process_tags' == $key)) {
+					$properties[$key] = (bool) intval($value);
 				}
 			}
-		} elseif ($namespace == 'ratings') {
-			$default_properties = array(
-				'ticket'             => $this->xpdo->context->getOption('tickets.rating_ticket_default', 10),
-				'comment'            => $this->xpdo->context->getOption('tickets.rating_comment_default', 1),
-				'view'               => $this->xpdo->context->getOption('tickets.rating_view_default', 0.1),
-				'vote_ticket'        => $this->xpdo->context->getOption('tickets.rating_vote_ticket_default', 1),
-				'vote_comment'       => $this->xpdo->context->getOption('tickets.rating_vote_comment_default', 0.2),
-				'star_ticket'        => $this->xpdo->context->getOption('tickets.rating_star_ticket_default', 3),
-				'star_comment'       => $this->xpdo->context->getOption('tickets.rating_star_comment_default', 0.6),
-				'min_ticket_create'  => '',
+		} elseif ('ratings' == $namespace) {
+			$default_properties = [
+				'ticket' => $this->xpdo->context->getOption('tickets.rating_ticket_default', 10),
+				'comment' => $this->xpdo->context->getOption('tickets.rating_comment_default', 1),
+				'view' => $this->xpdo->context->getOption('tickets.rating_view_default', 0.1),
+				'vote_ticket' => $this->xpdo->context->getOption('tickets.rating_vote_ticket_default', 1),
+				'vote_comment' => $this->xpdo->context->getOption('tickets.rating_vote_comment_default', 0.2),
+				'star_ticket' => $this->xpdo->context->getOption('tickets.rating_star_ticket_default', 3),
+				'star_comment' => $this->xpdo->context->getOption('tickets.rating_star_comment_default', 0.6),
+				'min_ticket_create' => '',
 				'min_comment_create' => '',
-				'days_ticket_vote'   => '',
-				'days_comment_vote'  => '',
-			);
+				'days_ticket_vote' => '',
+				'days_comment_vote' => '',
+			];
 
 			foreach ($default_properties as $key => $value) {
 				if (!isset($properties[$key])) {
@@ -507,7 +487,6 @@ class TicketsSection extends modResource
 
 		return $properties;
 	}
-
 
 	/**
 	 * @param null $cacheFlag
@@ -533,15 +512,18 @@ class TicketsSection extends modResource
 
 		$new = $this->isNew();
 		$saved = parent::save($cacheFlag);
-		if ($saved && !$new) $this->updateChildrenURIs();
-		if ($saved && $update_actions) $this->updateAuthorsActions();
+		if ($saved && !$new) {
+			$this->updateChildrenURIs();
+		}
+		if ($saved && $update_actions) {
+			$this->updateAuthorsActions();
+		}
 
 		return $saved;
 	}
 
-
 	/**
-	 * Update all children URIs if section uri was changed
+	 * Update all children URIs if section uri was changed.
 	 *
 	 * @return int
 	 */
@@ -559,7 +541,6 @@ class TicketsSection extends modResource
 		return $count;
 	}
 
-
 	/**
 	 * @param int $uid
 	 *
@@ -573,11 +554,11 @@ class TicketsSection extends modResource
 
 		$subscribers = $this->getProperties('subscribers');
 		if (empty($subscribers) || !is_array($subscribers)) {
-			$subscribers = array();
+			$subscribers = [];
 		}
 
-		$found = array_search($uid, $subscribers);
-		if ($found === false) {
+		$found = array_search($uid, $subscribers, true);
+		if (false === $found) {
 			$subscribers[] = $uid;
 		} else {
 			unset($subscribers[$found]);
@@ -585,9 +566,8 @@ class TicketsSection extends modResource
 		$this->setProperties(array_values($subscribers), 'subscribers', false);
 		$this->save();
 
-		return ($found === false);
+		return false === $found;
 	}
-
 
 	/**
 	 * @param int $uid
@@ -596,27 +576,28 @@ class TicketsSection extends modResource
 	 */
 	public function isSubscribed($uid = 0)
 	{
-		if (!$uid) $uid = $this->xpdo->user->id;
+		if (!$uid) {
+			$uid = $this->xpdo->user->id;
+		}
 
-		$properties = array();
-		$q = $this->xpdo->newQuery(TicketsSection::class, array('id' => $this->id));
+		$properties = [];
+		$q = $this->xpdo->newQuery(TicketsSection::class, ['id' => $this->id]);
 		$q->select('properties');
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
 			$this->xpdo->queryTime += microtime(true) - $tstart;
-			$this->xpdo->executedQueries++;
+			++$this->xpdo->executedQueries;
 			$properties = $this->xpdo->fromJSON($q->stmt->fetchColumn());
 		}
 		$subscribers = !empty($properties['subscribers'])
 			? $properties['subscribers']
-			: array();
+			: [];
 
-		return in_array($uid, $subscribers);
+		return in_array($uid, $subscribers, true);
 	}
 
-
 	/**
-	 * Update ratings for authors actions in section
+	 * Update ratings for authors actions in section.
 	 */
 	public function updateAuthorsActions()
 	{
@@ -627,27 +608,28 @@ class TicketsSection extends modResource
 			$this->xpdo->exec($sql);
 		}
 
-		$c = $this->xpdo->newQuery(TicketAuthorAction::class, array('section' => $this->id));
+		$c = $this->xpdo->newQuery(TicketAuthorAction::class, ['section' => $this->id]);
 		$c->select('DISTINCT(owner)');
-		$owners = array();
+		$owners = [];
 		if ($c->prepare() && $c->stmt->execute()) {
 			$owners = $c->stmt->fetchAll(PDO::FETCH_COLUMN);
 		}
 
-		$authors = $this->xpdo->getIterator(TicketAuthor::class, array('id:IN' => $owners));
+		$authors = $this->xpdo->getIterator(TicketAuthor::class, ['id:IN' => $owners]);
 		/** @var TicketAuthor $author */
 		foreach ($authors as $author) {
 			$author->updateTotals();
 		}
 	}
 
-
 	/**
 	 * @param string $context
 	 */
 	public function clearCache($context = '')
 	{
-		if (!$context) $context = $this->get('context_key');
+		if (!$context) {
+			$context = $this->get('context_key');
+		}
 		parent::clearCache($context);
 	}
 }
