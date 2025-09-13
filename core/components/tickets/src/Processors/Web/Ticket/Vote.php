@@ -55,7 +55,7 @@ class Vote extends CreateProcessor
 	 */
 	public function beforeSave()
 	{
-		if ($section = $this->ticket->getOne(TicketsSection::class)) {
+		if ($section = $this->ticket->getOne('Section')) {
 			/** @var TicketsSection $section */
 			$ratings = $section->getProperties('ratings');
 			if (isset($ratings['days_ticket_vote']) && $ratings['days_ticket_vote'] !== '') {

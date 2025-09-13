@@ -53,7 +53,7 @@ class Delete extends UpdateProcessor
 	public function afterSave()
 	{
 		$this->object->clearTicketCache();
-		if ($thread = $this->object->getOne(TicketThread::class)) {
+		if ($thread = $this->object->getOne('Thread')) {
 			/** @var TicketThread $thread */
 			$thread->updateLastComment();
 		}

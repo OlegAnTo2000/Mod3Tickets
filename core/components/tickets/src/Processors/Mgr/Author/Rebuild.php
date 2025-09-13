@@ -33,7 +33,7 @@ class Rebuild extends Processor
 		/** @var modUser $user */
 		foreach ($users as $user) {
 			/** @var TicketAuthor $profile */
-			if (!$profile = $user->getOne(TicketAuthor::class)) {
+			if (!$profile = $user->getOne('AuthorProfile')) {
 				$profile = $this->modx->newObject(TicketAuthor::class);
 				$user->addOne($profile);
 			}

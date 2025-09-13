@@ -12,7 +12,7 @@ class Create extends CreateProcessor
 {
 	/** @var TicketComment $object */
 	public $object;
-	public $objectType      = 'Tickets\Model\TicketComment';
+	public $objectType      = TicketComment::class;
 	public $classKey        = TicketComment::class;
 	public $languageTopics  = array('tickets:default');
 	public $permission      = 'comment_save';

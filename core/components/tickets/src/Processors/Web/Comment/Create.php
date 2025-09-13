@@ -115,10 +115,10 @@ class Create extends CreateProcessor
 	public function beforeSave()
 	{
 		/** @var TicketThread $thread */
-		if ($thread = $this->object->getOne(TicketThread::class)) {
+		if ($thread = $this->object->getOne('Thread')) {
 			/** @var Ticket $ticket */
-			if ($ticket = $thread->getOne(Ticket::class)) {
-				if ($section = $ticket->getOne(TicketsSection::class)) {
+			if ($ticket = $thread->getOne('Ticket')) {
+				if ($section = $ticket->getOne('Section')) {
 					/** @var TicketsSection $section */
 					$ratings = $section->getProperties('ratings');
 					if (isset($ratings['min_comment_create']) && $ratings['min_comment_create'] !== '') {

@@ -50,10 +50,10 @@ class Vote extends CreateProcessor
 	public function beforeSave()
 	{
 		/** @var TicketThread $thread */
-		if ($thread = $this->comment->getOne(TicketThread::class)) {
+		if ($thread = $this->comment->getOne('Thread')) {
 			/** @var Ticket $ticket */
-			if ($ticket = $thread->getOne(Ticket::class)) {
-				if ($section = $ticket->getOne(TicketsSection::class)) {
+			if ($ticket = $thread->getOne('Ticket')) {
+				if ($section = $ticket->getOne('Section')) {
 					/** @var TicketsSection $section */
 					$ratings = $section->getProperties('ratings');
 					if (isset($ratings['days_comment_vote']) && $ratings['days_comment_vote'] !== '') {

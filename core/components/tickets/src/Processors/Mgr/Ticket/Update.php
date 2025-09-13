@@ -158,7 +158,8 @@ class Update extends ResourceUpdate
 				$this->_sendEmails = true;
 
 				/** @var TicketsSection $section */
-				if ($section = $this->object->getOne(TicketsSection::class)) {
+				if ($section = $this->object->getOne('Section')) {
+					/** @var TicketsSection $section */
 					$ratings = $section->getProperties('ratings');
 					if (isset($ratings['min_ticket_create']) && $ratings['min_ticket_create'] !== '') {
 						if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
@@ -276,7 +277,8 @@ class Update extends ResourceUpdate
 	{
 		$this->object->clearCache();
 		/** @var TicketsSection $section */
-		if ($section = $this->object->getOne(TicketsSection::class)) {
+		if ($section = $this->object->getOne('Section')) {
+			/** @var TicketsSection $section */
 			$section->clearCache();
 		}
 	}
@@ -289,7 +291,7 @@ class Update extends ResourceUpdate
 	{
 		if ($this->modx->context->key != 'mgr') {
 			$values = array();
-			$tvs = $this->object->getMany(modTemplateVarResource::class);
+			$tvs = $this->object->getMany('TemplateVariables');
 
 			/** @var modTemplateVarResource $tv */
 			foreach ($tvs as $tv) {
