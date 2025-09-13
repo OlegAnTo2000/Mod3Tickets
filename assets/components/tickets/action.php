@@ -2,140 +2,139 @@
 
 use Tickets\Tickets;
 use MODX\Revolution\modX;
-use Tickets\Model\TicketThread;
 use MODX\Revolution\modContext;
+use Tickets\Model\TicketThread;
 use MODX\Revolution\modResource;
+use MODX\Revolution\Error\modError;
 
 if (empty($_REQUEST['action'])) {
-    die('Access denied');
+	die('Access denied');
 } else {
-    $action = $_REQUEST['action'];
+	$action = $_REQUEST['action'];
 }
 
 define('MODX_API_MODE', true);
 /** @noinspection PhpIncludeInspection */
 require_once dirname(dirname(dirname(dirname(__FILE__)))) . '/index.php';
 
-$modx->getService('error', 'error.modError');
+$modx->services->add('error', modError::class);
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');
 $modx->error->message = null;
 
 // Get properties
-$properties = array();
+$properties = [];
 /** @var TicketThread $thread */
 if (!empty($_REQUEST['thread']) && $thread = $modx->getObject(TicketThread::class, array('name' => $_REQUEST['thread']))) {
-    $properties = $thread->get('properties');
-    if (!empty($_REQUEST['form_key']) && isset($_SESSION['TicketForm'][$_REQUEST['form_key']])) {
-        $properties = array_merge($_SESSION['TicketForm'][$_REQUEST['form_key']], $properties);
-    }
+	$properties = $thread->get('properties');
+	if (!empty($_REQUEST['form_key']) && isset($_SESSION['TicketForm'][$_REQUEST['form_key']])) {
+		$properties = array_merge($_SESSION['TicketForm'][$_REQUEST['form_key']], $properties);
+	}
 } elseif (!empty($_REQUEST['form_key']) && isset($_SESSION['TicketForm'][$_REQUEST['form_key']])) {
-    $properties = $_SESSION['TicketForm'][$_REQUEST['form_key']];
+	$properties = $_SESSION['TicketForm'][$_REQUEST['form_key']];
 } elseif (!empty($_SESSION['TicketForm'])) {
-    $properties = $_SESSION['TicketForm'];
+	$properties = $_SESSION['TicketForm'];
 }
 
 // Switch context
 $context = 'web';
 if (!empty($thread) && $thread->get('resource') && $object = $thread->getOne('Resource')) {
-    $context = $object->get('context_key');
+	$context = $object->get('context_key');
 } elseif (!empty($_REQUEST['section']) && $object = $modx->getObject(modResource::class, (int)$_REQUEST['section'])) {
-    $context = $object->get('context_key');
+	$context = $object->get('context_key');
 } elseif (!empty($_REQUEST['parent']) && $object = $modx->getObject(modResource::class, (int)$_REQUEST['parent'])) {
-    $context = $object->get('context_key');
+	$context = $object->get('context_key');
 } elseif (!empty($_REQUEST['ctx']) && $object = $modx->getObject(modContext::class, array('key' => $_REQUEST['ctx']))) {
-    $context = $object->get('key');
+	$context = $object->get('key');
 }
 if ($context != 'web') {
-    $modx->switchContext($context);
+	$modx->switchContext($context);
 }
 
 /** @var Tickets $Tickets */
 define('MODX_ACTION_MODE', true);
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption('tickets.core_path', null,
-        $modx->getOption('core_path') . 'components/tickets/') . 'model/tickets/', $properties
-);
+$Tickets = tickets_service($modx, $properties);
 if ($modx->error->hasError() || !($Tickets instanceof Tickets)) {
-    die('Error');
+	die('Error');
 }
 
 switch ($action) {
-    case 'comment/preview':
-        $response = $Tickets->previewComment($_POST);
-        break;
-    case 'comment/save':
-        $response = $Tickets->saveComment($_POST);
-        break;
-    case 'comment/get':
-        $response = $Tickets->getComment((int)$_POST['id']);
-        break;
-    case 'comment/getlist':
-        $response = $Tickets->getNewComments($_POST['thread']);
-        break;
-    case 'comment/subscribe':
-        $response = $Tickets->subscribeThread($_POST['thread']);
-        break;
-    case 'comment/vote':
-        $response = $Tickets->voteComment((int)$_POST['id'], (int)$_POST['value']);
-        break;
-    case 'comment/star':
-        $response = $Tickets->starComment((int)$_POST['id']);
-        break;
-    case 'comment/file/upload':
-        $response = $Tickets->fileUploadComment($_POST, 'TicketComment');
-        break;
+	case 'comment/preview':
+		$response = $Tickets->previewComment($_POST);
+		break;
+	case 'comment/save':
+		$response = $Tickets->saveComment($_POST);
+		break;
+	case 'comment/get':
+		$response = $Tickets->getComment((int)$_POST['id']);
+		break;
+	case 'comment/getlist':
+		$response = $Tickets->getNewComments($_POST['thread']);
+		break;
+	case 'comment/subscribe':
+		$response = $Tickets->subscribeThread($_POST['thread']);
+		break;
+	case 'comment/vote':
+		$response = $Tickets->voteComment((int)$_POST['id'], (int)$_POST['value']);
+		break;
+	case 'comment/star':
+		$response = $Tickets->starComment((int)$_POST['id']);
+		break;
+	case 'comment/file/upload':
+		$response = $Tickets->fileUploadComment($_POST, 'TicketComment');
+		break;
 
-    case 'ticket/draft':
-    case 'ticket/publish':
-    case 'ticket/update':
-    case 'ticket/save':
-        $response = $Tickets->saveTicket($_POST);
-        break;
-    case 'ticket/preview':
-        $response = $Tickets->previewTicket($_POST);
-        break;
-    case 'ticket/vote':
-        $response = $Tickets->voteTicket((int)$_POST['id'], (int)$_POST['value']);
-        break;
-    case 'ticket/star':
-        $response = $Tickets->starTicket((int)$_POST['id']);
-        break;
-    case 'ticket/delete':
-        $response = $Tickets->deleteTicket(['id'=>(int)$_POST['tid']]);
-        break;
-    case 'ticket/undelete':
-        $response = $Tickets->deleteTicket(['id'=>(int)$_POST['tid']], true);
-        break;
+	case 'ticket/draft':
+	case 'ticket/publish':
+	case 'ticket/update':
+	case 'ticket/save':
+		$response = $Tickets->saveTicket($_POST);
+		break;
+	case 'ticket/preview':
+		$response = $Tickets->previewTicket($_POST);
+		break;
+	case 'ticket/vote':
+		$response = $Tickets->voteTicket((int)$_POST['id'], (int)$_POST['value']);
+		break;
+	case 'ticket/star':
+		$response = $Tickets->starTicket((int)$_POST['id']);
+		break;
+	case 'ticket/delete':
+		$response = $Tickets->deleteTicket(['id' => (int)$_POST['tid']]);
+		break;
+	case 'ticket/undelete':
+		$response = $Tickets->deleteTicket(['id' => (int)$_POST['tid']], true);
+		break;
 
-    case 'section/subscribe':
-        $response = $Tickets->subscribeSection((int)$_POST['section']);
-        break;
-    case 'author/subscribe':
-        $response = $Tickets->subscribeAuthor((int)$_POST['author']);
-        break;
+	case 'section/subscribe':
+		$response = $Tickets->subscribeSection((int)$_POST['section']);
+		break;
+	case 'author/subscribe':
+		$response = $Tickets->subscribeAuthor((int)$_POST['author']);
+		break;
 
-    case 'ticket/file/upload':
-        $response = $Tickets->fileUpload($_POST, 'Ticket');
-        break;
-    case 'ticket/file/delete':
-        $response = $Tickets->fileDelete((int)$_POST['id']);
-        break;
-    case 'ticket/file/sort':
-        $response = $Tickets->fileSort($_POST['rank']);
-        break;
-    default:
-        $message = $_REQUEST['action'] != $action
-            ? 'tickets_err_register_globals'
-            : 'tickets_err_unknown';
-        $response = json_encode(array(
-            'success' => false,
-            'message' => $modx->lexicon($message),
-        ));
+	case 'ticket/file/upload':
+		$response = $Tickets->fileUpload($_POST, 'Ticket');
+		break;
+	case 'ticket/file/delete':
+		$response = $Tickets->fileDelete((int)$_POST['id']);
+		break;
+	case 'ticket/file/sort':
+		$response = $Tickets->fileSort($_POST['rank']);
+		break;
+	default:
+		$message = $_REQUEST['action'] != $action
+			? 'tickets_err_register_globals'
+			: 'tickets_err_unknown';
+		$response = json_encode(array(
+			'success' => false,
+			'message' => $modx->lexicon($message),
+		));
 }
 
 if (is_array($response)) {
-    $response = json_encode($response);
+	$response = json_encode($response);
 }
 
 @session_write_close();

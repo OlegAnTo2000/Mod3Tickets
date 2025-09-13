@@ -24,16 +24,16 @@ class TicketsHomeManagerController extends modExtraManagerController
 	public function loadCustomCssJs()
 	{
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 
 		$Tickets->loadManagerFiles($this, [
-			'config' => true,
-			'utils' => true,
-			'css' => true,
-			'threads' => true,
+			'config'   => true,
+			'utils'    => true,
+			'css'      => true,
+			'threads'  => true,
 			'comments' => true,
-			'tickets' => true,
-			'authors' => true,
+			'tickets'  => true,
+			'authors'  => true,
 		]);
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/home.js');
 		$this->addLastJavascript($Tickets->config['jsUrl'] . 'mgr/misc/strftime-min-1.3.js');
@@ -51,7 +51,7 @@ class TicketsHomeManagerController extends modExtraManagerController
 	public function getTemplateFile()
 	{
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 
 		return $Tickets->config['templatesPath'] . 'home.tpl';
 	}

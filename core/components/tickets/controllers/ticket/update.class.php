@@ -40,7 +40,7 @@ class TicketUpdateManagerController extends ResourceUpdateManagerController
 		$this->resourceArray['properties']['tickets'] = $this->resource->getProperties('tickets');
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 		$Tickets->loadManagerFiles($this, [
 			'config' => true,
 			'utils' => true,

@@ -4,6 +4,7 @@ namespace Tickets\Processors\Mgr\Subscribe;
 
 use function intval;
 use function json_decode;
+use MODX\Revolution\Processors\ProcessorResponse;
 
 class Multiple extends \MODX\Revolution\Processors\Processor
 {
@@ -23,9 +24,9 @@ class Multiple extends \MODX\Revolution\Processors\Processor
 		}
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		$response = $Tickets->runProcessor('mgr/subscribe/' . $method, ['ids' => $ids, 'parents' => $parents]);
 		if ($response->isError()) {
 			return $response->getResponse();

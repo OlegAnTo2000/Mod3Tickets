@@ -9,6 +9,7 @@ use Rector\Set\ValueObject\SetList;
 return static function (RectorConfig $rectorConfig): void {
 	$rectorConfig->paths([
 		__DIR__ . '/core/components/tickets',
+		__DIR__ . '/assets/components/tickets',
 	]);
 
 	// Автоматически подгоняет код под конкретную версию PHP

@@ -1,16 +1,21 @@
 <?php
 
+use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketVote;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
+
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 /** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -23,17 +28,15 @@ if (!empty($parents) || !empty($resources) || !empty($threads)) {
 	$options = [
 		'innerJoin' => [
 			'Thread' => [
-				'class' => 'TicketThread',
+				'class' => TicketThread::class,
 				'on' => '`Ticket`.`id` = `Thread`.`resource`',
 			],
 		],
-		'groupby' => '`Ticket`.`id`',
-		'select' => ['Thread' => '`Thread`.`id`'],
+		'groupby'         => '`Ticket`.`id`',
+		'select'          => ['Thread' => '`Thread`.`id`'],
 		'showUnpublished' => !empty($showUnpublished),
-		'showDeleted' => !empty($showDeleted),
-		'depth' => isset($depth)
-			? (int) $depth
-			: 10,
+		'showDeleted'     => !empty($showDeleted),
+		'depth'           => isset($depth) ? (int) $depth : 10,
 	];
 	if (!empty($parents)) {
 		$options['parents'] = $parents;
@@ -62,7 +65,7 @@ if (!empty($parents) || !empty($resources) || !empty($threads)) {
 		}
 	}
 
-	$rows = $pdoFetch->getCollection('Ticket', $where, $options);
+	$rows = $pdoFetch->getCollection(Ticket::class, $where, $options);
 	$threads = [];
 	foreach ($rows as $item) {
 		$threads[] = $item['id'];
@@ -73,7 +76,7 @@ if (!empty($parents) || !empty($resources) || !empty($threads)) {
 }
 
 // Prepare query to db
-$class = 'TicketComment';
+$class = TicketComment::class;
 $where = [];
 if (empty($showUnpublished)) {
 	$where['published'] = 1;
@@ -133,44 +136,44 @@ if (!empty($comments)) {
 // Joining tables
 $innerJoin = [
 	'Thread' => [
-		'class' => 'TicketThread',
-		'on' => '`Thread`.`id` = `TicketComment`.`thread`',
+		'class' => TicketThread::class,
+		'on'    => '`Thread`.`id` = `TicketComment`.`thread`',
 	],
 ];
 $leftJoin = [
-	'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+	'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
-	'Ticket' => ['class' => 'Ticket', 'on' => '`Ticket`.`id` = `Thread`.`resource`'],
-	'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
+	'Ticket'  => ['class' => Ticket::class, 'on' => '`Ticket`.`id` = `Thread`.`resource`'],
+	'Section' => ['class' => TicketsSection::class, 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 ];
 if ($Tickets->authenticated) {
 	$leftJoin['Vote'] = [
-		'class' => 'TicketVote',
-		'on' => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "TicketComment" AND `Vote`.`createdby` = ' . $modx->user->id,
+		'class' => TicketVote::class,
+		'on'    => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "' . TicketComment::class . '" AND `Vote`.`createdby` = ' . $modx->user->id,
 	];
 	$leftJoin['Star'] = [
-		'class' => 'TicketStar',
-		'on' => '`Star`.`id` = `TicketComment`.`id` AND `Star`.`class` = "TicketComment" AND `Star`.`createdby` = ' . $modx->user->id,
+		'class' => TicketStar::class,
+		'on'    => '`Star`.`id` = `TicketComment`.`id` AND `Star`.`class` = "' . TicketComment::class . '" AND `Star`.`createdby` = ' . $modx->user->id,
 	];
 }
 // Fields to select
 $select = [
-	'TicketComment' => $modx->getSelectColumns('TicketComment', 'TicketComment', '', ['raw'], true),
-	'Thread' => '`Thread`.`resource`, `Thread`.`comments`',
-	'User' => '`User`.`username`',
-	'Profile' => $modx->getSelectColumns(
+	'TicketComment' => $modx->getSelectColumns(TicketComment::class, 'TicketComment', '', ['raw'], true),
+	'Thread'        => '`Thread`.`resource`, `Thread`.`comments`',
+	'User'          => '`User`.`username`',
+	'Profile'       => $modx->getSelectColumns(
 		modUserProfile::class,
 		'Profile',
 		'',
 		['id', 'email'],
 		true
-	) . ',`Profile`.`email` as `user_email`',
+	) . ', `Profile`.`email` as `user_email`',
 	'Ticket' => !empty($includeContent)
-		? $modx->getSelectColumns('Ticket', 'Ticket', 'ticket.')
-		: $modx->getSelectColumns('Ticket', 'Ticket', 'ticket.', ['content'], true),
+		? $modx->getSelectColumns(Ticket::class, 'Ticket', 'ticket.')
+		: $modx->getSelectColumns(Ticket::class, 'Ticket', 'ticket.', ['content'], true),
 	'Section' => !empty($includeContent)
-		? $modx->getSelectColumns('TicketsSection', 'Section', 'section.')
-		: $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
+		? $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.')
+		: $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.', ['content'], true),
 ];
 if ($Tickets->authenticated) {
 	$select['Vote'] = '`Vote`.`value` as `vote`';
@@ -193,16 +196,16 @@ foreach (['where', 'select', 'leftJoin', 'innerJoin'] as $v) {
 $pdoFetch->addTime('Conditions prepared');
 
 $default = [
-	'class' => $class,
-	'where' => \json_encode($where),
-	'innerJoin' => \json_encode($innerJoin),
-	'leftJoin' => \json_encode($leftJoin),
-	'select' => \json_encode($select),
-	'sortby' => $class . '.createdon',
-	'sortdir' => 'DESC',
-	'groupby' => $class . '.id',
-	'fastMode' => true,
-	'return' => 'data',
+	'class'             => $class,
+	'where'             => json_encode($where),
+	'innerJoin'         => json_encode($innerJoin),
+	'leftJoin'          => json_encode($leftJoin),
+	'select'            => json_encode($select),
+	'sortby'            => $class . '.createdon',
+	'sortdir'           => 'DESC',
+	'groupby'           => $class . '.id',
+	'fastMode'          => true,
+	'return'            => 'data',
 	'nestedChunkPrefix' => 'tickets_',
 ];
 
@@ -214,18 +217,16 @@ $rows = $pdoFetch->run();
 $output = [];
 if (!empty($rows)) {
 	foreach ($rows as $row) {
-		$row['ratings'] = !empty($row['section.properties']['ratings'])
-			? $row['section.properties']['ratings']
-			: [];
+		$row['ratings'] = !empty($row['section.properties']['ratings']) ? $row['section.properties']['ratings'] : [];
 		$output[] = $Tickets->templateNode($row, $tpl);
 	}
 }
 $pdoFetch->addTime('Returning processed chunks');
-$output = \implode($outputSeparator, $output);
+$output = implode($outputSeparator, $output);
 
 $log = '';
 if ($modx->user->hasSessionContext('mgr') && !empty($showLog)) {
-	$log .= '<pre class="getCommentsLog">' . \print_r($pdoFetch->getTime(), 1) . '</pre>';
+	$log .= '<pre class="getCommentsLog">' . print_r($pdoFetch->getTime(), 1) . '</pre>';
 }
 
 // Return output

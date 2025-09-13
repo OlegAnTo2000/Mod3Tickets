@@ -32,7 +32,7 @@ class TicketsSectionCreateManagerController extends ResourceCreateManagerControl
 		$this->resourceArray['syncsite'] = 0;
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 		$Tickets->loadManagerFiles($this, [
 			'config' => true,
 			'utils' => true,

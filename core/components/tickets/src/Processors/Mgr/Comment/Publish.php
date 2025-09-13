@@ -67,7 +67,7 @@ class TicketCommentPublishProcessor extends UpdateProcessor
 		/** @var Tickets\Model\TicketThread $thread */
 		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
 			/** @var Tickets $Tickets */
-			if ($Tickets = $this->modx->getService('Tickets')) {
+			if ($Tickets = tickets_service()) {
 				$Tickets->config = $thread->get('properties');
 				$Tickets->sendCommentMails($this->object->toArray());
 			}

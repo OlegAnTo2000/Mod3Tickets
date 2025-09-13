@@ -32,7 +32,7 @@ class TicketsSectionUpdateManagerController extends ResourceUpdateManagerControl
 		$this->resourceArray['syncsite'] = (bool) $this->resource->getProperties('syncsite');
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 		$Tickets->loadManagerFiles($this, [
 			'config' => true,
 			'utils' => true,

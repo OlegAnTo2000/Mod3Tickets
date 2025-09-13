@@ -211,7 +211,7 @@ class Update extends ResourceUpdate
 	protected function sendTicketMails()
 	{
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->modx->getService('Tickets')) {
+		if ($Tickets = tickets_service()) {
 			$Tickets->config['tplTicketEmailBcc'] = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->sendTicketMails($this->object->toArray());

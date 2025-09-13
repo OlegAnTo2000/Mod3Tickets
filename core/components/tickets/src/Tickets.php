@@ -42,22 +42,24 @@ use function version_compare;
 use MODX\Revolution\pdoTools;
 use Tickets\Model\TicketView;
 use function array_key_exists;
-use MODX\Revolution\modSnippet;
+use Tickets\Model\TicketQueue;
 
+use MODX\Revolution\modSnippet;
 use Tickets\Model\TicketAuthor;
 use Tickets\Model\TicketThread;
 use function html_entity_decode;
+use MODX\Revolution\modResource;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
 use MODX\Revolution\modManagerController;
 use MODX\Revolution\Processors\ProcessorResponse;
+
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
 use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
-
 use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
-use MODX\Revolution\Processors\ProcessorResponse as modProcessorResponse;
 use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
 use MODX\Revolution\Processors\Resource\Update as ResourceUpdateProcessor;
 
@@ -282,7 +284,7 @@ class Tickets
 		$processorname = $restore ? TicketUndeleteProcessor::class : TicketDeleteProcessor::class;
 		$response = $this->runProcessor($processorname, $fields);
 
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if ($response->isError()) {
 			$this->modx->log(
 				modX::LOG_LEVEL_INFO,
@@ -396,7 +398,7 @@ class Tickets
 			$response = $this->modx->runProcessor(ResourceCreateProcessor::class, $fields);
 		}
 
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if ($response->isError()) {
 			$this->modx->log(
 				modX::LOG_LEVEL_INFO,
@@ -473,7 +475,7 @@ class Tickets
 	public function voteTicket($id, $value = 1)
 	{
 		$data = ['id' => $id, 'value' => $value];
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor(TicketVoteProcessor::class, $data);
 			if ($response->isError()) {
@@ -509,7 +511,7 @@ class Tickets
 	public function starTicket($id)
 	{
 		$data = ['id' => $id];
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor('web/ticket/star', $data);
 			if ($response->isError()) {
@@ -651,7 +653,7 @@ class Tickets
 		} else {
 			$response = $this->runProcessor('web/comment/create', $data);
 		}
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if ($response->isError()) {
 			$this->modx->log(
 				modX::LOG_LEVEL_INFO,
@@ -708,7 +710,7 @@ class Tickets
 	{
 		$data = ['id' => $id, 'value' => $value];
 
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id) && !empty($value)) {
 			$response = $this->runProcessor('web/comment/vote', $data);
 			if ($response->isError()) {
@@ -744,7 +746,7 @@ class Tickets
 	public function starComment($id)
 	{
 		$data = ['id' => $id];
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		if (!empty($id)) {
 			$response = $this->runProcessor('web/comment/star', $data);
 			if ($response->isError()) {
@@ -1254,7 +1256,7 @@ class Tickets
 	{
 		$owner_uid = $reply_uid = $reply_email = null;
 		$subscribers = [];
-		$q = $this->modx->newQuery('TicketThread');
+		$q = $this->modx->newQuery(TicketThread::class);
 		$q->leftJoin(modResource::class, 'modResource', 'TicketThread.resource = modResource.id');
 		$q->select('modResource.createdby as uid, modResource.id as resource, modResource.pagetitle, TicketThread.subscribers');
 		$q->where(['TicketThread.id' => $comment['thread']]);
@@ -1262,9 +1264,9 @@ class Tickets
 			$res = $q->stmt->fetch(PDO::FETCH_ASSOC);
 			if (!empty($res)) {
 				$comment = array_merge($comment, [
-					'resource' => $res['resource'],
+					'resource'  => $res['resource'],
 					'pagetitle' => $res['pagetitle'],
-					'author' => $res['uid'],
+					'author'    => $res['uid'],
 				]);
 				$owner_uid = $res['uid'];
 				$subscribers = json_decode($res['subscribers'], true);
@@ -1276,7 +1278,7 @@ class Tickets
 
 		// It is a reply for a comment
 		if ($comment['parent']) {
-			$q = $this->modx->newQuery('TicketComment');
+			$q = $this->modx->newQuery(TicketComment::class);
 			$q->select('TicketComment.createdby as uid, TicketComment.text, TicketComment.email');
 			$q->where(['TicketComment.id' => $comment['parent']]);
 			if ($q->prepare() && $q->stmt->execute()) {
@@ -1369,12 +1371,12 @@ class Tickets
 
 		/** @var TicketQueue $queue */
 		$queue = $this->modx->newObject(
-			'TicketQueue',
+			TicketQueue::class,
 			[
-				'uid' => $uid,
+				'uid'     => $uid,
 				'subject' => $subject,
-				'body' => $body,
-				'email' => $email,
+				'body'    => $body,
+				'email'   => $email,
 			]
 		);
 
@@ -1712,7 +1714,7 @@ class Tickets
 		$data['source'] = $this->config['source'];
 		$data['class'] = $class;
 
-		/** @var modProcessorResponse $response */
+		/** @var ProcessorResponse $response */
 		$response = $this->runProcessor(Processors\Web\File\UploadComment::class, $data);
 		if ($response->isError()) {
 			return $this->error($response->getMessage());

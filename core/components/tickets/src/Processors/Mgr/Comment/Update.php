@@ -56,7 +56,7 @@ class Update extends UpdateProcessor
 		$text = $this->getProperty('text');
 
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->modx->getService('Tickets')) {
+		if ($Tickets = tickets_service()) {
 			$this->object->fromArray([
 				'editedon' => time(),
 				'editedby' => $this->modx->user->id,

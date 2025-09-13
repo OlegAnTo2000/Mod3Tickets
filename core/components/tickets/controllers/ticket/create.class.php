@@ -46,7 +46,7 @@ class TicketCreateManagerController extends ResourceCreateManagerController
 		$this->resourceArray['properties']['tickets'] = $properties;
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 		$Tickets->loadManagerFiles($this, [
 			'config' => true,
 			'utils' => true,

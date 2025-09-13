@@ -4,7 +4,7 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $finder = Finder::create()
-	->in([__DIR__ . '/core/components/tickets'])
+	->in([__DIR__ . '/core/components/tickets', __DIR__ . '/assets/components/tickets'])
 	->name('*.php')
 	->ignoreDotFiles(true)
 	->ignoreVCS(true);
