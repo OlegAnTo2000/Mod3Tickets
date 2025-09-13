@@ -1,15 +1,18 @@
 <?php
 
-class TicketThreadDeleteProcessor extends MODX\Revolution\Processors\Model\UpdateProcessor
+use Tickets\Model\TicketThread;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+class Delete extends UpdateProcessor
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey = 'TicketThread';
-	public $objectType = 'TicketThread';
-	public $languageTopics = ['tickets:default'];
+	public $classKey        = TicketThread::class;
+	public $objectType      = TicketThread::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadDelete';
-	public $afterSaveEvent = 'OnTicketThreadDelete';
-	public $permission = 'thread_delete';
+	public $afterSaveEvent  = 'OnTicketThreadDelete';
+	public $permission      = 'thread_delete';
 
 	/**
 	 * @return bool
@@ -27,8 +30,8 @@ class TicketThreadDeleteProcessor extends MODX\Revolution\Processors\Model\Updat
 	public function beforeSave()
 	{
 		$this->object->fromArray([
-			'deleted' => 1,
-			'deletedon' => \time(),
+			'deleted'   => 1,
+			'deletedon' => time(),
 			'deletedby' => $this->modx->user->get('id'),
 		]);
 
@@ -55,5 +58,3 @@ class TicketThreadDeleteProcessor extends MODX\Revolution\Processors\Model\Updat
 		);
 	}
 }
-
-return 'TicketThreadDeleteProcessor';

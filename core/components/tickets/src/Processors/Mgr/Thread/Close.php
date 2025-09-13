@@ -1,15 +1,18 @@
 <?php
 
-class TicketThreadCloseProcessor extends MODX\Revolution\Processors\Model\UpdateProcessor
+use Tickets\Model\TicketThread;
+use MODX\Revolution\Processors\Model\UpdateProcessor;
+
+class Close extends UpdateProcessor
 {
 	/** @var TicketThread */
 	public $object;
-	public $classKey = 'TicketThread';
-	public $objectType = 'TicketThread';
-	public $languageTopics = ['tickets:default'];
+	public $classKey        = TicketThread::class;
+	public $objectType      = TicketThread::class;
+	public $languageTopics  = ['tickets:default'];
 	public $beforeSaveEvent = 'OnBeforeTicketThreadClose';
-	public $afterSaveEvent = 'OnTicketThreadClose';
-	public $permission = 'thread_close';
+	public $afterSaveEvent  = 'OnTicketThreadClose';
+	public $permission      = 'thread_close';
 
 	/**
 	 * @return bool
@@ -53,5 +56,3 @@ class TicketThreadCloseProcessor extends MODX\Revolution\Processors\Model\Update
 		);
 	}
 }
-
-return 'TicketThreadCloseProcessor';

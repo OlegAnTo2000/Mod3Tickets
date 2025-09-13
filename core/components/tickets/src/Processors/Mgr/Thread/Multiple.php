@@ -1,6 +1,10 @@
 <?php
 
-class TicketThreadMultipleProcessor extends MODX\Revolution\Processors\Processor
+use Tickets\Tickets;
+use MODX\Revolution\Processors\Processor;
+use MODX\Revolution\Processors\ProcessorResponse;
+
+class Multiple extends Processor
 {
 	/**
 	 * @return array|string
@@ -16,10 +20,10 @@ class TicketThreadMultipleProcessor extends MODX\Revolution\Processors\Processor
 		}
 
 		/** @var Tickets $Tickets */
-		$Tickets = $this->modx->getService('Tickets');
+		$Tickets = tickets_service();
 
 		foreach ($ids as $id) {
-			/** @var modProcessorResponse $response */
+			/** @var ProcessorResponse $response */
 			$response = $Tickets->runProcessor('mgr/thread/' . $method, ['id' => $id]);
 			if ($response->isError()) {
 				return $response->getResponse();
@@ -29,5 +33,3 @@ class TicketThreadMultipleProcessor extends MODX\Revolution\Processors\Processor
 		return $this->success();
 	}
 }
-
-return 'TicketThreadMultipleProcessor';

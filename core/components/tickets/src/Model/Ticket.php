@@ -2,41 +2,37 @@
 
 namespace Tickets\Model;
 
+use PDO;
+use xPDO\xPDO;
 use function abs;
-use function array_key_exists;
-use function array_merge;
-use function array_reverse;
-use function array_search;
-use function boolval;
 use function date;
+use function reset;
+use function rtrim;
+use function intval;
+use function strpos;
+use function boolval;
 use function explode;
 use function in_array;
-use function intval;
 use function is_array;
-use function is_numeric;
 use function is_object;
 use function is_string;
 use function microtime;
 
-use MODX\Revolution\modAccessibleObject;
-use MODX\Revolution\modContentType;
-use MODX\Revolution\modResource;
-use PDO;
-
-use function preg_match;
-use function preg_replace;
-use function reset;
-use function rtrim;
-use function str_replace;
-use function strpos;
 use function strtotime;
+use xPDO\Om\xPDOObject;
+use function is_numeric;
+use function preg_match;
 
-use xPDO\xPDO;
-
-/** @noinspection PhpIncludeInspection */
-require_once MODX_CORE_PATH . 'components/tickets/processors/mgr/ticket/create.class.php';
-/** @noinspection PhpIncludeInspection */
-require_once MODX_CORE_PATH . 'components/tickets/processors/mgr/ticket/update.class.php';
+use function array_merge;
+use function str_replace;
+use function array_search;
+use function preg_replace;
+use function array_reverse;
+use Tickets\Model\TicketView;
+use function array_key_exists;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modContentType;
+use MODX\Revolution\modAccessibleObject;
 
 class Ticket extends modResource
 {
@@ -211,8 +207,6 @@ class Ticket extends modResource
 			$this->xpdo->sendForward($id);
 			exit;
 		} else {
-			// $this->xpdo->setPlaceholders($this->_getVirtualFields(), 'ticket_');
-
 			return parent::process();
 		}
 	}
@@ -221,10 +215,8 @@ class Ticket extends modResource
 	{
 		$content = parent::get('content');
 		$properties = $this->getProperties();
+		$content = tickets_service()->sanitizeText($content, false);
 
-		if (!$properties['disable_jevix']) {
-			$content = $this->sanitizeText($content, false);
-		}
 		if (!$properties['process_tags']) {
 			$content = str_replace(
 				['[', ']', '`', '{', '}'],
@@ -275,8 +267,8 @@ class Ticket extends modResource
 		} else {
 			$tmp = explode('<cut/>', $content);
 			$introtext = reset($tmp);
-			if ($jevix) {
-				$introtext = $this->sanitizeText($introtext);
+			if ($Tickets = tickets_service()) {
+				$introtext = $Tickets->sanitizeText($introtext, true);
 			}
 		}
 
@@ -331,10 +323,11 @@ class Ticket extends modResource
 	{
 		/** @var TicketTotal $total */
 		if (!$total = $this->getOne('Total')) {
-			$total = $this->xpdo->newObject('TicketTotal');
+			/** @var TicketTotal $total */
+			$total = $this->xpdo->newObject(TicketTotal::class);
 			$total->fromArray([
-				'id' => $this->id,
-				'class' => 'Ticket',
+				'id'    => $this->id,
+				'class' => Ticket::class,
 			], '', true, true);
 			$total->fetchValues();
 			$total->save();
@@ -357,7 +350,7 @@ class Ticket extends modResource
 	 */
 	public function getViewsCount()
 	{
-		return $this->xpdo->getCount('TicketView', ['parent' => $this->id]);
+		return $this->xpdo->getCount(TicketView::class, ['parent' => $this->id]);
 	}
 
 	/**
@@ -367,9 +360,9 @@ class Ticket extends modResource
 	 */
 	public function getCommentsCount()
 	{
-		$q = $this->xpdo->newQuery('TicketThread', ['name' => 'resource-' . $this->id]);
+		$q = $this->xpdo->newQuery(TicketThread::class, ['name' => 'resource-' . $this->id]);
 		$q->leftJoin(
-			'TicketComment',
+			TicketComment::class,
 			'TicketComment',
 			'`TicketThread`.`id` = `TicketComment`.`thread` AND `TicketComment`.`published` = 1'
 		);
@@ -528,7 +521,7 @@ class Ticket extends modResource
 		];
 
 		/** @var modContentType $contentType */
-		if ($contentType = $this->xpdo->getObject('modContentType', $this->get('content_type'))) {
+		if ($contentType = $this->xpdo->getObject(modContentType::class, $this->get('content_type'))) {
 			/** @var modContentType $contentType */
 			$pls['vl'][] = $contentType->getExtension();
 		} else {
@@ -581,7 +574,7 @@ class Ticket extends modResource
 		if (empty($properties)) {
 			/** @var TicketsSection $parent */
 			if (!$parent = $this->getOne('Parent')) {
-				$parent = $this->xpdo->newObject('TicketsSection');
+				$parent = $this->xpdo->newObject(TicketsSection::class);
 			}
 			/** @var TicketsSection $parent */
 			$default_properties = $parent->getProperties($namespace);
@@ -688,7 +681,7 @@ class Ticket extends modResource
 	public function updateAuthorsActions()
 	{
 		if (!$section = $this->getOne('Section')) {
-			$section = $this->xpdo->newObject('TicketsSection');
+			$section = $this->xpdo->newObject(TicketsSection::class);
 		}
 
 		/** @var TicketsSection $section */
@@ -702,14 +695,14 @@ class Ticket extends modResource
 			$this->xpdo->exec($sql);
 		}
 
-		$c = $this->xpdo->newQuery('TicketAuthorAction', ['ticket' => $this->id]);
+		$c = $this->xpdo->newQuery(TicketAuthorAction::class, ['ticket' => $this->id]);
 		$c->select('DISTINCT(owner)');
 		$owners = [];
 		if ($c->prepare() && $c->stmt->execute()) {
 			$owners = $c->stmt->fetchAll(PDO::FETCH_COLUMN);
 		}
 
-		$authors = $this->xpdo->getIterator('TicketAuthor', ['id:IN' => $owners]);
+		$authors = $this->xpdo->getIterator(TicketAuthor::class, ['id:IN' => $owners]);
 		/** @var TicketAuthor $author */
 		foreach ($authors as $author) {
 			$author->updateTotals();
@@ -724,7 +717,7 @@ class Ticket extends modResource
 	public function getNeighborhood()
 	{
 		$arr = [];
-		$q = $this->xpdo->newQuery('Ticket', ['parent' => $this->parent, 'class_key' => 'Ticket']);
+		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->parent, 'class_key' => Ticket::class]);
 		$q->sortby('id', 'ASC');
 		$q->select('id');
 		if ($q->prepare() && $q->stmt->execute()) {
@@ -756,5 +749,10 @@ class Ticket extends modResource
 			$context = $this->get('context_key');
 		}
 		parent::clearCache($context);
+	}
+
+	public function sanitizeText($text = null, $replaceTags = true)
+	{
+		return tickets_service()->sanitizeText($text, $replaceTags);
 	}
 }

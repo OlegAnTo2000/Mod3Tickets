@@ -1,9 +1,12 @@
 <?php
 
-class TicketThreadGetProcessor extends MODX\Revolution\Processors\Model\GetProcessor
+use Tickets\Model\TicketThread;
+use MODX\Revolution\Processors\Model\GetProcessor;
+
+class Get extends GetProcessor
 {
-	public $objectType = 'TicketThread';
-	public $classKey = 'TicketThread';
+	public $objectType     = TicketThread::class;
+	public $classKey       = TicketThread::class;
 	public $languageTopics = ['tickets:default'];
 	/** @var TicketThread */
 	public $object;
@@ -23,10 +26,10 @@ class TicketThreadGetProcessor extends MODX\Revolution\Processors\Model\GetProce
 			if (!empty($res)) {
 				$this->object = $this->modx->newObject($this->classKey);
 				$this->object->fromArray([
-					'name' => 'resource-' . $res,
-					'createdby' => $this->modx->user->id,
-					'createdon' => \date('Y-m-d H:i:s'),
-					'resource' => $res,
+					'name'        => 'resource-' . $res,
+					'createdby'   => $this->modx->user->id,
+					'createdon'   => \date('Y-m-d H:i:s'),
+					'resource'    => $res,
 					'subscribers' => [$this->modx->user->id],
 				]);
 				$this->object->save();
@@ -52,5 +55,3 @@ class TicketThreadGetProcessor extends MODX\Revolution\Processors\Model\GetProce
 		return $this->success('', $thread);
 	}
 }
-
-return 'TicketThreadGetProcessor';

@@ -2,63 +2,64 @@
 
 namespace Tickets;
 
+use PDO;
 use function abs;
-use function array_key_exists;
-use function array_map;
-use function array_merge;
-use function array_unique;
+use function md5;
 use function date;
+use function time;
+use function trim;
+use function round;
+use function mktime;
+use function strpos;
 use function defined;
 use function explode;
-use function file_exists;
-use function html_entity_decode;
-use function htmlentities;
+use function mt_rand;
+use function print_r;
 use function in_array;
 use function is_array;
+use function array_map;
 use function is_object;
+use function strtotime;
+use function preg_match;
+
+use function strtolower;
+use function array_merge;
+use function file_exists;
 use function json_decode;
 use function json_encode;
-use function md5;
-use function method_exists;
-use function mktime;
-
-use MODX\Revolution\modManagerController;
-use MODX\Revolution\modSnippet;
+use function str_replace;
 use MODX\Revolution\modX;
+use Tickets\Model\Ticket;
+
+use function array_unique;
+
+use function htmlentities;
+
+use function preg_replace;
+use function method_exists;
+use MODX\Revolution\modUser;
+use function version_compare;
 use MODX\Revolution\pdoTools;
+use Tickets\Model\TicketView;
+use function array_key_exists;
+use MODX\Revolution\modSnippet;
+
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketThread;
+use function html_entity_decode;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modManagerController;
 use MODX\Revolution\Processors\ProcessorResponse;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
+use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
+
+use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
 use MODX\Revolution\Processors\ProcessorResponse as modProcessorResponse;
 use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
 use MODX\Revolution\Processors\Resource\Update as ResourceUpdateProcessor;
-
-use function mt_rand;
-
-use PDO;
-
-use function preg_match;
-use function preg_replace;
-use function print_r;
-use function round;
-use function str_replace;
-use function strpos;
-use function strtolower;
-use function strtotime;
-
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketAuthor;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketsSection;
-use Tickets\Model\TicketThread;
-use Tickets\Model\TicketView;
-use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
-use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
-use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
-
-use function time;
-use function trim;
-use function version_compare;
 
 class Tickets
 {
@@ -554,7 +555,7 @@ class Tickets
 		$comment = $comment->toArray();
 
 		/** @var modUser $user */
-		if ($this->authenticated && $user = $this->modx->getObject('modUser', $this->modx->user->id)) {
+		if ($this->authenticated && $user = $this->modx->getObject(modUser::class, $this->modx->user->id)) {
 			$comment['name'] = $this->modx->user->Profile->fullname;
 			$comment['email'] = $this->modx->user->Profile->email;
 			/** @var modUserProfile $profile */
@@ -669,7 +670,7 @@ class Tickets
 			$comment['vote'] = $comment['star'] = '';
 
 			/** @var modUser $user */
-			if ($user = $this->modx->getObject('modUser', $comment['createdby'])) {
+			if ($user = $this->modx->getObject(modUser::class, $comment['createdby'])) {
 				/** @var modUserProfile $profile */
 				$profile = $user->getOne('Profile');
 				$comment = array_merge($profile->toArray(), $user->toArray(), $comment);
@@ -869,8 +870,8 @@ class Tickets
 			) {
 				$date = $view->get('timestamp');
 				$q = $this->modx->newQuery('TicketComment');
-				$q->leftJoin('modUser', 'User', '`User`.`id` = `TicketComment`.`createdby`');
-				$q->leftJoin('modUserProfile', 'Profile', '`Profile`.`internalKey` = `TicketComment`.`createdby`');
+				$q->leftJoin(modUser::class, 'User', '`User`.`id` = `TicketComment`.`createdby`');
+				$q->leftJoin(modUserProfile::class, 'Profile', '`Profile`.`internalKey` = `TicketComment`.`createdby`');
 				$q->where([
 					'`TicketComment`.`published`' => 1,
 					'`TicketComment`.`thread`' => $thread->id,
@@ -883,8 +884,8 @@ class Tickets
 
 				$q->sortby('`TicketComment`.`id`', 'ASC');
 				$q->select($this->modx->getSelectColumns('TicketComment', 'TicketComment'));
-				$q->select($this->modx->getSelectColumns('modUser', 'User', '', ['username']));
-				$q->select($this->modx->getSelectColumns('modUserProfile', 'Profile', '', ['id'], true));
+				$q->select($this->modx->getSelectColumns(modUser::class, 'User', '', ['username']));
+				$q->select($this->modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true));
 
 				$comments = [];
 				if ($q->prepare() && $q->stmt->execute()) {
@@ -1182,7 +1183,7 @@ class Tickets
 			$ticket = array_merge($ticket, $section->toArray('section.'));
 		}
 		/** @var modUser $user */
-		if ($user = $this->modx->getObject('modUser', $ticket['createdby'])) {
+		if ($user = $this->modx->getObject(modUser::class, $ticket['createdby'])) {
 			if ($profile = $user->getOne('Profile')) {
 				$ticket = array_merge($ticket, array_merge($profile->toArray('user.'), $user->toArray('user.')));
 			}
@@ -1254,7 +1255,7 @@ class Tickets
 		$owner_uid = $reply_uid = $reply_email = null;
 		$subscribers = [];
 		$q = $this->modx->newQuery('TicketThread');
-		$q->leftJoin('modResource', 'modResource', 'TicketThread.resource = modResource.id');
+		$q->leftJoin(modResource::class, 'modResource', 'TicketThread.resource = modResource.id');
 		$q->select('modResource.createdby as uid, modResource.id as resource, modResource.pagetitle, TicketThread.subscribers');
 		$q->where(['TicketThread.id' => $comment['thread']]);
 		if ($q->prepare() && $q->stmt->execute()) {

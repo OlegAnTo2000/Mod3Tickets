@@ -18,9 +18,9 @@ $time = \time();
 $modx->removeCollection('TicketAuthorAction', []);
 $modx->removeCollection('TicketTotal', []);
 
-$c = $modx->newQuery('modUser');
+$c = $modx->newQuery(modUser::class);
 $c->sortby('id', 'asc');
-$users = $modx->getIterator('modUser', $c);
+$users = $modx->getIterator(modUser::class, $c);
 /** @var modUser $user */
 foreach ($users as $user) {
 	/** @var TicketAuthor $profile */

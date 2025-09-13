@@ -141,7 +141,7 @@ class TicketsSectionGetCatsProcessor extends MODX\Revolution\Processors\Model\Ge
 			unset($parents[\count($parents) - 1]);
 		}
 		if (!empty($parents) && \is_array($parents)) {
-			$q = $this->modx->newQuery('modResource', ['id:IN' => $parents]);
+			$q = $this->modx->newQuery(modResource::class, ['id:IN' => $parents]);
 			$q->select('id,pagetitle');
 			if ($q->prepare() && $q->stmt->execute()) {
 				while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {

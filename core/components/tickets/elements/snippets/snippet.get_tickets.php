@@ -53,8 +53,8 @@ if (!empty($user)) {
 // Joining tables
 $leftJoin = [
 	'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
-	'User' => ['class' => 'modUser', 'on' => '`User`.`id` = `Ticket`.`createdby`'],
-	'Profile' => ['class' => 'modUserProfile', 'on' => '`Profile`.`internalKey` = `User`.`id`'],
+	'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
+	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `User`.`id`'],
 	'Total' => ['class' => 'TicketTotal'],
 ];
 if ($Tickets->authenticated) {
@@ -75,8 +75,8 @@ if ($Tickets->authenticated) {
 // Fields to select
 $select = [
 	'Section' => $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
-	'User' => $modx->getSelectColumns('modUser', 'User', '', ['username']),
-	'Profile' => $modx->getSelectColumns('modUserProfile', 'Profile', '', ['id'], true),
+	'User' => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
+	'Profile' => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true),
 	'Ticket' => !empty($includeContent)
 		? $modx->getSelectColumns($class, $class)
 		: $modx->getSelectColumns($class, $class, '', ['content'], true),

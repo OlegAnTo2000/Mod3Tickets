@@ -60,7 +60,7 @@ class TicketAuthor extends xPDOObject
 				'createdby' => $createdby,
 			];
 			/** @var TicketAuthorAction $action */
-			if (!$action = $this->xpdo->getObject('TicketAuthorAction', $key)) {
+			if (!$action = $this->xpdo->getObject(TicketAuthorAction::class, $key)) {
 				$action = $this->xpdo->newObject('TicketAuthorAction');
 				$action->fromArray($key, '', true, true);
 				$action->fromArray([
@@ -113,7 +113,7 @@ class TicketAuthor extends xPDOObject
 			'createdby' => $createdby,
 		];
 		/** @var TicketAuthorAction $action */
-		if ($action = $this->xpdo->getObject('TicketAuthorAction', $key)) {
+		if ($action = $this->xpdo->getObject(TicketAuthorAction::class, $key)) {
 			if ($section = $action->getOne('Section')) {
 				if ($ticket = $action->getOne('Ticket')) {
 					$this->_updateTotal($type, $ticket, $section, 0, true);

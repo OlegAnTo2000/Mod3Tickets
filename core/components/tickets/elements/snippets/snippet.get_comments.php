@@ -138,8 +138,8 @@ $innerJoin = [
 	],
 ];
 $leftJoin = [
-	'User' => ['class' => 'modUser', 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
-	'Profile' => ['class' => 'modUserProfile', 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
+	'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
 	'Ticket' => ['class' => 'Ticket', 'on' => '`Ticket`.`id` = `Thread`.`resource`'],
 	'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 ];
@@ -159,7 +159,7 @@ $select = [
 	'Thread' => '`Thread`.`resource`, `Thread`.`comments`',
 	'User' => '`User`.`username`',
 	'Profile' => $modx->getSelectColumns(
-		'modUserProfile',
+		modUserProfile::class,
 		'Profile',
 		'',
 		['id', 'email'],

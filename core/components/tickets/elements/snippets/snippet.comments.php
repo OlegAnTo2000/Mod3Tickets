@@ -1,7 +1,8 @@
 <?php
 
-use Tickets\Model\TicketThread;
 use Tickets\Tickets;
+use Tickets\Model\TicketThread;
+use MODX\Revolution\Sources\modMediaSource;
 
 /** @var array $scriptProperties */
 if (empty($thread)) {
@@ -50,7 +51,7 @@ $pdoFetch->addTime('pdoTools loaded');
 // Prepare Ticket Thread
 /** @var TicketThread $thread */
 if (!$thread = $modx->getObject(TicketThread::class, ['name' => $scriptProperties['thread']])) {
-	$thread = $modx->newObject('TicketThread');
+	$thread = $modx->newObject(TicketThread::class);
 	$thread->fromArray([
 		'name' => $scriptProperties['thread'],
 		'resource' => $modx->resource->get('id'),
@@ -98,8 +99,8 @@ $innerJoin = [
 	],
 ];
 $leftJoin = [
-	'User' => ['class' => 'modUser', 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
-	'Profile' => ['class' => 'modUserProfile', 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
+	'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
 ];
 if ($Tickets->authenticated) {
 	$leftJoin['Vote'] = [
@@ -118,7 +119,7 @@ $select = [
 	'Thread' => '`Thread`.`resource`',
 	'User' => '`User`.`username`',
 	'Profile' => $modx->getSelectColumns(
-		'modUserProfile',
+		modUserProfile::class,
 		'Profile',
 		'',
 		['id', 'email'],
@@ -214,7 +215,7 @@ if (!empty($allowFiles)) {
 		$pls['files'] = $Tickets->getFileComment();
 
 		/** @var modMediaSource $source */
-		if ($source = $modx->getObject('sources.modMediaSource', ['id' => $source])) {
+		if ($source = $modx->getObject(modMediaSource::class, ['id' => $source])) {
 			$properties = $source->getPropertyList();
 			$config = [
 				'size' => !empty($properties['maxUploadSize'])

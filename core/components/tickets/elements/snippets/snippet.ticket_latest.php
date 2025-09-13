@@ -124,9 +124,9 @@ if ('comments' == $action) {
 
 	$leftJoin = [
 		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
-		'User' => ['class' => 'modUser', 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
+		'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 		'Profile' => [
-			'class' => 'modUserProfile',
+			'class' => modUserProfile::class,
 			'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`',
 		],
 	];
@@ -154,8 +154,8 @@ if ('comments' == $action) {
 			'on' => '`Thread`.`resource` = `Ticket`.`id` AND `Thread`.`deleted` = 0',
 		],
 		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
-		'User' => ['class' => 'modUser', 'on' => '`User`.`id` = `Ticket`.`createdby`'],
-		'Profile' => ['class' => 'modUserProfile', 'on' => '`Profile`.`internalKey` = `Ticket`.`createdby`'],
+		'User' => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
+		'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `Ticket`.`createdby`'],
 	];
 
 	$select = [
@@ -172,8 +172,8 @@ if ('comments' == $action) {
 // Fields to select
 $select = \array_merge($select, [
 	'Section' => $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
-	'User' => $modx->getSelectColumns('modUser', 'User', '', ['username']),
-	'Profile' => $modx->getSelectColumns('modUserProfile', 'Profile', '', ['id'], true),
+	'User' => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
+	'Profile' => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true),
 ]);
 
 // Add custom parameters

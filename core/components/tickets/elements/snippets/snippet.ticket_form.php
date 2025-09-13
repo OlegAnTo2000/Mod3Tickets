@@ -1,5 +1,9 @@
 <?php
 
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketFile;
+use MODX\Revolution\Sources\modMediaSource;
+
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
 $Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
@@ -84,40 +88,30 @@ if (!empty($tid)) {
 
 // Get available sections for ticket create
 $data['sections'] = '';
-/** @var modProcessorResponse $response */
+/** @var ProcessorResponse $response */
 $response = $Tickets->runProcessor('web/section/getlist', [
-	'parents' => $scriptProperties['parents'],
+	'parents'   => $scriptProperties['parents'],
 	'resources' => $scriptProperties['resources'],
-	'sortby' => !empty($scriptProperties['sortby'])
-		? $scriptProperties['sortby']
-		: 'pagetitle',
-	'sortdir' => !empty($scriptProperties['sortdir'])
-		? $scriptProperties['sortdir']
-		: 'asc',
-	'depth' => isset($scriptProperties['depth'])
-		? $scriptProperties['depth']
-		: 0,
-	'context' => !empty($scriptProperties['context'])
-		? $scriptProperties['context']
-		: $modx->context->key,
-	'limit' => 0,
+	'sortby'    => !empty($scriptProperties['sortby']) ? $scriptProperties['sortby'] : 'pagetitle',
+	'sortdir'   => !empty($scriptProperties['sortdir']) ? $scriptProperties['sortdir'] : 'asc',
+	'depth'     => isset($scriptProperties['depth']) ? $scriptProperties['depth'] : 0,
+	'context'   => !empty($scriptProperties['context']) ? $scriptProperties['context'] : $modx->context->key,
+	'limit'     => 0,
 ]);
-$response = \json_decode($response->getResponse(), true);
+$response = $response->getResponse();
 
 if (!empty($response['results'])) {
 	$Tickets->config['sections'] = [];
 	foreach ($response['results'] as $v) {
-		$v['selected'] = $parent == $v['id'] || $parent == $v['alias']
-			? 'selected'
-			: '';
+		$v['selected'] = ($parent == $v['id'] || $parent == $v['alias']) ? 'selected' : '';
 		$data['sections'] .= $Tickets->getChunk($tplSectionRow, $v);
 		$Tickets->config['sections'][] = $v['id'];
 	}
 }
 
 if (!empty($allowFiles)) {
-	$q = $modx->newQuery('TicketFile');
-	$q->where(['class' => 'Ticket']);
+	$q = $modx->newQuery(TicketFile::class);
+	$q->where(['class' => Ticket::class]);
 	if (!empty($tid)) {
 		$q->andCondition(['parent' => $tid, 'createdby' => $modx->user->id], null, 1);
 	} else {
@@ -125,27 +119,25 @@ if (!empty($allowFiles)) {
 	}
 	$q->sortby('rank', 'ASC');
 	$q->sortby('createdon', 'ASC');
-	$collection = $modx->getIterator('TicketFile', $q);
+	$collection = $modx->getIterator(TicketFile::class, $q);
 	$files = '';
 	/** @var TicketFile $item */
 	foreach ($collection as $item) {
 		if ($item->get('deleted') && !$item->get('parent')) {
 			$item->remove();
 		} else {
-			$item = $item->toArray();
-			$item['size'] = \round($item['size'] / 1024, 2);
-			$item['new'] = empty($item['parent']);
-			$tpl = 'image' == $item['type']
-				? $tplImage
-				: $tplFile;
-			$files .= $Tickets->getChunk($tpl, $item);
+			$item          = $item->toArray();
+			$item['size']  = \round($item['size'] / 1024, 2);
+			$item['new']   = empty($item['parent']);
+			$tpl           = 'image' == $item['type'] ? $tplImage : $tplFile;
+			$files        .= $Tickets->getChunk($tpl, $item);
 		}
 	}
 	$data['files'] = $Tickets->getChunk($tplFiles, [
 		'files' => $files,
 	]);
 	/** @var modMediaSource $source */
-	if ($source = $modx->getObject('sources.modMediaSource', ['id' => $source])) {
+	if ($source = $modx->getObject(modMediaSource::class, ['id' => $source])) {
 		$properties = $source->getPropertyList();
 		$config = [
 			'size' => !empty($properties['maxUploadSize'])
@@ -162,7 +154,9 @@ if (!empty($allowFiles)) {
 				: 'jpg,jpeg,png,gif',
 		];
 		$modx->regClientStartupScript(
-			'<script type="text/javascript">TicketsConfig.source=' . \json_encode($config) . ';</script>',
+			'<script type="text/javascript">
+				TicketsConfig.source=' . json_encode($config) . ';
+			</script>',
 			true
 		);
 	}
@@ -170,15 +164,15 @@ if (!empty($allowFiles)) {
 	$modx->regClientScript($Tickets->config['jsUrl'] . 'web/files.js');
 
 	$lang = $modx->getOption('cultureKey');
-	if ('en' != $lang && \file_exists($Tickets->config['jsPath'] . 'web/lib/plupload/i18n/' . $lang . '.js')) {
+	if ('en' != $lang && file_exists($Tickets->config['jsPath'] . 'web/lib/plupload/i18n/' . $lang . '.js')) {
 		$modx->regClientScript($Tickets->config['jsUrl'] . 'web/lib/plupload/i18n/' . $lang . '.js');
 	}
 }
 
 $output = $Tickets->getChunk($tplWrapper, $data);
-$key = \md5(\json_encode($Tickets->config));
+$key = md5(json_encode($Tickets->config));
 $_SESSION['TicketForm'][$key] = $Tickets->config;
-$output = \str_ireplace(
+$output = str_ireplace(
 	'</form>',
 	"\n<input type=\"hidden\" name=\"form_key\" value=\"{$key}\" class=\"disable-sisyphus\" />\n</form>",
 	$output

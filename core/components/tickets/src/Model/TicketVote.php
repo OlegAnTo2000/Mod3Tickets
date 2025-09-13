@@ -3,6 +3,8 @@
 namespace Tickets\Model;
 
 use xPDO\Om\xPDOObject;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketComment;
 
 /**
  * @property int $id
@@ -54,9 +56,9 @@ class TicketVote extends xPDOObject
 	{
 		$type = '';
 		$class = $this->get('class');
-		if ('TicketComment' == $class) {
+		if (TicketComment::class == $class) {
 			$type = 'vote_comment';
-		} elseif ('Ticket' == $class) {
+		} elseif (Ticket::class == $class) {
 			$type = 'vote_ticket';
 		}
 		if (!empty($type)) {

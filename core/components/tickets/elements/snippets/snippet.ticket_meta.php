@@ -1,5 +1,14 @@
 <?php
 
+use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketFile;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketVote;
+use MODX\Revolution\modResource;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
+
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
 $Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
@@ -24,8 +33,8 @@ if (!$ticket = $modx->getObject(modResource::class, ['id' => $id])) {
 }
 
 $class = $ticket instanceof Ticket
-	? 'Ticket'
-	: 'modResource';
+	? Ticket::class
+	: modResource::class;
 
 /** @var TicketTotal $total */
 if ('Ticket' == $class && $total = $ticket->getOne('Total')) {
@@ -39,7 +48,7 @@ $vote = $pdoFetch->getObject(
 	TicketVote::class,
 	[
 		'id' => $ticket->id,
-		'class' => 'Ticket',
+		'class' => Ticket::class,
 		'createdby' => $modx->user->id,
 	],
 	[
@@ -51,7 +60,7 @@ if (!empty($vote)) {
 	$data['vote'] = $vote['value'];
 }
 
-$star = $modx->getCount('TicketStar', ['id' => $ticket->id, 'class' => 'Ticket', 'createdby' => $modx->user->id]);
+$star = $modx->getCount(TicketStar::class, ['id' => $ticket->id, 'class' => Ticket::class, 'createdby' => $modx->user->id]);
 $data['stared'] = !empty($star);
 $data['unstared'] = empty($star);
 
@@ -60,8 +69,8 @@ if ('Ticket' != $class) {
 	if (!$modx->user->id || $modx->user->id == $ticket->createdby) {
 		$data['voted'] = 0;
 	} else {
-		$q = $modx->newQuery('TicketVote');
-		$q->where(['id' => $ticket->id, 'createdby' => $modx->user->id, 'class' => 'Ticket']);
+		$q = $modx->newQuery(TicketVote::class);
+		$q->where(['id' => $ticket->id, 'createdby' => $modx->user->id, 'class' => Ticket::class]);
 		$q->select('`value`');
 		$tstart = \microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
@@ -154,10 +163,10 @@ $data['inactive'] = (int) !empty($data['cant_vote']);
 $data['can_star'] = $Tickets->authenticated;
 
 if (!empty($getUser)) {
-	$fields = $modx->getFieldMeta('modUserProfile');
-	$user = $pdoFetch->getObject('modUserProfile', ['internalKey' => $ticket->createdby], [
+	$fields = $modx->getFieldMeta(modUserProfile::class);
+	$user = $pdoFetch->getObject(modUserProfile::class, ['internalKey' => $ticket->createdby], [
 		'innerJoin' => [
-			'modUser' => ['class' => 'modUser', 'on' => 'modUserProfile.internalKey = modUser.id'],
+			'modUser' => ['class' => modUser::class, 'on' => 'modUserProfile.internalKey = modUser.id'],
 		],
 		'select' => [
 			'modUserProfile' => \implode(',', \array_keys($fields)),
@@ -170,8 +179,8 @@ if (!empty($getUser)) {
 }
 
 if (!empty($getFiles)) {
-	$where = ['deleted' => 0, 'class' => 'Ticket', 'parent' => $ticket->id];
-	$collection = $pdoFetch->getCollection('TicketFile', $where, ['sortby' => 'createdon', 'sortdir' => 'ASC']);
+	$where = ['deleted' => 0, 'class' => Ticket::class, 'parent' => $ticket->id];
+	$collection = $pdoFetch->getCollection(TicketFile::class, $where, ['sortby' => 'createdon', 'sortdir' => 'ASC']);
 	$data['files'] = $content = '';
 	if (!empty($unusedFiles)) {
 		$content = $ticket->getContent();

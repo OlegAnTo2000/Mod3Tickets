@@ -1,16 +1,17 @@
 <?php
 
-/** @noinspection PhpIncludeInspection */
-require_once MODX_CORE_PATH . 'model/modx/modprocessor.class.php';
-/** @noinspection PhpIncludeInspection */
-require_once MODX_CORE_PATH . 'model/modx/processors/resource/create.class.php';
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketFile;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
 
-class TicketCreateProcessor extends modResourceCreateProcessor
+class Create extends ResourceCreateProcessor
 {
 	/** @var Ticket */
 	public $object;
-	public $classKey = 'Ticket';
-	public $permission = 'ticket_save';
+	public $classKey       = Ticket::class;
+	public $permission     = 'ticket_save';
 	public $languageTopics = ['access', 'resource', 'tickets:default'];
 	/** @var TicketsSection */
 	public $parentResource;
@@ -77,23 +78,21 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 		$createdon = \time();
 		// Redefine main parameters if we are not in the manager
 		if ('mgr' == $this->modx->context->key) {
-			$template = $this->getProperty('template');
-			$hidemenu = $this->getProperty('hidemenu');
+			$template     = $this->getProperty('template');
+			$hidemenu     = $this->getProperty('hidemenu');
 			$show_in_tree = $this->getProperty('show_in_tree');
-			$createdby = $this->getProperty('createdby');
-			$published = $this->getProperty('published');
-			$publishedon = $this->getProperty('publishedon', $createdon);
-			$publishedby = $this->getProperty('publishedby', $createdby);
+			$createdby    = $this->getProperty('createdby');
+			$published    = $this->getProperty('published');
+			$publishedon  = $this->getProperty('publishedon', $createdon);
+			$publishedby  = $this->getProperty('publishedby', $createdby);
 		} else {
-			$template = $properties['template'];
-			$hidemenu = $properties['hidemenu'];
+			$template     = $properties['template'];
+			$hidemenu     = $properties['hidemenu'];
 			$show_in_tree = $properties['show_in_tree'];
-			$createdby = $this->modx->user->id;
-			$published = $this->_published;
-			$publishedon = $this->_published
-				? $createdon
-				: 0;
-			$publishedby = $this->modx->user->id;
+			$createdby    = $this->modx->user->id;
+			$published    = $this->_published;
+			$publishedon  = $this->_published ? $createdon : 0;
+			$publishedby  = $this->modx->user->id;
 		}
 		if (empty($template)) {
 			$template = $this->modx->context->getOption(
@@ -104,7 +103,7 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 
 		$tmp = [
 			'disable_jevix' => !empty($properties['disable_jevix']),
-			'process_tags' => !empty($properties['process_tags']),
+			'process_tags'  => !empty($properties['process_tags']),
 		];
 		if (empty($published)) {
 			$tmp['was_published'] = false;
@@ -113,18 +112,18 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 		}
 		// Set properties
 		$this->setProperties([
-			'class_key' => 'Ticket',
-			'published' => $published,
-			'createdby' => $createdby,
-			'createdon' => $createdon,
-			'publishedby' => $publishedby,
-			'publishedon' => $publishedon,
-			'syncsite' => 0,
-			'template' => $template,
-			'introtext' => $introtext,
-			'hidemenu' => $hidemenu,
+			'class_key'    => Ticket::class,
+			'published'    => $published,
+			'createdby'    => $createdby,
+			'createdon'    => $createdon,
+			'publishedby'  => $publishedby,
+			'publishedon'  => $publishedon,
+			'syncsite'     => 0,
+			'template'     => $template,
+			'introtext'    => $introtext,
+			'hidemenu'     => $hidemenu,
 			'show_in_tree' => $show_in_tree,
-			'properties' => ['tickets' => $tmp],
+			'properties'   => ['tickets' => $tmp],
 		]);
 
 		return $set;
@@ -161,7 +160,7 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 			}
 			$this->parentResource = $this->modx->getObject(TicketsSection::class, $parentId);
 			if ($this->parentResource) {
-				if ('TicketsSection' != $this->parentResource->get('class_key')) {
+				if (TicketsSection::class != $this->parentResource->get('class_key')) {
 					return $this->modx->lexicon('ticket_err_wrong_parent');
 				} elseif (!$this->parentResource->checkPolicy(['section_add_children' => true])) {
 					return $this->modx->lexicon('ticket_err_wrong_parent');
@@ -230,7 +229,7 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 	protected function sendTicketMails()
 	{
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->modx->getService('Tickets')) {
+		if ($Tickets = tickets_service()) {
 			$Tickets->config['tplTicketEmailBcc'] = 'tpl.Tickets.ticket.email.bcc';
 			$Tickets->config['tplTicketEmailSubscription'] = 'tpl.Tickets.ticket.email.subscription';
 			$Tickets->sendTicketMails($this->object->toArray());
@@ -244,7 +243,8 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 	{
 		$clear = false;
 		/** @var TicketsSection $section */
-		if ($section = $this->object->getOne('Section')) {
+		$section = $this->object->getOne('Section');
+		if ($section) {
 			$section->clearCache();
 			$clear = true;
 		}
@@ -301,11 +301,11 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 	 */
 	public function processFiles()
 	{
-		$q = $this->modx->newQuery('TicketFile');
-		$q->where(['class' => 'Ticket']);
+		$q = $this->modx->newQuery(TicketFile::class);
+		$q->where(['class' => Ticket::class]);
 		$q->andCondition(['parent' => 0, 'createdby' => $this->modx->user->id], null, 1);
 		$q->sortby('createdon', 'ASC');
-		$collection = $this->modx->getIterator('TicketFile', $q);
+		$collection = $this->modx->getIterator(TicketFile::class, $q);
 
 		$replace = [];
 		$count = 0;

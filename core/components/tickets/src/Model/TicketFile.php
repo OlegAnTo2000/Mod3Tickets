@@ -42,7 +42,7 @@ class TicketFile extends xPDOSimpleObject
 			$this->mediaSource = $mediaSource;
 		} elseif (empty($this->mediaSource) && $source = $this->get('source')) {
 			/** @var modMediaSource $mediaSource */
-			if ($mediaSource = $this->xpdo->getObject('sources.modMediaSource', ['id' => $source])) {
+			if ($mediaSource = $this->xpdo->getObject(modMediaSource::class, ['id' => $source])) {
 				/* @noinspection PhpUndefinedFieldInspection */
 				/** @var modMediaSource $mediaSource */
 				$mediaSource->set('ctx', $this->xpdo->context->key);

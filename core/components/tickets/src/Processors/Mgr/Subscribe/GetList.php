@@ -11,8 +11,8 @@ use xPDO\Om\xPDOQuery;
 
 class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 {
-	public $objectType = 'modUser';
-	public $classKey = 'modUser';
+	public $objectType = modUser::class;
+	public $classKey = modUser::class;
 	public $languageTopics = ['tickets:default'];
 	public $defaultSortField = 'modUser.id';
 	public $defaultSortDirection = 'DESC';
@@ -34,7 +34,7 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 
 	public function prepareQueryBeforeCount(xPDOQuery $c)
 	{
-		$c->leftJoin('modUserProfile', 'Profile');
+		$c->leftJoin(modUserProfile::class, 'Profile');
 		if (empty($this->subscribers)) {
 			$c->where([
 				'modUser.id' => 0,
@@ -64,8 +64,8 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 
 	public function prepareQueryAfterCount(xPDOQuery $c)
 	{
-		$c->select($this->modx->getSelectColumns('modUser', 'modUser'));
-		$c->select($this->modx->getSelectColumns('modUserProfile', 'Profile', '', ['fullname', 'email']));
+		$c->select($this->modx->getSelectColumns(modUser::class, 'modUser'));
+		$c->select($this->modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['fullname', 'email']));
 
 		return $c;
 	}
