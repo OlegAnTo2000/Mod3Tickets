@@ -1,8 +1,0 @@
-# ignore properties file
-properties.inc.php
-
-# ignore cache/ dir
-/cache/
-
-# ignore tmp test files
-test-*
