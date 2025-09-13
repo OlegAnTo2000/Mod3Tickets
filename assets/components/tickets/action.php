@@ -2,7 +2,7 @@
 
 use Tickets\Tickets;
 use MODX\Revolution\modX;
-use Tickets\TicketThread;
+use Tickets\Model\TicketThread;
 use MODX\Revolution\modContext;
 use MODX\Revolution\modResource;
 

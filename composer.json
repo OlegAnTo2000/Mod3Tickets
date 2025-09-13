@@ -4,7 +4,10 @@
 	"require-dev": {
 		"modx/revolution": "v3.1.2-pl",
 		"sterc/formit": "dev-3.x",
-		"modx-pro/pdotools": "dev-3.x"
+		"modx-pro/pdotools": "dev-3x-new",
+		"phpstan/phpstan": "^2.1",
+		"rector/rector": "^2.1",
+		"friendsofphp/php-cs-fixer": "^3.87"
 	},
 	"repositories": [
 		{
@@ -26,9 +29,9 @@
 			"type": "package",
 			"package": {
 				"name": "modx-pro/pdotools",
-				"version": "dev-3.x",
+				"version": "dev-3x-new",
 				"dist": {
-					"url": "https://github.com/modx-pro/pdotools/archive/refs/heads/3.x.zip",
+					"url": "https://github.com/modx-pro/pdotools/archive/refs/heads/3x-new.zip",
 					"type": "zip"
 				}
 			}
@@ -47,5 +50,9 @@
     "psr-4": {
       "Tickets\\": "core/components/tickets/src/"
     }
-  }
+  },
+	"scripts": {
+		"phpstan": "phpstan analyse --error-format=raw --no-progress --memory-limit=8G",
+		"rector": "rector process --no-progress --dry-run"
+	}
 }

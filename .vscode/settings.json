@@ -1,0 +1,17 @@
+{
+	"intelephense.diagnostics.undefinedConstants": false,
+	"intelephense.environment.phpVersion": "8.1",
+	"editor.formatOnSave": false,
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit"
+	},
+	"[php]": {
+		"editor.formatOnSave": true
+	},
+	"[js]": {
+		"editor.formatOnSave": true
+	},
+	"editor.tabSize": 2,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false
+}
