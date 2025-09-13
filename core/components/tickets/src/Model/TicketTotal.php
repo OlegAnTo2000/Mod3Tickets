@@ -52,7 +52,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 				break;
 			case 'TicketsSection':
 				/** @var TicketsSection $section */
-				if ($section = $this->xpdo->getObject('TicketsSection', $id)) {
+				if ($section = $this->xpdo->getObject(TicketsSection::class, $id)) {
 					$rating = $section->getRating();
 					$values = [
 						'tickets' => $section->getTicketsCount(),

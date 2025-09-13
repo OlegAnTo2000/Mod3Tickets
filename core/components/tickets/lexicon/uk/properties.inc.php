@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Properties Russian Lexicon Entries
  *
@@ -50,7 +51,7 @@ $_lang['tickets_prop_tplTicketEmailBcc'] = 'Чанк для попереджен
 $_lang['tickets_prop_commentsDepth'] = 'Ціле число, для визначення максимальної глибини гілки коментарів.';
 $_lang['tickets_prop_autoPublish'] = 'Автоматично публікувати всі нові коментарі без премодерації.';
 $_lang['tickets_prop_formBefore'] = 'Розташувати форму коментування перед коментарями. За замовчуванням - ні.';
-//$_lang['tickets_prop_dateFormat'] = 'Формат дати коментаря, для функції date()';
+// $_lang['tickets_prop_dateFormat'] = 'Формат дати коментаря, для функції date()';
 $_lang['tickets_prop_gravatarIcon'] = 'Якщо аватарка користувача не знайдено, вантажити цю картинку на заміну.';
 $_lang['tickets_prop_gravatarSize'] = 'Розмір аватара';
 $_lang['tickets_prop_gravatarUrl'] = 'Адреса для завантаження аватарів';

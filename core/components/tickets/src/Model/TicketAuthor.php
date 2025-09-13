@@ -38,7 +38,7 @@ class TicketAuthor extends xPDOObject
 	public function addAction($type, $id, $ticket_id, $createdby, $multiplier = 1)
 	{
 		/** @var Ticket $ticket */
-		$ticket = $this->xpdo->getObject('modResource', ['id' => $ticket_id]);
+		$ticket = $this->xpdo->getObject(modResource::class, ['id' => $ticket_id]);
 		if (!$ticket || !($ticket instanceof Ticket) || empty($type)) {
 			return false;
 		}
@@ -556,7 +556,7 @@ class TicketAuthor extends xPDOObject
 	{
 		if (!isset($this->_ratings[$section_id])) {
 			/** @var TicketsSection $section */
-			if (!$section = $this->xpdo->getObject('TicketsSection', ['id' => $section_id])) {
+			if (!$section = $this->xpdo->getObject(TicketsSection::class, ['id' => $section_id])) {
 				$section = $this->xpdo->newObject('TicketsSection');
 			}
 
@@ -594,7 +594,7 @@ class TicketAuthor extends xPDOObject
 			'id' => $section->id,
 			'class' => 'TicketsSection',
 		];
-		if (!$section_total = $this->xpdo->getObject('TicketTotal', $key)) {
+		if (!$section_total = $this->xpdo->getObject(TicketTotal::class, $key)) {
 			$section_total = $this->xpdo->newObject('TicketTotal');
 			$section_total->fromArray($key, '', true, true);
 		}
@@ -603,7 +603,7 @@ class TicketAuthor extends xPDOObject
 			'id' => $ticket->id,
 			'class' => 'Ticket',
 		];
-		if (!$ticket_total = $this->xpdo->getObject('TicketTotal', $key)) {
+		if (!$ticket_total = $this->xpdo->getObject(TicketTotal::class, $key)) {
 			$ticket_total = $this->xpdo->newObject('TicketTotal');
 			$ticket_total->fromArray($key, '', true, true);
 		}

@@ -25,20 +25,20 @@ class TicketUnsubscribeRemoveProcessor extends MODX\Revolution\Processors\Proces
 	public function process()
 	{
 		$parents = $this->getProperty('parents');
-		if ($section = $this->modx->getObject('TicketsSection', $parents, false)) {
+		if ($section = $this->modx->getObject(TicketsSection::class, $parents, false)) {
 			$properties = $section->get('properties');
 		}
 
 		$arrUnsubscribe = $this->getProperty('ids');
 		if (!empty($properties['subscribers'])) {
 			$properties['subscribers'] =
-			\array_filter($properties['subscribers'], function ($k) use ($arrUnsubscribe, $parents) {
-				if ($unsub = \in_array($k, $arrUnsubscribe, true)) {
-					$this->logManagerAction($k, $parents);
-				}
+				\array_filter($properties['subscribers'], function ($k) use ($arrUnsubscribe, $parents) {
+					if ($unsub = \in_array($k, $arrUnsubscribe, true)) {
+						$this->logManagerAction($k, $parents);
+					}
 
-				return !$unsub;
-			});
+					return !$unsub;
+				});
 		}
 
 		$section->set('properties', $properties);

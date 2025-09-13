@@ -1,9 +1,10 @@
 <?php
+
 /**
- * Default Russian Lexicon Entries for Tickets
+ * Default Russian Lexicon Entries for Tickets.
  */
 
-include_once('setting.inc.php');
+include_once 'setting.inc.php';
 
 $_lang['tickets'] = 'Тикеты';
 $_lang['comments'] = 'Комментарии';

@@ -4,7 +4,7 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $finder = Finder::create()
-	->in([__DIR__ . '/core/components/tickets/src'])
+	->in([__DIR__ . '/core/components/tickets'])
 	->name('*.php')
 	->ignoreDotFiles(true)
 	->ignoreVCS(true);
@@ -15,6 +15,7 @@ return (new Config())
 	->setRules([
 		// 🔹 Базовые пресеты
 		'@PSR12' => true,
+		'phpdoc_to_comment' => false, // не нужно комментировать докблоки
 		'@Symfony' => true, // можно убрать, если строгая PSR12 нужна без лишнего
 
 		// 🔹 Массивы

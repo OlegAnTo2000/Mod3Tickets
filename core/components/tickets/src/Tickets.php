@@ -2,63 +2,63 @@
 
 namespace Tickets;
 
-use PDO;
 use function abs;
-use function md5;
+use function array_key_exists;
+use function array_map;
+use function array_merge;
+use function array_unique;
 use function date;
-use function time;
-use function trim;
-use function round;
-use function mktime;
-use function strpos;
 use function defined;
 use function explode;
-use function mt_rand;
-use function print_r;
+use function file_exists;
+use function html_entity_decode;
+use function htmlentities;
 use function in_array;
 use function is_array;
-use function array_map;
 use function is_object;
-use function strtotime;
-use function preg_match;
-
-use function strtolower;
-use function array_merge;
-use function file_exists;
 use function json_decode;
 use function json_encode;
-use function str_replace;
-use MODX\Revolution\modX;
-use Tickets\Model\Ticket;
-
-use function array_unique;
-
-use function htmlentities;
-
-use function preg_replace;
+use function md5;
 use function method_exists;
-use function version_compare;
-use MODX\Revolution\pdoTools;
-use Tickets\Model\TicketView;
-use function array_key_exists;
-use MODX\Revolution\modSnippet;
-use Tickets\Model\TicketAuthor;
+use function mktime;
 
-use Tickets\Model\TicketThread;
-use function html_entity_decode;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketsSection;
 use MODX\Revolution\modManagerController;
+use MODX\Revolution\modSnippet;
+use MODX\Revolution\modX;
+use MODX\Revolution\pdoTools;
 use MODX\Revolution\Processors\ProcessorResponse;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
-use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
-
-use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
 use MODX\Revolution\Processors\ProcessorResponse as modProcessorResponse;
 use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
 use MODX\Revolution\Processors\Resource\Update as ResourceUpdateProcessor;
+
+use function mt_rand;
+
+use PDO;
+
+use function preg_match;
+use function preg_replace;
+use function print_r;
+use function round;
+use function str_replace;
+use function strpos;
+use function strtolower;
+use function strtotime;
+
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketView;
+use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
+use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
+use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
+
+use function time;
+use function trim;
+use function version_compare;
 
 class Tickets
 {
@@ -860,7 +860,7 @@ class Tickets
 	{
 		if (!$this->authenticated) {
 			return $this->error($this->modx->lexicon('access_denied'));
-		} elseif ($thread = $this->modx->getObject('TicketThread', ['name' => $name])) {
+		} elseif ($thread = $this->modx->getObject(TicketThread::class, ['name' => $name])) {
 			if (
 				$this->authenticated && $view = $this->modx->getObject(
 					'TicketView',
@@ -1174,7 +1174,7 @@ class Tickets
 		}
 
 		/** @var TicketsSection $section */
-		if ($section = $this->modx->getObject('TicketsSection', $ticket['parent'], false)) {
+		if ($section = $this->modx->getObject(TicketsSection::class, $ticket['parent'], false)) {
 			$properties = $section->get('properties');
 			$subscribers = !empty($properties['subscribers'])
 				? $properties['subscribers']
@@ -1210,7 +1210,7 @@ class Tickets
 		}
 
 		// Send email to subscribers current author
-		if ($author = $this->modx->getObject('TicketAuthor', ['id' => $ticket['createdby']])) {
+		if ($author = $this->modx->getObject(TicketAuthor::class, ['id' => $ticket['createdby']])) {
 			$properties = $author->get('properties');
 			if (!empty($properties['subscribers'])) {
 				foreach ($properties['subscribers'] as $uid) {

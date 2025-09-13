@@ -68,7 +68,7 @@ class TicketComment extends xPDOSimpleObject
 			/** @var TicketThread $thread */
 			$thread = $this->getOne('Thread');
 			/** @var modResource|Ticket $ticket */
-			if ($ticket = $this->xpdo->getObject('modResource', $thread->get('resource'))) {
+			if ($ticket = $this->xpdo->getObject(modResource::class, $thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
 					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
@@ -92,9 +92,9 @@ class TicketComment extends xPDOSimpleObject
 	public function changeThread($from, $to)
 	{
 		/** @var TicketThread $old_thread */
-		$old_thread = $this->xpdo->getObject('TicketThread', $from);
+		$old_thread = $this->xpdo->getObject(TicketThread::class, $from);
 		/** @var TicketThread $new_thread */
-		$new_thread = $this->xpdo->getObject('TicketThread', $to);
+		$new_thread = $this->xpdo->getObject(TicketThread::class, $to);
 
 		if ($new_thread && $old_thread) {
 			$this->set('thread', $to);
@@ -109,7 +109,7 @@ class TicketComment extends xPDOSimpleObject
 
 			$old_thread->updateLastComment();
 			/** @var modResource|Ticket $ticket */
-			if ($ticket = $this->xpdo->getObject('modResource', $old_thread->get('resource'))) {
+			if ($ticket = $this->xpdo->getObject(modResource::class, $old_thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
 					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
@@ -118,7 +118,7 @@ class TicketComment extends xPDOSimpleObject
 
 			$new_thread->updateLastComment();
 			/** @var modResource|Ticket $ticket */
-			if ($ticket = $this->xpdo->getObject('modResource', $new_thread->get('resource'))) {
+			if ($ticket = $this->xpdo->getObject(modResource::class, $new_thread->get('resource'))) {
 				if (method_exists($ticket, 'clearCache')) {
 					/** @var modResource|Ticket $ticket */
 					$ticket->clearCache();
@@ -174,7 +174,7 @@ class TicketComment extends xPDOSimpleObject
 		$thread = $this->getOne('Thread');
 
 		/** @var TicketAuthor $profile */
-		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+		if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('createdby'))) {
 			if ($action && $enabled) {
 				$profile->addAction('comment', $this->id, $thread->get('resource'), $this->get('createdby'));
 			} elseif (!$enabled) {
@@ -200,7 +200,7 @@ class TicketComment extends xPDOSimpleObject
 		}
 
 		/** @var TicketAuthor $profile */
-		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+		if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('createdby'))) {
 			$profile->removeAction('comment', $this->id, $this->get('createdby'));
 		}
 

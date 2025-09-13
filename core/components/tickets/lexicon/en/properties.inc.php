@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Properties English Lexicon Entries
  *
@@ -55,7 +56,7 @@ $_lang['tickets_prop_commentsDepth'] = 'Integer value indicating maximum depth o
 $_lang['tickets_prop_autoPublish'] = 'If true, all comments of authenticated users in thread will be published without moderation.';
 $_lang['tickets_prop_autoPublishGuest'] = 'If true, all comments of anonymous users in thread will be published without moderation.';
 $_lang['tickets_prop_formBefore'] = 'If true, commenting form will be placed before comments.';
-//$_lang['tickets_prop_dateFormat'] = 'The format of the dates displayed for a comment, with function date().';
+// $_lang['tickets_prop_dateFormat'] = 'The format of the dates displayed for a comment, with function date().';
 $_lang['tickets_prop_gravatarIcon'] = 'The default Gravatar icon to load if none is found for a user.';
 $_lang['tickets_prop_gravatarSize'] = 'The size, in pixels, of the Gravatar.';
 $_lang['tickets_prop_gravatarUrl'] = 'The URL of Gravatar';

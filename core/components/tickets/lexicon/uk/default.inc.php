@@ -1,9 +1,10 @@
 <?php
+
 /**
- *  Ukrainian Lexicon Entries for Tickets (by viktorminator)
+ *  Ukrainian Lexicon Entries for Tickets (by viktorminator).
  */
 
-include_once('setting.inc.php');
+include_once 'setting.inc.php';
 
 $_lang['tickets'] = 'Тікети';
 $_lang['comments'] = 'Коментарі';

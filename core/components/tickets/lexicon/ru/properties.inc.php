@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Properties Russian Lexicon Entries
  *
@@ -55,7 +56,7 @@ $_lang['tickets_prop_commentsDepth'] = 'Целое число, для указа
 $_lang['tickets_prop_autoPublish'] = 'Публиковать все новые комментарии авторизованных пользователей, без премодерации.';
 $_lang['tickets_prop_autoPublishGuest'] = 'Публиковать все новые комментарии анонимных пользователей, без премодерации.';
 $_lang['tickets_prop_formBefore'] = 'Расположить форму комментирования перед комментариями. По умолчанию - нет.';
-//$_lang['tickets_prop_dateFormat'] = 'Формат даты комментария, для функции date()';
+// $_lang['tickets_prop_dateFormat'] = 'Формат даты комментария, для функции date()';
 $_lang['tickets_prop_gravatarIcon'] = 'Если аватарка пользователя не найдена, грузить эту картинку на замену.';
 $_lang['tickets_prop_gravatarSize'] = 'Размер загружаемого аватара';
 $_lang['tickets_prop_gravatarUrl'] = 'Адрес для загрузки аватаров';

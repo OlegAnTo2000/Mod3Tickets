@@ -1,9 +1,7 @@
 <?php
+
 /**
- * Russian permissions Lexicon Entries for Tickets
- *
- * @package tickets
- * @subpackage lexicon
+ * Russian permissions Lexicon Entries for Tickets.
  */
 $_lang['ticket_save'] = 'Дозволяє створення\зміну тікету.';
 $_lang['ticket_delete'] = 'Дозволяє видалити свій тікет.';

@@ -1,9 +1,10 @@
 <?php
+
 /**
- * Default English Lexicon Entries for Tickets
+ * Default English Lexicon Entries for Tickets.
  */
 
-include_once('setting.inc.php');
+include_once 'setting.inc.php';
 
 $_lang['tickets'] = 'Tickets';
 $_lang['comments'] = 'Comments';

@@ -19,10 +19,11 @@ class TicketsSectionUpdateProcessor extends modResourceUpdateProcessor
 			return $this->modx->lexicon($this->objectType . '_err_ns');
 		}
 
-		if (!$this->modx->getCount($this->classKey, [
-			'id' => $primaryKey,
-			'class_key' => $this->classKey,
-		]) && $res = $this->modx->getObject('modResource', ['id' => $primaryKey])
+		if (
+			!$this->modx->getCount($this->classKey, [
+				'id' => $primaryKey,
+				'class_key' => $this->classKey,
+			]) && $res = $this->modx->getObject(modResource::class, ['id' => $primaryKey])
 		) {
 			$res->set('class_key', $this->classKey);
 			$res->save();

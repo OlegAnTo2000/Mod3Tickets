@@ -1,8 +1,8 @@
 <?php
-/**
- * Settings English Lexicon Entries
- */
 
+/**
+ * Settings English Lexicon Entries.
+ */
 $_lang['area_tickets.main'] = 'Main';
 $_lang['area_tickets.section'] = 'Tickets section';
 $_lang['area_tickets.ticket'] = 'Ticket';
@@ -45,7 +45,6 @@ $_lang['setting_tickets.unpublished_ticket_page_desc'] = 'Id of existing MODX re
 $_lang['setting_tickets.ticket_max_cut'] = 'The maximum size of the text without cut';
 $_lang['setting_tickets.ticket_max_cut_desc'] = 'Максимальное количество символов без тегов, которые можно сохранить без тега cut.';
 
-
 $_lang['setting_tickets.snippet_prepare_comment'] = 'Snippet for comment prepare';
 $_lang['setting_tickets.snippet_prepare_comment_desc'] = 'Special snippet, that will prepare all comments before returning to frontend. It will be called in class "Tickets" and will be able to use all it methods and variables.';
 $_lang['setting_tickets.comment_edit_time'] = 'Time to edit';
@@ -70,10 +69,10 @@ $_lang['setting_tickets.count_guests_desc'] = 'When enabled, component will coun
 $_lang['setting_tickets.max_files_upload'] = 'Limit max file uploads';
 $_lang['setting_tickets.max_files_upload_desc'] = 'Max files count which allow to upload for current user. 0 - unlimited.';
 
-//$_lang['setting_tickets.section_id_as_alias'] = 'Use id of section as alias';
-//$_lang['setting_tickets.section_id_as_alias_desc'] = 'If true, aliases for friendly urls of sections will don`t be generated. Id will be set as alias.';
-//$_lang['setting_tickets.ticket_id_as_alias'] = 'Use id of ticket as alias';
-//$_lang['setting_tickets.ticket_id_as_alias_desc'] = 'If true, aliases for friendly urls of tickets will don`t be generated. Id will be set as alias.';
+// $_lang['setting_tickets.section_id_as_alias'] = 'Use id of section as alias';
+// $_lang['setting_tickets.section_id_as_alias_desc'] = 'If true, aliases for friendly urls of sections will don`t be generated. Id will be set as alias.';
+// $_lang['setting_tickets.ticket_id_as_alias'] = 'Use id of ticket as alias';
+// $_lang['setting_tickets.ticket_id_as_alias_desc'] = 'If true, aliases for friendly urls of tickets will don`t be generated. Id will be set as alias.';
 
 $_lang['setting_mgr_tree_icon_ticket'] = 'Icon of ticket';
 $_lang['setting_mgr_tree_icon_ticket_desc'] = 'Icon of ticket in the resource tree.';
@@ -88,4 +87,3 @@ $_lang['tickets.source_maxUploadWidth_desc'] = 'Maximum width of image for uploa
 $_lang['tickets.source_maxUploadHeight_desc'] = 'Maximum height of image for upload. All images, that exceeds this parameter, will be resized to fit.';
 $_lang['tickets.source_maxUploadSize_desc'] = 'Maximum size of file for upload (in bytes).';
 $_lang['tickets.source_imageNameType_desc'] = 'This setting specifies how to rename a file after upload. Hash is the generation of a unique name depending on the contents of the file. Friendly - generation behalf of the algorithm friendly URLs of pages of the site (they are managed by system settings).';
-

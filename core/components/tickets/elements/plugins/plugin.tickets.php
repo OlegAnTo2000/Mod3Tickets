@@ -1,13 +1,12 @@
 <?php
 
-use Tickets\Model\Ticket;
 use MODX\Revolution\modX;
+use Tickets\Model\Ticket;
 use Tickets\Model\TicketAuthor;
 use Tickets\Model\TicketsSection;
 
 /** @var modX $modx */
 switch ($modx->event->name) {
-
 	case 'OnSiteRefresh':
 		if ($modx->cacheManager->refresh(['default/tickets' => []])) {
 			$modx->log(modX::LOG_LEVEL_INFO, $modx->lexicon('refresh_default') . ': Tickets');
@@ -16,50 +15,50 @@ switch ($modx->event->name) {
 
 	case 'OnDocFormSave':
 		/** @var Ticket $resource */
-		if ($mode == 'new' && $resource->class_key == Ticket::class) {
+		if ('new' == $mode && Ticket::class == $resource->class_key) {
 			$modx->cacheManager->delete('tickets/latest.tickets');
 		}
 		break;
 
 	case 'OnWebPagePrerender':
 		$output = &$modx->resource->_output;
-		$output = str_replace(
-			array('*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'),
-			array('[', ']', '{', '}'),
+		$output = \str_replace(
+			['*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'],
+			['[', ']', '{', '}'],
 			$output
 		);
 		break;
 
 	case 'OnPageNotFound':
 		// It is working only with friendly urls enabled
-		$q = trim(@$_REQUEST[$modx->context->getOption('request_param_alias', 'q')]);
-		$matches = explode('/', rtrim($q, '/'));
-		if (count($matches) < 2) {
+		$q = \trim(@$_REQUEST[$modx->context->getOption('request_param_alias', 'q')]);
+		$matches = \explode('/', \rtrim($q, '/'));
+		if (\count($matches) < 2) {
 			return;
 		}
 
-		$ticket_uri = array_pop($matches);
-		$section_uri = implode('/', $matches) . '/';
+		$ticket_uri = \array_pop($matches);
+		$section_uri = \implode('/', $matches) . '/';
 
 		if ($section_id = $modx->findResource($section_uri)) {
 			/** @var TicketsSection $section */
-			if ($section = $modx->getObject(TicketsSection::class, array('id' => $section_id))) {
-				if (is_numeric($ticket_uri)) {
+			if ($section = $modx->getObject(TicketsSection::class, ['id' => $section_id])) {
+				if (\is_numeric($ticket_uri)) {
 					$ticket_id = $ticket_uri;
-				} elseif (preg_match('#^\d+#', $ticket_uri, $tmp)) {
+				} elseif (\preg_match('#^\d+#', $ticket_uri, $tmp)) {
 					$ticket_id = $tmp[0];
 				} else {
 					$properties = $section->getProperties('tickets');
-					if (!empty($properties['uri']) && strpos($properties['uri'], '%id') !== false) {
-						$pcre = str_replace('%id', '([0-9]+)', $properties['uri']);
-						$pcre = preg_replace('#(\%[a-z]+)#', '(?:.*?)', $pcre);
-						if (@preg_match('#' . trim($pcre, '/') . '#', $ticket_uri, $matches)) {
+					if (!empty($properties['uri']) && false !== \strpos($properties['uri'], '%id')) {
+						$pcre = \str_replace('%id', '([0-9]+)', $properties['uri']);
+						$pcre = \preg_replace('#(\%[a-z]+)#', '(?:.*?)', $pcre);
+						if (@\preg_match('#' . \trim($pcre, '/') . '#', $ticket_uri, $matches)) {
 							$ticket_id = $matches[1];
 						}
 					}
 				}
 				if (!empty($ticket_id)) {
-					if ($ticket = $modx->getObject(Ticket::class, array('id' => $ticket_id, 'deleted' => 0))) {
+					if ($ticket = $modx->getObject(Ticket::class, ['id' => $ticket_id, 'deleted' => 0])) {
 						if ($ticket->published) {
 							$modx->sendRedirect($modx->makeUrl($ticket_id), ['responseCode' => 'HTTP/1.1 301 Moved Permanently']);
 						} elseif ($unp_id = $modx->getOption('tickets.unpublished_ticket_page')) {
@@ -83,9 +82,9 @@ switch ($modx->event->name) {
 			if (!empty($_SESSION[$key])) {
 				$guest_key = $_SESSION[$key];
 			} else {
-				$guest_key = $_SESSION[$key] = md5(rand() . time() . rand());
+				$guest_key = $_SESSION[$key] = \md5(\rand() . \time() . \rand());
 			}
-			setcookie($key, $guest_key, time() + (86400 * 365), '/');
+			\setcookie($key, $guest_key, \time() + (86400 * 365), '/');
 		} else {
 			$guest_key = $_COOKIE[$key];
 		}
@@ -100,7 +99,7 @@ switch ($modx->event->name) {
 				$profile = $modx->newObject(TicketAuthor::class);
 				$modx->user->addOne($profile);
 			}
-			$profile->set('visitedon', time());
+			$profile->set('visitedon', \time());
 			$profile->save();
 		}
 		break;
@@ -113,7 +112,7 @@ switch ($modx->event->name) {
 
 	case 'OnUserSave':
 		/** @var modUser $user */
-		if ($mode == 'new' && $user && !$user->getOne('AuthorProfile')) {
+		if ('new' == $mode && $user && !$user->getOne('AuthorProfile')) {
 			$profile = $modx->newObject('TicketAuthor');
 			$user->addOne($profile);
 			$profile->save();

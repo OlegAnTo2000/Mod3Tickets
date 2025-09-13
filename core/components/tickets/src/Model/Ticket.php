@@ -223,7 +223,7 @@ class Ticket extends modResource
 		$properties = $this->getProperties();
 
 		if (!$properties['disable_jevix']) {
-			$content = $this->Jevix($content, false);
+			$content = $this->sanitizeText($content, false);
 		}
 		if (!$properties['process_tags']) {
 			$content = str_replace(
@@ -249,7 +249,7 @@ class Ticket extends modResource
 	{
 		/** @var Tickets $Tickets */
 		if ($Tickets = $this->xpdo->getService('Tickets')) {
-			return $Tickets->Jevix($text, 'Ticket', $replaceTags);
+			return $Tickets->sanitizeText($text, $replaceTags);
 		}
 
 		return 'Error on loading class "Tickets".';
@@ -276,7 +276,7 @@ class Ticket extends modResource
 			$tmp = explode('<cut/>', $content);
 			$introtext = reset($tmp);
 			if ($jevix) {
-				$introtext = $this->Jevix($introtext);
+				$introtext = $this->sanitizeText($introtext);
 			}
 		}
 
@@ -495,7 +495,7 @@ class Ticket extends modResource
 			$alias = $this->get('alias');
 		}
 		/** @var TicketsSection $section */
-		if ($section = $this->xpdo->getObject('TicketsSection', $this->get('parent'))) {
+		if ($section = $this->xpdo->getObject(TicketsSection::class, $this->get('parent'))) {
 			$properties = $section->getProperties();
 		} else {
 			return false;
@@ -637,10 +637,10 @@ class Ticket extends modResource
 		$save = parent::save();
 
 		/** @var TicketAuthor $profile */
-		if ($new_author && $profile = $this->xpdo->getObject('TicketAuthor', $this->_oldAuthor)) {
+		if ($new_author && $profile = $this->xpdo->getObject(TicketAuthor::class, $this->_oldAuthor)) {
 			$profile->removeAction('ticket', $this->id, $this->get('createdby'));
 		}
-		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+		if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('createdby'))) {
 			if (($action || $new_author) && $enabled) {
 				$profile->addAction('ticket', $this->id, $this->id, $this->get('createdby'));
 			} elseif (!$enabled) {
@@ -666,15 +666,15 @@ class Ticket extends modResource
 		}
 
 		/** @var TicketAuthor $profile */
-		if ($profile = $this->xpdo->getObject('TicketAuthor', $this->get('createdby'))) {
+		if ($profile = $this->xpdo->getObject(TicketAuthor::class, $this->get('createdby'))) {
 			$profile->removeAction('ticket', $this->id, $this->get('createdby'));
 		}
 
 		/** @var TicketTotal $total */
-		if ($total = $this->xpdo->getObject('TicketTotal', ['id' => $this->id, 'class' => 'Ticket'])) {
+		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->id, 'class' => 'Ticket'])) {
 			$total->remove();
 		}
-		if ($total = $this->xpdo->getObject('TicketTotal', ['id' => $this->parent, 'class' => 'TicketsSection'])) {
+		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->parent, 'class' => 'TicketsSection'])) {
 			$total->set('children', $total->get('children') - 1);
 			$total->save();
 		}

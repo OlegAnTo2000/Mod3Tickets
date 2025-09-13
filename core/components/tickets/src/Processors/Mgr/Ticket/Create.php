@@ -71,7 +71,7 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 			$introtext = $this->object->getIntroText($this->getProperty('content'), false);
 		}
 		if (empty($properties['disable_jevix'])) {
-			$introtext = $this->object->Jevix($introtext);
+			$introtext = $this->object->sanitizeText($introtext);
 		}
 
 		$createdon = \time();
@@ -159,7 +159,7 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 			if (!empty($sections) && !\in_array($parentId, $sections, true)) {
 				return $this->modx->lexicon('ticket_err_wrong_parent');
 			}
-			$this->parentResource = $this->modx->getObject('TicketsSection', $parentId);
+			$this->parentResource = $this->modx->getObject(TicketsSection::class, $parentId);
 			if ($this->parentResource) {
 				if ('TicketsSection' != $this->parentResource->get('class_key')) {
 					return $this->modx->lexicon('ticket_err_wrong_parent');
@@ -183,10 +183,10 @@ class TicketCreateProcessor extends modResourceCreateProcessor
 	{
 		/** @var TicketsSection $section */
 		if ($this->getProperty('published')) {
-			if ($section = $this->modx->getObject('TicketsSection', $this->object->get('parent'))) {
+			if ($section = $this->modx->getObject(TicketsSection::class, $this->object->get('parent'))) {
 				$ratings = $section->getProperties('ratings');
 				if (isset($ratings['min_ticket_create']) && '' !== $ratings['min_ticket_create']) {
-					if ($profile = $this->modx->getObject('TicketAuthor', $this->object->get('createdby'))) {
+					if ($profile = $this->modx->getObject(TicketAuthor::class, $this->object->get('createdby'))) {
 						$min = (float) $ratings['min_ticket_create'];
 						$rating = $profile->get('rating');
 						if ($rating < $min) {

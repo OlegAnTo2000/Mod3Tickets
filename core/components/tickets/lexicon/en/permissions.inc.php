@@ -1,9 +1,7 @@
 <?php
+
 /**
- * English permissions Lexicon Entries for Tickets
- *
- * @package tickets
- * @subpackage lexicon
+ * English permissions Lexicon Entries for Tickets.
  */
 $_lang['ticket_save'] = 'Permission for save\update ticket.';
 $_lang['ticket_delete'] = 'Permission for delete own ticket.';

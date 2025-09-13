@@ -21,13 +21,13 @@ class GetList extends \MODX\Revolution\Processors\Model\GetListProcessor
 	public function beforeQuery()
 	{
 		$target = intval($this->getProperty('parents'));
-		if ($section = $this->modx->getObject('TicketsSection', $target, false)) {
+		if ($section = $this->modx->getObject(TicketsSection::class, $target, false)) {
 			$properties = $section->get('properties');
 		}
 
 		$this->subscribers = !empty($properties['subscribers'])
-		? $properties['subscribers']
-		: [];
+			? $properties['subscribers']
+			: [];
 
 		return true;
 	}

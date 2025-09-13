@@ -1,4 +1,5 @@
 <?php
 
-class TicketDataManagerController extends ResourceDataManagerController {
+class TicketDataManagerController extends ResourceDataManagerController
+{
 }
