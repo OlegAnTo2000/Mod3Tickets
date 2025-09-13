@@ -9,86 +9,88 @@ use \xPDO\Om\xPDOObject;
 
 class TicketCommentUnpublishProcessor extends UpdateProcessor
 {
-    /** @var TicketComment $object */
-    public $object;
-    public $objectType = 'Tickets\TicketComment';
-    public $classKey = 'Tickets\TicketComment';
-    public $languageTopics = array('tickets:default');
-    public $beforeSaveEvent = 'OnBeforeCommentUnpublish';
-    public $afterSaveEvent = 'OnCommentUnpublish';
-    public $permission = 'comment_publish';
-    protected $_sendEmails = false;
+	/** @var TicketComment $object */
+	public $object;
+	public $objectType = 'Tickets\Model\TicketComment';
+	public $classKey = 'Tickets\Model\TicketComment';
+	public $languageTopics = array('tickets:default');
+	public $beforeSaveEvent = 'OnBeforeCommentUnpublish';
+	public $afterSaveEvent = 'OnCommentUnpublish';
+	public $permission = 'comment_publish';
+	protected $_sendEmails = false;
 
 
-    /**
-     *
-     */
-    public function beforeSet()
-    {
-        $this->properties = array();
+	/**
+	 *
+	 */
+	public function beforeSet()
+	{
+		$this->properties = array();
 
-        return true;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function beforeSave()
-    {
-        $this->object->set('published', 0);
-
-        return parent::beforeSave();
-    }
+		return true;
+	}
 
 
-    /**
-     * @return bool
-     */
-    public function afterSave()
-    {
-        $this->object->clearTicketCache();
-        /** @var TicketThread $thread */
-        if ($thread = $this->object->getOne('Tickets\TicketThread')) {
-            $thread->updateLastComment();
-        }
+	/**
+	 * @return bool
+	 */
+	public function beforeSave()
+	{
+		$this->object->set('published', 0);
 
-        $this->modx->cacheManager->delete('tickets/latest.comments');
-        $this->modx->cacheManager->delete('tickets/latest.tickets');
-
-        if ($this->_sendEmails) {
-            $this->sendCommentMails();
-        }
-
-        return parent::afterSave();
-    }
+		return parent::beforeSave();
+	}
 
 
-    /**
-     *
-     */
-    protected function sendCommentMails()
-    {
-        /** @var TicketThread $thread */
-        if ($thread = $this->object->getOne('Tickets\TicketThread')) {
-            /** @var Tickets $Tickets */
-            if ($Tickets = $this->modx->getService('Tickets')) {
-                $Tickets->config = $thread->get('properties');
-                $Tickets->sendCommentMails($this->object->toArray());
-            }
-        }
-    }
+	/**
+	 * @return bool
+	 */
+	public function afterSave()
+	{
+		$this->object->clearTicketCache();
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+			$thread->updateLastComment();
+		}
+
+		$this->modx->cacheManager->delete('tickets/latest.comments');
+		$this->modx->cacheManager->delete('tickets/latest.tickets');
+
+		if ($this->_sendEmails) {
+			$this->sendCommentMails();
+		}
+
+		return parent::afterSave();
+	}
 
 
-    /**
-     * @param string $action
-     */
-    public function logManagerAction($action = '')
-    {
-        $this->modx->logManagerAction($this->objectType . '_unpublish', $this->classKey,
-            $this->object->get($this->primaryKeyField));
-    }
+	/**
+	 *
+	 */
+	protected function sendCommentMails()
+	{
+		/** @var TicketThread $thread */
+		if ($thread = $this->object->getOne('Tickets\Model\TicketThread')) {
+			/** @var Tickets $Tickets */
+			if ($Tickets = $this->modx->getService('Tickets')) {
+				$Tickets->config = $thread->get('properties');
+				$Tickets->sendCommentMails($this->object->toArray());
+			}
+		}
+	}
 
+
+	/**
+	 * @param string $action
+	 */
+	public function logManagerAction($action = '')
+	{
+		$this->modx->logManagerAction(
+			$this->objectType . '_unpublish',
+			$this->classKey,
+			$this->object->get($this->primaryKeyField)
+		);
+	}
 }
 
 return 'TicketCommentUnpublishProcessor';
