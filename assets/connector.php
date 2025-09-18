@@ -1,9 +1,31 @@
 <?php
 
-/** @noinspection PhpIncludeInspection */
-require_once \dirname(\dirname(\dirname(\dirname(__FILE__)))) . '/config.core.php';
-/** @noinspection PhpIncludeInspection */
-require_once MODX_CORE_PATH . 'config/' . MODX_CONFIG_KEY . '.inc.php';
+\define('MODX_API_MODE', true);
+
+if (!defined('MODX_CORE_PATH')) {
+	if (file_exists('/modx/config.core.php')) {
+		require '/modx/config.core.php'; // for local development
+	} else {
+		$dir = __DIR__;
+		while (true) {
+			if ($dir === '/') break;
+			if (file_exists($dir . '/config.core.php')) {
+				require $dir . '/config.core.php';
+				break;
+			}
+			if (file_exists($dir . '/config/config.inc.php')) {
+				require $dir . '/config/config.inc.php';
+				break;
+			}
+			$dir = dirname($dir);
+		}
+	}
+	if (!defined('MODX_CORE_PATH')) {
+		exit('Access denied');
+	}
+	require_once MODX_CORE_PATH . '/vendor/autoload.php';
+}
+
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CONNECTORS_PATH . 'index.php';
 
