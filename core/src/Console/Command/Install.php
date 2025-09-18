@@ -74,6 +74,10 @@ class Install extends Command
 		$this->createPolicies($db);
 		$output->writeln("<info>Created access policies</info>");
 
+		// migrate
+		$this->migrate($db, $output);
+		$output->writeln("<info>Migrated database</info>");
+
 		$this->modx->getCacheManager()->refresh();
 		$output->writeln('<info>Cleared MODX cache</info>');
 	}
