@@ -1,0 +1,61 @@
+#!/usr/bin/env php
+<?php
+
+use xPDO\xPDO;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+
+error_reporting(E_ALL & ~E_DEPRECATED);
+
+// пути
+$root = dirname(__DIR__) . '/';
+$sources = [
+	'root'        => $root,
+	'source_core' => $root . 'core',
+	'src'         => $root . 'core/src',
+	'model'       => $root . 'core/src/Model',
+	'schema'      => $root . 'core/schema/',
+	'xml'         => $root . 'core/schema/extra.mysql.schema.xml',
+];
+unset($root);
+
+// липовое подключение (dsn / login / pass неважны, схема читается напрямую из xml)
+$xpdo = new xPDO(
+	dsn: 'mysql:host=127.0.0.1;dbname=fake;charset=utf8',
+	username: 'fake',
+	password: 'fake',
+	options: [],
+	driverOptions: []
+);
+
+$xpdo->setLogLevel(xPDO::LOG_LEVEL_INFO);
+$xpdo->setLogTarget('ECHO');
+
+// get generator directly
+$manager   = $xpdo->getManager();
+$generator = $manager->getGenerator();
+
+// remove old classes
+$pkgModelPath = $sources['model'] . '/mysql';
+if (is_dir($pkgModelPath)) {
+	$it = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator($pkgModelPath, RecursiveDirectoryIterator::SKIP_DOTS),
+		RecursiveIteratorIterator::CHILD_FIRST
+	);
+	foreach ($it as $file) {
+		$file->isDir() ? rmdir($file->getRealPath()) : unlink($file->getRealPath());
+	}
+	rmdir($pkgModelPath);
+}
+
+// generate new
+$generator->parseSchema(
+	$sources['xml'],
+	$sources['src'],
+	[
+		'namespacePrefix' => 'Tickets',
+		'update'          => 0,
+	]
+);
+
+echo "Model generated.\n";

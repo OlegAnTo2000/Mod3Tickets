@@ -2,15 +2,16 @@
 
 namespace Tickets\Console;
 
+use Throwable;
 use Tickets\App;
-use Tickets\Console\Command\Install;
-use Tickets\Console\Command\Remove;
 use MODX\Revolution\modX;
+use Tickets\Console\Command\Test;
+use Tickets\Console\Command\Remove;
+use Tickets\Console\Command\Install;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 
 class Console extends Application
 {
@@ -33,6 +34,7 @@ class Console extends Application
 			new ListCommand(),
 			new Install($this->modx),
 			new Remove($this->modx),
+			new Test($this->modx),
 		];
 	}
 }
