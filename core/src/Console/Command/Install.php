@@ -324,8 +324,7 @@ class Install extends Command
 		], [
 			'name'        => App::NAME,
 			'description' => '',
-			'plugincode'  => $this->getFileContent('core/elements/plugins/plugin.tickets.php'),
-			'static'      => false,
+			'static'      => true,
 			'source'      => 1,
 			'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/plugins/plugin.tickets.php',
 			'category'    => $this->getCategoryId(),
@@ -378,7 +377,7 @@ class Install extends Command
 			], [
 				'name'        => $name,
 				'description' => '',
-				'snippet'     => $this->getFileContent('core/elements/snippets/snippet.' . $file . '.php'),
+				'snippet'     => $this->getFileContent('snippets/snippet.' . $file . '.php'),
 				'static'      => false,
 				'source'      => 1,
 				'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/snippets/snippet.' . $file . '.php',
@@ -434,8 +433,7 @@ class Install extends Command
 			], [
 				'name'        => $name,
 				'description' => '',
-				'snippet'     => $this->getFileContent('core/elements/chunks/chunk.' . $file . '.tpl'),
-				'static'      => false,
+				'static'      => true,
 				'source'      => 1,
 				'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/chunks/chunk.' . $file . '.tpl',
 				'category'    => $this->getCategoryId(),
@@ -447,7 +445,7 @@ class Install extends Command
 
 	protected function getFileContent(string $path): string
 	{
-		$fullPath = dirname(__DIR__, 3) . '/' . $path;
+		$fullPath = MODX_CORE_PATH . 'components/' . strtolower(App::NAME) . '/elements/' . $path;
 		return file_exists($fullPath) ? file_get_contents($fullPath) : '';
 	}
 
