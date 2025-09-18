@@ -7,7 +7,8 @@
 		"modx-pro/pdotools": "dev-3x-new",
 		"phpstan/phpstan": "^2.1",
 		"rector/rector": "^2.1",
-		"friendsofphp/php-cs-fixer": "^3.87"
+		"friendsofphp/php-cs-fixer": "^3.87",
+		"phpunit/phpunit": "12"
 	},
 	"repositories": [
 		{
@@ -44,14 +45,19 @@
 		}
 	},
 	"require": {
-		"symfony/html-sanitizer": "^7.3"
+		"symfony/html-sanitizer": "^7.3",
+		"php-di/slim-bridge": "^3.4",
+		"php-di/php-di": "^7.1",
+		"psr/container": "^2.0",
+		"slim/slim": "^4.15"
 	},
 	"autoload": {
     "psr-4": {
-      "Tickets\\": "core/components/tickets/src/"
+      "Tickets\\": "core/src/"
     }
   },
 	"scripts": {
+		"test": "phpunit",
 		"phpstan": "phpstan analyse --error-format=raw --no-progress --memory-limit=8G",
 		"rector": "rector process --no-progress",
 		"rector-dry": "rector process --no-progress --dry-run",

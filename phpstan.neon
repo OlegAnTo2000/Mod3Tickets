@@ -1,5 +1,10 @@
 parameters:
+	tmpDir: null
 	level: 0
 	paths:
-		- core/components/tickets
-		- assets/components/tickets
+		- core
+		- assets
+	excludePaths:
+		analyse:
+			- */vendor/*
+			- */vendor/**/*
