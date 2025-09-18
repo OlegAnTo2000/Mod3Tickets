@@ -43,6 +43,9 @@ if (!defined('MODX_CORE_PATH')) {
 $modx = new modX();
 $modx->initialize();
 
+if (!isset($modx)) exit('Access denied');
+if (!($modx instanceof modX)) exit('Access denied');
+
 $modx->services->add('error', modError::class);
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
@@ -80,9 +83,6 @@ if ('web' != $context) {
 /** @var Tickets $Tickets */
 \define('MODX_ACTION_MODE', true);
 $Tickets = \tickets_service($modx, $properties);
-if ($modx->error->hasError() || !($Tickets instanceof Tickets)) {
-	exit('Error');
-}
 
 switch ($action) {
 	case 'comment/preview':
@@ -149,9 +149,7 @@ switch ($action) {
 		$response = $Tickets->fileSort($_POST['rank']);
 		break;
 	default:
-		$message = $_REQUEST['action'] != $action
-			? 'tickets_err_register_globals'
-			: 'tickets_err_unknown';
+		$message = $_REQUEST['action'] != $action ? 'tickets_err_register_globals' : 'tickets_err_unknown';
 		$response = \json_encode([
 			'success' => false,
 			'message' => $modx->lexicon($message),
