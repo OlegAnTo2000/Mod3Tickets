@@ -3,7 +3,9 @@
 namespace Tickets\Console\Command;
 
 use Tickets\App;
+use Phinx\Config\Config;
 use MODX\Revolution\modX;
+use Phinx\Migration\Manager;
 use MMX\Database\Models\Menu;
 use MMX\Database\Models\Chunk;
 use Phinx\Wrapper\TextWrapper;
@@ -18,7 +20,9 @@ use MMX\Database\Models\SystemSetting;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\StringInput;
 
 class Install extends Command
 {
@@ -565,26 +569,26 @@ class Install extends Command
 	{
 		$phinxMigrationsPath = App::VENDOR_PATH . '/core/db/migrations';
 		$connection = $db->getConnection();
-		$config    = [
+
+		$configArray = [
 			'paths' => [
 				'migrations' => $phinxMigrationsPath,
-			],
-			'templates' => [
-				'style' => 'up_down',
 			],
 			'environments' => [
 				'default_migration_table' => $connection->getConfig()['prefix'] . 'tickets_phinx_migrations',
 				'default_environment'     => 'local',
 				'local' => [
-					'name' => $connection->getConfig()['database'],
+					'name'       => $connection->getConfig()['database'],
 					'connection' => $connection->getPdo(),
 				],
 			],
 		];
+
 		$output->writeln('<info>Run Phinx migrations</info>');
-		$phinx = new TextWrapper(new PhinxApplication(), ['configuration' => $config]);
-		if ($res = $phinx->getMigrate('local')) {
-			$output->writeln(explode(PHP_EOL, $res));
-		}
+
+		$config  = new Config($configArray);
+		$manager = new Manager($config, new StringInput(' '), $output);
+
+		$manager->migrate('local');
 	}
 }
