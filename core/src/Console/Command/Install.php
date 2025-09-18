@@ -92,6 +92,8 @@ class Install extends Command
 			} else {
 				$output->writeln("<error>Failed to create symlink to $vendorPath/core in $corePath</error>");
 			}
+		} else {
+			$output->writeln("<info>Symlink to $vendorPath/core in $corePath already exists</info>");
 		}
 		if (!is_dir($assetsPath)) {
 			if (symlink($vendorPath . '/assets', $assetsPath)) {
@@ -99,6 +101,8 @@ class Install extends Command
 			} else {
 				$output->writeln("<error>Failed to create symlink to $vendorPath/assets in $assetsPath</error>");
 			}
+		} else {
+			$output->writeln("<info>Symlink to $vendorPath/assets in $assetsPath already exists</info>");
 		}
 	}
 
