@@ -624,12 +624,8 @@ class Tickets
 					);
 				}
 			}
-			$data['name'] = !empty($data['name'])
-				? $data['name']
-				: '';
-			$data['email'] = !empty($data['email'])
-				? $data['email']
-				: '';
+			$data['name'] = !empty($data['name']) ? $data['name'] : '';
+			$data['email'] = !empty($data['email']) ? $data['email'] : '';
 		}
 		unset($data['rating'], $data['rating_plus'], $data['rating_minus']);
 

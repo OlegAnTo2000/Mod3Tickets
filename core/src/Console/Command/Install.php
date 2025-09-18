@@ -5,15 +5,17 @@ namespace Tickets\Console\Command;
 use Tickets\App;
 use MODX\Revolution\modX;
 use MMX\Database\Models\Menu;
+use MMX\Database\Models\Chunk;
+use Phinx\Wrapper\TextWrapper;
+use MMX\Database\Models\Plugin;
+use MMX\Database\Models\Snippet;
 use MMX\Database\Models\Category;
 use MMX\Database\Models\Namespaces;
-use MMX\Database\Models\SystemSetting;
-use MMX\Database\Models\Plugin;
+use Phinx\Console\PhinxApplication;
 use MMX\Database\Models\PluginEvent;
-use MMX\Database\Models\Snippet;
-use MMX\Database\Models\Chunk;
-use Illuminate\Database\Eloquent\Model;
 use MODX\Revolution\modAccessPolicy;
+use MMX\Database\Models\SystemSetting;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -552,6 +554,33 @@ class Install extends Command
 			$policy->set('data', json_encode($data['data']));
 			$policy->set('lexicon', strtolower(App::NAME) . ':permissions');
 			$policy->save();
+		}
+	}
+
+	protected function migrate(\MMX\Database\App $db, OutputInterface $output): void
+	{
+		$phinxMigrationsPath = App::VENDOR_PATH . '/core/db/migrations';
+		$connection = $db->getConnection();
+		$config    = [
+			'paths' => [
+				'migrations' => $phinxMigrationsPath,
+			],
+			'templates' => [
+				'style' => 'up_down',
+			],
+			'environments' => [
+				'default_migration_table' => $connection->getConfig()['prefix'] . 'tickets_phinx_migrations',
+				'default_environment'     => 'local',
+				'local' => [
+					'name' => $connection->getConfig()['database'],
+					'connection' => $connection->getPdo(),
+				],
+			],
+		];
+		$output->writeln('<info>Run Phinx migrations</info>');
+		$phinx = new TextWrapper(new PhinxApplication(), ['configuration' => $config]);
+		if ($res = $phinx->getMigrate('local')) {
+			$output->writeln(explode(PHP_EOL, $res));
 		}
 	}
 }
