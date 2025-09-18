@@ -324,7 +324,7 @@ class Install extends Command
 		], [
 			'name'        => App::NAME,
 			'description' => '',
-			'plugincode'  => $this->getFileContent('plugins/plugin.tickets.php'),
+			'plugincode'  => $this->getSnippetOrPluginContent('plugins/plugin.tickets.php'),
 			'static'      => false,
 			'source'      => 0,
 			'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/plugins/plugin.tickets.php',
@@ -378,7 +378,7 @@ class Install extends Command
 			], [
 				'name'        => $name,
 				'description' => '',
-				'snippet'     => $this->getFileContent('snippets/snippet.' . $file . '.php'),
+				'snippet'     => $this->getSnippetOrPluginContent('snippets/snippet.' . $file . '.php'),
 				'static'      => false,
 				'source'      => 0,
 				'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/snippets/snippet.' . $file . '.php',
@@ -449,6 +449,19 @@ class Install extends Command
 	{
 		$fullPath = MODX_CORE_PATH . 'components/' . strtolower(App::NAME) . '/elements/' . $path;
 		return file_exists($fullPath) ? file_get_contents($fullPath) : '';
+	}
+
+	/**
+	 * Return content of snippet or plugin file without php tags (modx db store plugins and snippets files without php tags)
+	 *
+	 * @param string $path
+	 * @return string
+	 */
+	protected function getSnippetOrPluginContent(string $path): string
+	{
+		$file = trim($this->getFileContent($path));
+		preg_match('#\<\?php(.*)#is', $file, $data);
+		return rtrim(rtrim(trim($data[1]), '?>'));
 	}
 
 	protected function getCategoryId(): int
