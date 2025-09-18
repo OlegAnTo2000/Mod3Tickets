@@ -29,14 +29,7 @@ class Install extends Command
 		$corePath = App::CORE_PATH;
 		$assetsPath = App::ASSETS_PATH;
 
-		if (!is_dir($corePath)) {
-			symlink($vendorPath . '/core', $corePath);
-			$output->writeln('<info>Created symlink to ' . $vendorPath . '/core in ' . $corePath . '</info>');
-		}
-		if (!is_dir($assetsPath)) {
-			symlink($vendorPath . '/assets', $assetsPath);
-			$output->writeln('<info>Created symlink to ' . $vendorPath . '/assets in ' . $assetsPath . '</info>');
-		}
+		$this->createSymlinks($vendorPath, $corePath, $assetsPath, $output);
 
 		$db = new \MMX\Database\App($this->modx);
 
@@ -55,6 +48,24 @@ class Install extends Command
 
 		$this->modx->getCacheManager()->refresh();
 		$output->writeln('<info>Cleared MODX cache</info>');
+	}
+
+	protected function createSymlinks(string $vendorPath, string $corePath, string $assetsPath, OutputInterface $output): void
+	{
+		if (!is_dir($corePath)) {
+			if (symlink($vendorPath . '/core', $corePath, true)) {
+				$output->writeln("<info>Created symlink to $vendorPath/core in $corePath</info>");
+			} else {
+				$output->writeln("<error>Failed to create symlink to $vendorPath/core in $corePath</error>");
+			}
+		}
+		if (!is_dir($assetsPath)) {
+			if (symlink($vendorPath . '/assets', $assetsPath, true)) {
+				$output->writeln("<info>Created symlink to $vendorPath/assets in $assetsPath</info>");
+			} else {
+				$output->writeln("<error>Failed to create symlink to $vendorPath/assets in $assetsPath</error>");
+			}
+		}
 	}
 
 	protected function createNamespace(\MMX\Database\App $db): Namespaces
