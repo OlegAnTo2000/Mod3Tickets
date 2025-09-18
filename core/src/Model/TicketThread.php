@@ -8,6 +8,7 @@ use function in_array;
 use function is_array;
 
 use PDO;
+use Tickets\Model\TicketComment;
 use xPDO\Om\xPDOSimpleObject;
 
 /**

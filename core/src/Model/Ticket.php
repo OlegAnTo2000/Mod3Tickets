@@ -21,6 +21,11 @@ use function microtime;
 use MODX\Revolution\modAccessibleObject;
 use MODX\Revolution\modContentType;
 use MODX\Revolution\modResource;
+use Tickets\Model\TicketAuthorAction;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketVote;
 use PDO;
 
 use function preg_match;
@@ -387,7 +392,7 @@ class Ticket extends modResource
 	 */
 	public function getStarsCount()
 	{
-		return $this->xpdo->getCount('TicketStar', ['id' => $this->id, 'class' => 'Ticket']);
+		return $this->xpdo->getCount(TicketStar::class, ['id' => $this->id, 'class' => Ticket::class]);
 	}
 
 	/**
@@ -413,11 +418,11 @@ class Ticket extends modResource
 	 */
 	public function getVote()
 	{
-		$q = $this->xpdo->newQuery('TicketVote');
+		$q = $this->xpdo->newQuery(TicketVote::class);
 		$q->where([
 			'id'        => $this->id,
 			'createdby' => $this->xpdo->user->id,
-			'class'     => 'Ticket',
+			'class'     => Ticket::class,
 		]);
 		$q->select('`value`');
 
@@ -441,10 +446,10 @@ class Ticket extends modResource
 	{
 		$rating = ['rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0];
 
-		$q = $this->xpdo->newQuery('TicketVote');
-		$q->innerJoin('Ticket', 'Ticket', 'Ticket.id = TicketVote.id');
+		$q = $this->xpdo->newQuery(TicketVote::class);
+		$q->innerJoin(Ticket::class, 'Ticket', 'Ticket.id = TicketVote.id');
 		$q->where([
-			'class'            => 'Ticket',
+			'class'            => Ticket::class,
 			'id'               => $this->id,
 			'Ticket.deleted'   => 0,
 			'Ticket.published' => 1,
@@ -653,7 +658,7 @@ class Ticket extends modResource
 	 */
 	public function remove(array $ancestors = [])
 	{
-		$collection = $this->xpdo->getIterator('TicketThread', ['name' => 'resource-' . $this->id]);
+		$collection = $this->xpdo->getIterator(TicketThread::class, ['name' => 'resource-' . $this->id]);
 		/** @var TicketThread $item */
 		foreach ($collection as $item) {
 			$item->remove();
@@ -665,10 +670,10 @@ class Ticket extends modResource
 		}
 
 		/** @var TicketTotal $total */
-		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->id, 'class' => 'Ticket'])) {
+		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->id, 'class' => Ticket::class])) {
 			$total->remove();
 		}
-		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->parent, 'class' => 'TicketsSection'])) {
+		if ($total = $this->xpdo->getObject(TicketTotal::class, ['id' => $this->parent, 'class' => TicketsSection::class])) {
 			$total->set('children', $total->get('children') - 1);
 			$total->save();
 		}
@@ -687,12 +692,16 @@ class Ticket extends modResource
 
 		/** @var TicketsSection $section */
 		$ratings = $section->getProperties('ratings');
-		$table   = $this->xpdo->getTableName('TicketAuthorAction');
+		$table   = $this->xpdo->getTableName(TicketAuthorAction::class);
 		foreach ($ratings as $action => $rating) {
 			$sql = "
-                UPDATE {$table} SET `rating` = `multiplier` * {$rating}, `section` = {$section->id}
-                WHERE `ticket` = {$this->id} AND `action` = '{$action}';
-            ";
+				UPDATE {$table} SET 
+					`rating` = `multiplier` * {$rating}, 
+					`section` = '{$section->id}'
+				WHERE 
+					`ticket` = '{$this->id}' 
+					AND `action` = '{$action}';
+			";
 			$this->xpdo->exec($sql);
 		}
 

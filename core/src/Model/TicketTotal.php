@@ -2,6 +2,11 @@
 
 namespace Tickets\Model;
 
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketsSection;
+
 class TicketTotal extends \xPDO\Om\xPDOObject
 {
 	/**
@@ -50,7 +55,7 @@ class TicketTotal extends \xPDO\Om\xPDOObject
 					];
 				}
 				break;
-			case 'TicketsSection':
+			case TicketsSection::class:
 				/** @var TicketsSection $section */
 				if ($section = $this->xpdo->getObject(TicketsSection::class, $id)) {
 					$rating = $section->getRating();

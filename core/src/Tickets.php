@@ -539,14 +539,14 @@ class Tickets
 
 		// Additional properties
 		$properties = [];
-		$meta       = $this->modx->getFieldMeta('TicketComment');
+		$meta       = $this->modx->getFieldMeta(TicketComment::class);
 		foreach ($data as $k => $v) {
 			if (!isset($meta[$k])) {
 				$properties[$k] = $this->modx->stripTags($v);
 			}
 		}
 		// Create comment
-		$comment = $this->modx->newObject('TicketComment', [
+		$comment = $this->modx->newObject(TicketComment::class, [
 			'text'       => $this->sanitizeText($data['text'], true),
 			'createdon'  => date('Y-m-d H:i:s'),
 			'createdby'  => $this->modx->user->id,
@@ -866,12 +866,12 @@ class Tickets
 		} elseif ($thread = $this->modx->getObject(TicketThread::class, ['name' => $name])) {
 			if (
 				$this->authenticated && $view = $this->modx->getObject(
-					'TicketView',
+					TicketView::class,
 					['uid' => $this->modx->user->id, 'parent' => $thread->get('resource')]
 				)
 			) {
 				$date = $view->get('timestamp');
-				$q    = $this->modx->newQuery('TicketComment');
+				$q    = $this->modx->newQuery(TicketComment::class);
 				$q->leftJoin(modUser::class, 'User', '`User`.`id` = `TicketComment`.`createdby`');
 				$q->leftJoin(modUserProfile::class, 'Profile', '`Profile`.`internalKey` = `TicketComment`.`createdby`');
 				$q->where([
@@ -1065,7 +1065,7 @@ class Tickets
 		if (isset($node['resource']) && 0 === $this->last_view) {
 			if (
 				$this->authenticated && $view = $this->modx->getObject(
-					'TicketView',
+					TicketView::class,
 					['parent' => $node['resource'], 'uid' => $this->modx->user->id]
 				)
 			) {
@@ -1632,7 +1632,7 @@ class Tickets
 			$guest_key = $_SESSION[$key];
 		} else {
 			if (!empty($_SESSION[$key])) {
-				$table = $this->modx->getTableName('TicketView');
+				$table = $this->modx->getTableName(TicketView::class);
 				$this->modx->exec("DELETE FROM {$table} WHERE `uid` = 0 AND `guest_key` = '{$_SESSION[$key]}' AND `parent` = {$resource};");
 			}
 			$guest_key = '';

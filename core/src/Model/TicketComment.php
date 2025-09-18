@@ -8,6 +8,9 @@ use function method_exists;
 
 use MODX\Revolution\modResource;
 use PDO;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketThread;
 use xPDO\Om\xPDOSimpleObject;
 
 /**
@@ -140,7 +143,7 @@ class TicketComment extends xPDOSimpleObject
 	{
 		$rating = ['rating' => 0, 'rating_plus' => 0, 'rating_minus' => 0];
 
-		$q = $this->xpdo->newQuery('TicketVote', ['id' => $this->id, 'class' => 'TicketComment']);
+		$q = $this->xpdo->newQuery(TicketVote::class, ['id' => $this->id, 'class' => TicketComment::class]);
 		$q->select('value');
 		if ($q->prepare() && $q->stmt->execute()) {
 			while ($value = $q->stmt->fetch(PDO::FETCH_COLUMN)) {
@@ -193,7 +196,7 @@ class TicketComment extends xPDOSimpleObject
 	 */
 	public function remove(array $ancestors = [])
 	{
-		$collection = $this->xpdo->getIterator('TicketComment', ['parent' => $this->id]);
+		$collection = $this->xpdo->getIterator(TicketComment::class, ['parent' => $this->id]);
 		/** @var TicketComment $item */
 		foreach ($collection as $item) {
 			$item->remove();

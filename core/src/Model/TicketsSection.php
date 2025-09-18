@@ -18,6 +18,15 @@ use function microtime;
 
 use MODX\Revolution\modAccessibleObject;
 use MODX\Revolution\modResource;
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketAuthorAction;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketView;
+use Tickets\Model\TicketVote;
 use PDO;
 use xPDO\xPDO;
 
@@ -314,7 +323,7 @@ class TicketsSection extends modResource
 	{
 		$q = $this->xpdo->newQuery(Ticket::class, ['parent' => $this->id, 'published' => 1, 'deleted' => 0]);
 		$q->leftJoin(TicketStar::class, 'Stars');
-		$q->select('COUNT(Stars.owner) as views');
+		$q->select('COUNT(Stars.owner) as stars');
 
 		$count = 0;
 		if ($q->prepare() && $q->stmt->execute()) {

@@ -2,6 +2,10 @@
 
 namespace Tickets\Model;
 
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketsSection;
 use xPDO\Om\xPDOObject;
 
 /**
