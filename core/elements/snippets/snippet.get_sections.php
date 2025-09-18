@@ -1,16 +1,17 @@
 <?php
 
+use Tickets\Tickets;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketsSection;
+
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
-/** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+/** @var \ModxPro\PdoTools\Fetch $pdoFetch */
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -18,7 +19,7 @@ if (isset($parents) && '' === $parents) {
 	$scriptProperties['parents'] = $modx->resource->id;
 }
 
-$class = 'TicketsSection';
+$class = TicketsSection::class;
 $where = ['class_key' => $class];
 
 // Add custom parameters
@@ -38,14 +39,14 @@ $pdoFetch->addTime('Conditions prepared');
 
 // Joining tables
 $leftJoin = [
-	'Total' => ['class' => 'TicketTotal'],
+	'Total' => ['class' => TicketTotal::class],
 ];
 
 // Fields to select
 $select = [
 	'TicketsSection' => !empty($includeContent)
-		? $modx->getSelectColumns($class, $class)
-		: $modx->getSelectColumns($class, $class, '', ['content'], true),
+		? $modx->getSelectColumns(TicketsSection::class, 'TicketsSection')
+		: $modx->getSelectColumns(TicketsSection::class, 'TicketsSection', '', ['content'], true),
 	'Total' => 'tickets, comments, views, stars, rating, rating_plus, rating_minus',
 ];
 
@@ -82,7 +83,7 @@ if (!empty($rows) && \is_array($rows)) {
 		$tpl      = $pdoFetch->defineChunk($row);
 		$output[] = empty($tpl)
 			? '<pre>' . $pdoFetch->getChunk('', $row) . '</pre>'
-			: $pdoFetch->getChunk($tpl, $row, $pdoFetch->config['fastMode']);
+			: $pdoFetch->getChunk($tpl, $row, $pdoFetch->config('fastMode'));
 	}
 }
 $pdoFetch->addTime('Returning processed chunks');
@@ -104,7 +105,7 @@ if (!empty($toSeparatePlaceholders)) {
 	$output .= $log;
 
 	if (!empty($tplWrapper) && (!empty($wrapIfEmpty) || !empty($output))) {
-		$output = $pdoFetch->getChunk($tplWrapper, ['output' => $output], $pdoFetch->config['fastMode']);
+		$output = $pdoFetch->getChunk($tplWrapper, ['output' => $output], $pdoFetch->config('fastMode'));
 	}
 
 	if (!empty($toPlaceholder)) {

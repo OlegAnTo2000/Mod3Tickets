@@ -1,20 +1,26 @@
 <?php
 
+use Tickets\Tickets;
+use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
+
+/** @var \MODX\Revolution\modX $modx */
+
 /** @var array $scriptProperties */
 if (!empty($cacheKey) && $output = $modx->cacheManager->get('tickets/latest.' . $cacheKey)) {
 	return $output;
 }
 
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
-/** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+/** @var \ModxPro\PdoTools\Fetch $pdoFetch */
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -26,7 +32,7 @@ if ('tickets' == $action && 'tpl.Tickets.comment.latest' == $scriptProperties['t
 }
 $action = \strtolower($action);
 $where  = 'tickets' == $action
-	? ['class_key' => 'Ticket']
+	? ['class_key' => Ticket::class]
 	: [];
 
 if (empty($showUnpublished)) {
@@ -108,22 +114,22 @@ else {
 
 // Joining tables
 if ('comments' == $action) {
-	$class = 'TicketComment';
+	$class = TicketComment::class;
 
 	$innerJoin           = [];
 	$innerJoin['Thread'] = empty($user)
 		? [
-			'class' => 'TicketThread',
+			'class' => TicketThread::class,
 			'on'    => '`TicketComment`.`id` = `Thread`.`comment_last` AND `Thread`.`deleted` = 0',
 		]
 		: [
-			'class' => 'TicketThread',
+			'class' => TicketThread::class,
 			'on'    => '`TicketComment`.`thread` = `Thread`.`id` AND `Thread`.`deleted` = 0',
 		];
-	$innerJoin['Ticket'] = ['class' => 'Ticket', 'on' => '`Ticket`.`id` = `Thread`.`resource`'];
+	$innerJoin['Ticket'] = ['class' => Ticket::class, 'on' => '`Ticket`.`id` = `Thread`.`resource`'];
 
 	$leftJoin = [
-		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
+		'Section' => ['class' => TicketsSection::class, 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 		'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 		'Profile' => [
 			'class' => modUserProfile::class,
@@ -133,11 +139,11 @@ if ('comments' == $action) {
 
 	$select = [
 		'TicketComment' => !empty($includeContent)
-			? $modx->getSelectColumns('TicketComment', 'TicketComment', '', ['raw'], true)
-			: $modx->getSelectColumns('TicketComment', 'TicketComment', '', ['text', 'raw'], true),
+			? $modx->getSelectColumns(TicketComment::class, 'TicketComment', '', ['raw'], true)
+			: $modx->getSelectColumns(TicketComment::class, 'TicketComment', '', ['text', 'raw'], true),
 		'Ticket' => !empty($includeContent)
-			? $modx->getSelectColumns('Ticket', 'Ticket', 'ticket.')
-			: $modx->getSelectColumns('Ticket', 'Ticket', 'ticket.', ['content'], true),
+			? $modx->getSelectColumns(Ticket::class, 'Ticket', 'ticket.')
+			: $modx->getSelectColumns(Ticket::class, 'Ticket', 'ticket.', ['content'], true),
 		'Thread' => '`Thread`.`comments`',
 	];
 	$groupby = empty($user)
@@ -145,23 +151,23 @@ if ('comments' == $action) {
 		: '`TicketComment`.`id`';
 	$where['TicketComment.deleted'] = 0;
 } elseif ('tickets' == $action) {
-	$class = 'Ticket';
+	$class = Ticket::class;
 
 	$innerJoin = [];
 	$leftJoin  = [
 		'Thread' => [
-			'class' => 'TicketThread',
+			'class' => TicketThread::class,
 			'on'    => '`Thread`.`resource` = `Ticket`.`id` AND `Thread`.`deleted` = 0',
 		],
-		'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
+		'Section' => ['class' => TicketsSection::class, 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 		'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
 		'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `Ticket`.`createdby`'],
 	];
 
 	$select = [
 		'Ticket' => !empty($includeContent)
-			? $modx->getSelectColumns('Ticket', 'Ticket')
-			: $modx->getSelectColumns('Ticket', 'Ticket', '', ['content'], true),
+			? $modx->getSelectColumns(Ticket::class, 'Ticket')
+			: $modx->getSelectColumns(Ticket::class, 'Ticket', '', ['content'], true),
 		'Thread' => '`Thread`.`id` as `thread`, `Thread`.`comments`',
 	];
 	$groupby = '`Ticket`.`id`';
@@ -171,7 +177,7 @@ if ('comments' == $action) {
 
 // Fields to select
 $select = \array_merge($select, [
-	'Section' => $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
+	'Section' => $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.', ['content'], true),
 	'User'    => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
 	'Profile' => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true),
 ]);
@@ -213,7 +219,7 @@ $output = [];
 if (!empty($rows) && \is_array($rows)) {
 	foreach ($rows as $k => $row) {
 		// Prepare row
-		if ('Ticket' == $class) {
+		if (Ticket::class == $class) {
 			$row['date_ago'] = $Tickets->dateFormat($row['createdon']);
 			$properties      = \is_string($row['properties'])
 				? \json_decode($row['properties'], true)
@@ -240,7 +246,7 @@ if (!empty($rows) && \is_array($rows)) {
 		$row['idx'] = $pdoFetch->idx++;
 		$tpl        = $pdoFetch->defineChunk($row);
 		$output[]   = !empty($tpl)
-			? $pdoFetch->getChunk($tpl, $row, $pdoFetch->config['fastMode'])
+			? $pdoFetch->getChunk($tpl, $row, $pdoFetch->config('fastMode'))
 			: $pdoFetch->getChunk('', $row);
 	}
 	$pdoFetch->addTime('Returning processed chunks');

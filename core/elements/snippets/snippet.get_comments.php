@@ -1,20 +1,22 @@
 <?php
 
-use MODX\Revolution\modUser;
-use MODX\Revolution\modUserProfile;
+use Tickets\Tickets;
 use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketVote;
+use Tickets\Model\TicketThread;
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketsSection;
-use Tickets\Model\TicketStar;
-use Tickets\Model\TicketThread;
-use Tickets\Model\TicketVote;
+use MODX\Revolution\modUserProfile;
 
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
 $Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
-/** @var pdoFetch $pdoFetch */
+/** @var \ModxPro\PdoTools\Fetch $pdoFetch */
 $pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
@@ -237,7 +239,7 @@ if (!empty($toSeparatePlaceholders)) {
 	$output .= $log;
 
 	if (!empty($tplWrapper) && (!empty($wrapIfEmpty) || !empty($output))) {
-		$output = $pdoFetch->getChunk($tplWrapper, ['output' => $output], $pdoFetch->config['fastMode']);
+		$output = $pdoFetch->getChunk($tplWrapper, ['output' => $output], $pdoFetch->config('fastMode'));
 	}
 
 	if (!empty($toPlaceholder)) {

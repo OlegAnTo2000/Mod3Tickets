@@ -1,12 +1,12 @@
 <?php
 
+use Tickets\Tickets;
+use Tickets\Model\TicketAuthor;
+
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 
 if (!$Tickets->authenticated || empty($scriptProperties['createdby'])) {
 	return '';

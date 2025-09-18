@@ -1,26 +1,30 @@
 <?php
 
-use MODX\Revolution\modResource;
-use MODX\Revolution\modUser;
-use MODX\Revolution\modUserProfile;
+use Tickets\Tickets;
 use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
 use Tickets\Model\TicketFile;
-use Tickets\Model\TicketsSection;
 use Tickets\Model\TicketStar;
+use Tickets\Model\TicketView;
 use Tickets\Model\TicketVote;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketThread;
+use MODX\Revolution\modResource;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
 
+/** @var \MODX\Revolution\modX $modx */
+/** @var TicketsSection $section */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 $scriptProperties['nestedChunkPrefix'] = 'tickets_';
-/** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+
+/** @var \ModxPro\PdoTools\Fetch $pdoFetch */
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -32,12 +36,11 @@ if (!$ticket = $modx->getObject(modResource::class, ['id' => $id])) {
 	return 'Could not load resource with id = ' . $id;
 }
 
-$class = $ticket instanceof Ticket
-	? Ticket::class
-	: modResource::class;
+$class = $ticket instanceof Ticket ? Ticket::class : modResource::class;
 
 /** @var TicketTotal $total */
-if ('Ticket' == $class && $total = $ticket->getOne('Total')) {
+if (Ticket::class == $class && $total = $ticket->getOne('Total')) {
+	/** @var TicketTotal $total */
 	$total->fetchValues();
 	$total->save();
 }
@@ -64,7 +67,7 @@ $star             = $modx->getCount(TicketStar::class, ['id' => $ticket->id, 'cl
 $data['stared']   = !empty($star);
 $data['unstared'] = empty($star);
 
-if ('Ticket' != $class) {
+if (Ticket::class != $class) {
 	// Rating
 	if (!$modx->user->id || $modx->user->id == $ticket->createdby) {
 		$data['voted'] = 0;
@@ -92,16 +95,14 @@ if ('Ticket' != $class) {
 	}
 
 	// Views
-	$data['views'] = $modx->getCount('TicketView', ['parent' => $ticket->id]);
+	$data['views'] = $modx->getCount(TicketView::class, ['parent' => $ticket->id]);
 
 	// Comments
 	$data['comments'] = 0;
-	$thread           = empty($thread)
-		? 'resource-' . $ticket->id
-		: $thread;
-	$q = $modx->newQuery('TicketThread', ['name' => $thread]);
+	$thread           = empty($thread) ? 'resource-' . $ticket->id : $thread;
+	$q = $modx->newQuery(TicketThread::class, ['name' => $thread]);
 	$q->leftJoin(
-		'TicketComment',
+		TicketComment::class,
 		'TicketComment',
 		'TicketThread.id = TicketComment.thread AND TicketComment.published = 1'
 	);
@@ -114,7 +115,7 @@ if ('Ticket' != $class) {
 	}
 
 	// Stars
-	$data['stars'] = $modx->getCount('TicketStar', ['id' => $ticket->id, 'class' => 'Ticket']);
+	$data['stars'] = $modx->getCount(TicketStar::class, ['id' => $ticket->id, 'class' => Ticket::class]);
 }
 
 if ($data['rating'] > 0) {

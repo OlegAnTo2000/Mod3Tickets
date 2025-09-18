@@ -1,17 +1,17 @@
 <?php
 
+use Tickets\Model\Ticket;
+use Tickets\Model\TicketStar;
+
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
-if (empty($class)) {
-	$class = 'Ticket';
-}
+if (empty($class)) $class = Ticket::class;
 /** @var int $user */
-if (empty($user)) {
-	$user = $modx->user->get('id');
-}
+if (empty($user)) $user = $modx->user->get('id');
 unset($scriptProperties['user']);
 
 $ids = [];
-$q   = $modx->newQuery('TicketStar', ['class' => $class, 'createdby' => $user]);
+$q   = $modx->newQuery(TicketStar::class, ['class' => $class, 'createdby' => $user]);
 $q->select('id');
 $tstart = \microtime(true);
 if ($q->prepare() && $q->stmt->execute()) {
@@ -21,9 +21,7 @@ if ($q->prepare() && $q->stmt->execute()) {
 	$ids = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 
-if (empty($ids)) {
-	return false;
-}
+if (empty($ids)) 	return false;
 
 $where = [$class . '.id:IN' => $ids];
 foreach (['where'] as $v) {
@@ -46,6 +44,6 @@ if (empty($tpl)) {
 	unset($scriptProperties['tpl']);
 }
 
-return 'Ticket' == $class
+return Ticket::class == $class
 	? $modx->runSnippet('getTickets', $scriptProperties)
 	: $modx->runSnippet('getComments', $scriptProperties);

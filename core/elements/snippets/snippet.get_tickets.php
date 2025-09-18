@@ -1,18 +1,26 @@
 <?php
 
+use Tickets\Tickets;
+use Tickets\Model\Ticket;
+use ModxPro\PdoTools\Fetch;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketStar;
 use Tickets\Model\TicketView;
+use Tickets\Model\TicketVote;
+use Tickets\Model\TicketTotal;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
 
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
-/** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+/** @var \ModxPro\PdoTools\Fetch $pdoFetch */
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -20,7 +28,7 @@ if (isset($parents) && '' === $parents) {
 	$scriptProperties['parents'] = $modx->resource->id;
 }
 
-$class = 'Ticket';
+$class = Ticket::class;
 $where = ['class_key' => $class];
 
 // Filter by user
@@ -52,34 +60,34 @@ if (!empty($user)) {
 
 // Joining tables
 $leftJoin = [
-	'Section' => ['class' => 'TicketsSection', 'on' => '`Section`.`id` = `Ticket`.`parent`'],
+	'Section' => ['class' => TicketsSection::class, 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 	'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `Ticket`.`createdby`'],
 	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `User`.`id`'],
-	'Total'   => ['class' => 'TicketTotal'],
+	'Total'   => ['class' => TicketTotal::class],
 ];
 if ($Tickets->authenticated) {
 	$leftJoin['Vote'] = [
-		'class' => 'TicketVote',
+		'class' => TicketVote::class,
 		'on'    => '`Vote`.`id` = `Ticket`.`id` AND `Vote`.`class` = "Ticket" AND `Vote`.`createdby` = ' . $modx->user->id,
 	];
 	$leftJoin['Star'] = [
-		'class' => 'TicketStar',
+		'class' => TicketStar::class,
 		'on'    => '`Star`.`id` = `Ticket`.`id` AND `Star`.`class` = "Ticket" AND `Star`.`createdby` = ' . $modx->user->id,
 	];
 	$leftJoin['Thread'] = [
-		'class' => 'TicketThread',
+		'class' => TicketThread::class,
 		'on'    => '`Thread`.`resource` = `Ticket`.`id` AND `Thread`.`deleted` = 0',
 	];
 }
 
 // Fields to select
 $select = [
-	'Section' => $modx->getSelectColumns('TicketsSection', 'Section', 'section.', ['content'], true),
+	'Section' => $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.', ['content'], true),
 	'User'    => $modx->getSelectColumns(modUser::class, 'User', '', ['username']),
 	'Profile' => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id'], true),
 	'Ticket'  => !empty($includeContent)
-		? $modx->getSelectColumns($class, $class)
-		: $modx->getSelectColumns($class, $class, '', ['content'], true),
+		? $modx->getSelectColumns(Ticket::class, 'Ticket')
+		: $modx->getSelectColumns(Ticket::class, 'Ticket', '', ['content'], true),
 	'Total' => 'comments, views, stars, rating, rating_plus, rating_minus',
 ];
 if ($Tickets->authenticated) {
@@ -111,9 +119,7 @@ $default = [
 	'sortby'   => 'createdon',
 	'sortdir'  => 'DESC',
 	'groupby'  => $class . '.id',
-	'return'   => !empty($returnIds)
-		? 'ids'
-		: 'data',
+	'return'   => !empty($returnIds) ? 'ids' : 'data',
 	'nestedChunkPrefix' => 'tickets_',
 ];
 
@@ -208,7 +214,7 @@ if (!empty($rows) && \is_array($rows)) {
 				'limit'   => 1,
 			]);
 			if (!empty($last_view['timestamp'])) {
-				$row['new_comments'] = $modx->getCount('TicketComment', [
+				$row['new_comments'] = $modx->getCount(TicketComment::class, [
 					'published'    => 1,
 					'thread'       => $row['thread'],
 					'createdon:>'  => $last_view['timestamp'],
@@ -225,7 +231,7 @@ if (!empty($rows) && \is_array($rows)) {
 		$tpl      = $pdoFetch->defineChunk($row);
 		$output[] = empty($tpl)
 			? '<pre>' . $pdoFetch->getChunk('', $row) . '</pre>'
-			: $pdoFetch->getChunk($tpl, $row, $pdoFetch->config['fastMode']);
+			: $pdoFetch->getChunk($tpl, $row, $pdoFetch->config('fastMode'));
 	}
 }
 $pdoFetch->addTime('Returning processed chunks');
@@ -248,12 +254,12 @@ if (!empty($toSeparatePlaceholders)) {
 
 	if (!empty($tplWrapper) && (!empty($wrapIfEmpty) || !empty($output))) {
 		$array = ['output' => $output];
-		if ($Tickets->authenticated && 'TicketsSection' == $modx->resource->class_key) {
+		if ($Tickets->authenticated && TicketsSection::class == $modx->resource->class_key) {
 			/** @var TicketsSection $section */
 			$section             = &$modx->resource;
 			$array['subscribed'] = $section->isSubscribed();
 		}
-		$output = $pdoFetch->getChunk($tplWrapper, $array, $pdoFetch->config['fastMode']);
+		$output = $pdoFetch->getChunk($tplWrapper, $array, $pdoFetch->config('fastMode'));
 	}
 
 	if (!empty($toPlaceholder)) {

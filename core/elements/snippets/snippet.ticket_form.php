@@ -1,16 +1,15 @@
 <?php
 
-use MODX\Revolution\Sources\modMediaSource;
+use Tickets\Tickets;
 use Tickets\Model\Ticket;
 use Tickets\Model\TicketFile;
+use MODX\Revolution\Sources\modMediaSource;
 
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 if (!$Tickets->authenticated) {
@@ -48,7 +47,7 @@ $data = [];
 if (!empty($tid)) {
 	$tplWrapper = $tplFormUpdate;
 	/** @var Ticket $ticket */
-	if ($ticket = $modx->getObject(Ticket::class, ['class_key' => 'Ticket', 'id' => $tid])) {
+	if ($ticket = $modx->getObject(Ticket::class, ['class_key' => Ticket::class, 'id' => $tid])) {
 		if ($ticket->get('createdby') != $modx->user->id && !$modx->hasPermission('edit_document')) {
 			return $modx->lexicon('ticket_err_wrong_user');
 		}
@@ -56,7 +55,7 @@ if (!empty($tid)) {
 		$allowedFields = \array_map('trim', \explode(',', $scriptProperties['allowedFields']));
 		$allowedFields = \array_unique(\array_merge($allowedFields, ['parent', 'pagetitle', 'content']));
 
-		$fields = \array_keys($modx->getFieldMeta('Ticket'));
+		$fields = \array_keys($modx->getFieldMeta(Ticket::class));
 		foreach ($allowedFields as $field) {
 			$value = \in_array($field, $fields, true)
 				? $ticket->get($field)

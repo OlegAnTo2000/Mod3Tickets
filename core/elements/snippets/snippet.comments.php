@@ -1,15 +1,20 @@
 <?php
 
 use Tickets\Tickets;
+use Tickets\Model\Ticket;
+use ModxPro\PdoTools\Fetch;
 use MODX\Revolution\modUser;
 use Tickets\Model\TicketStar;
 use Tickets\Model\TicketVote;
 use Tickets\Model\TicketThread;
 use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
 use MODX\Revolution\modUserProfile;
 use MODX\Revolution\Sources\modMediaSource;
 
+/** @var \MODX\Revolution\modX $modx */
 /** @var array $scriptProperties */
+
 if (empty($thread)) {
 	$scriptProperties['thread'] = $modx->getOption(
 		'thread',
@@ -44,8 +49,8 @@ $tplImage = $Tickets->config['tplImage'] = $modx->getOption(
 	true
 );
 
-/** @var pdoFetch $pdoFetch */
-$pdoFetch = $modx->getService('pdoFetch');
+/** @var Fetch $pdoFetch */
+$pdoFetch = $modx->services->get('pdoFetch');
 $pdoFetch->setConfig($scriptProperties);
 $pdoFetch->addTime('pdoTools loaded');
 
@@ -78,9 +83,10 @@ $thread->save();
 
 $ratings = [];
 /** @var Ticket $ticket */
-if ($ticket = $thread->getOne('Ticket')) {
+if ($ticket = $thread->getOne(Ticket::class)) {
 	/** @var TicketsSection $section */
-	if ($section = $ticket->getOne('Section')) {
+	if ($section = $ticket->getOne(TicketsSection::class)) {
+		/** @var TicketsSection $section */
 		$ratings = $section->getProperties('ratings');
 	}
 }
@@ -189,7 +195,7 @@ if (!empty($rows) && \is_array($rows)) {
 }
 
 $commentsThread = $pdoFetch->getChunk($tplComments, [
-	'total'      => $modx->getPlaceholder($pdoFetch->config['totalVar']),
+	'total'      => $modx->getPlaceholder($pdoFetch->config('totalVar')),
 	'comments'   => $output,
 	'subscribed' => $thread->isSubscribed(),
 ]);
