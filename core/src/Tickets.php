@@ -226,9 +226,7 @@ class Tickets
 	 */
 	public function runProcessor($action = '', $data = [])
 	{
-		if (empty($action)) {
-			return false;
-		}
+		if (empty($action)) return false;
 		if ($this->modx->error instanceof \MODX\Revolution\Error\modError) {
 			$this->modx->error->reset();
 		}
@@ -236,7 +234,17 @@ class Tickets
 			? $this->config['processorsPath']
 			: MODX_CORE_PATH . 'components/tickets/src/Processors/';
 
-		return $this->modx->runProcessor($action, $data, ['processors_path' => $processorsPath]);
+		$class = '\\Tickets\\Processors\\' . $this->convertActionToClass($action);
+		return $this->modx->runProcessor($class, $data, ['processors_path' => $processorsPath]);
+	}
+
+	public function convertActionToClass(string $action): string
+	{
+		return implode('\\', array_map(function ($part) {
+			$lower = strtolower($part);
+			if ($lower === 'getlist') return 'GetList';
+			return str_replace(' ', '', ucwords(str_replace('_', ' ', $lower)));
+		}, explode('/', $action)));
 	}
 
 	/**
