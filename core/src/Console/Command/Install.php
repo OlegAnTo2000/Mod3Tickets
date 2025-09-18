@@ -131,7 +131,6 @@ class Install extends Command
 			'handler'     => '',
 			'permissions' => '',
 			'namespace'   => App::NAME,
-			'icon'        => ''
 		]);
 		Model::reguard();
 		return $menu;
@@ -141,11 +140,11 @@ class Install extends Command
 	{
 		Model::unguard();
 		$category = Category::updateOrCreate([
-			'name' => App::NAME,
+			'category' => App::NAME,
 		], [
-			'name'   => App::NAME,
-			'parent' => 0,
-			'rank'   => 0,
+			'category' => App::NAME,
+			'parent'   => 0,
+			'rank'     => 0,
 		]);
 		Model::reguard();
 		return $category;
@@ -454,7 +453,7 @@ class Install extends Command
 
 	protected function getCategoryId(): int
 	{
-		$category = Category::where('name', App::NAME)->first();
+		$category = Category::where('category', App::NAME)->first();
 		return $category ? $category->id : 0;
 	}
 
