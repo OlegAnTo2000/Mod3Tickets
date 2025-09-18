@@ -4,6 +4,8 @@ namespace Tickets\Console\Command;
 
 use Tickets\App;
 use MODX\Revolution\modX;
+use MMX\Database\Models\Menu;
+use MMX\Database\Models\Namespaces;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,9 +37,14 @@ class Install extends Command
 			$output->writeln('<info>Created symlink for "assets"</info>');
 		}
 
+		$db = new \MMX\Database\App($this->modx);
+
 		// namespace
+		$namespace = $this->createNamespace($db);
 
 		// menu
+		$this->createMenu($db);
+
 
 		// category
 
@@ -47,5 +54,24 @@ class Install extends Command
 
 		$this->modx->getCacheManager()->refresh();
 		$output->writeln('<info>Cleared MODX cache</info>');
+	}
+
+	protected function createNamespace(\MMX\Database\App $db): Namespaces
+	{
+		return Namespaces::updateOrCreate([
+			'name' => App::NAME,
+		], [
+			'path'        => '{core_path}components/' . App::NAME . '/',
+			'assets_path' => '{assets_path}components/' . App::NAME . '/',
+		]);
+	}
+
+	protected function createMenu(\MMX\Database\App $db): Menu
+	{
+		return Menu::updateOrCreate([
+			'name' => App::NAME,
+		], [
+			'path' => '{core_path}components/' . App::NAME . '/',
+		]);
 	}
 }

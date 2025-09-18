@@ -4,6 +4,7 @@ namespace Tickets\Console\Command;
 
 use Tickets\App;
 use MODX\Revolution\modX;
+use MMX\Database\Models\Namespaces;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,10 +24,11 @@ class Remove extends Command
 	public function run(InputInterface $input, OutputInterface $output): void
 	{
 		$vendorPath = App::VENDOR_PATH;
-		$corePath = App::CORE_PATH;
+		$corePath   = App::CORE_PATH;
 		$assetsPath = App::ASSETS_PATH;
 
 		// namespace
+		$this->removeNamespace();
 
 		// menu
 
@@ -47,5 +49,10 @@ class Remove extends Command
 
 		$this->modx->getCacheManager()->refresh();
 		$output->writeln('<info>Cleared MODX cache</info>');
+	}
+
+	protected function removeNamespace(): void
+	{
+		Namespaces::query()->where('name', App::NAME)->delete();
 	}
 }

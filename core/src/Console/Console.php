@@ -33,8 +33,7 @@ class Console extends Application
 		return [
 			new ListCommand(),
 			new Install($this->modx),
-			new Remove($this->modx),
-			new Test($this->modx),
+			new Remove($this->modx)
 		];
 	}
 }
