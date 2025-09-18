@@ -545,33 +545,8 @@ class Tickets
 				$properties[$k] = $this->modx->stripTags($v);
 			}
 		}
-		// Create comment
-		$comment = $this->modx->newObject(TicketComment::class, [
-			'text'       => $this->sanitizeText($data['text'], true),
-			'createdon'  => date('Y-m-d H:i:s'),
-			'createdby'  => $this->modx->user->id,
-			'resource'   => $this->config['resource'],
-			'properties' => $properties,
-			'mode'       => 'preview',
-		]);
-		$comment = $comment->toArray();
 
-		/** @var modUser $user */
-		if ($this->authenticated && $user = $this->modx->getObject(modUser::class, $this->modx->user->id)) {
-			$comment['name']  = $this->modx->user->Profile->fullname;
-			$comment['email'] = $this->modx->user->Profile->email;
-			/** @var modUserProfile $profile */
-			$profile = $this->modx->user->Profile;
-			$comment = array_merge($profile->toArray(), $user->toArray(), $comment);
-		} else {
-			$comment['name'] = !empty($data['name'])
-				? $data['name']
-				: '';
-			$comment['email'] = !empty($data['email'])
-				? $data['email']
-				: '';
-		}
-		$preview = $this->templateNode($comment, $this->config['tplCommentGuest']);
+		$preview = $this->sanitizeText($data['text'], true);
 		$preview = preg_replace('/\[\[.*?\]\]/', '', $preview);
 
 		return $this->success('', ['preview' => $preview]);
