@@ -47,7 +47,6 @@ $modx->services->add('error', modError::class);
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');
-$modx->error->message = null;
 
 // Get properties
 $properties = [];
