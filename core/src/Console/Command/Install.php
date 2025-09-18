@@ -59,12 +59,15 @@ class Install extends Command
 
 	protected function createNamespace(\MMX\Database\App $db): Namespaces
 	{
-		return Namespaces::updateOrCreate([
+		Model::unguard();
+		$namespace = Namespaces::updateOrCreate([
 			'name' => App::NAME,
 		], [
 			'path'        => '{core_path}components/' . App::NAME . '/',
 			'assets_path' => '{assets_path}components/' . App::NAME . '/',
 		]);
+		Model::reguard();
+		return $namespace;
 	}
 
 	protected function createMenu(\MMX\Database\App $db): Menu
