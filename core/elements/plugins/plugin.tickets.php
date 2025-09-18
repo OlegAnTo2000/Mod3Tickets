@@ -1,11 +1,14 @@
 <?php
 
+use Tickets\Tickets;
 use MODX\Revolution\modX;
 use Tickets\Model\Ticket;
+use MODX\Revolution\modUser;
 use Tickets\Model\TicketAuthor;
 use Tickets\Model\TicketsSection;
 
-/** @var modX $modx */
+/** @var \MODX\Revolution\modX $modx */
+
 switch ($modx->event->name) {
 	case 'OnSiteRefresh':
 		if ($modx->cacheManager->refresh(['default/tickets' => []])) {
@@ -106,14 +109,14 @@ switch ($modx->event->name) {
 
 	case 'OnWebPageComplete':
 		/** @var Tickets $Tickets */
-		$Tickets = $modx->getService('tickets');
+		$Tickets = \tickets_service($modx);
 		$Tickets->logView($modx->resource->get('id'));
 		break;
 
 	case 'OnUserSave':
 		/** @var modUser $user */
 		if ('new' == $mode && $user && !$user->getOne('AuthorProfile')) {
-			$profile = $modx->newObject('TicketAuthor');
+			$profile = $modx->newObject(TicketAuthor::class);
 			$user->addOne($profile);
 			$profile->save();
 		}
