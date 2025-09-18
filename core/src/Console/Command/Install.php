@@ -324,9 +324,10 @@ class Install extends Command
 		], [
 			'name'        => App::NAME,
 			'description' => '',
-			'static'      => true,
-			'source'      => 1,
-			'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/plugins/plugin.tickets.php',
+			'plugincode'  => $this->getFileContent('plugins/plugin.tickets.php'),
+			'static'      => false,
+			'source'      => 0,
+			'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/plugins/plugin.tickets.php',
 			'category'    => $this->getCategoryId(),
 		]);
 
@@ -379,8 +380,8 @@ class Install extends Command
 				'description' => '',
 				'snippet'     => $this->getFileContent('snippets/snippet.' . $file . '.php'),
 				'static'      => false,
-				'source'      => 1,
-				'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/snippets/snippet.' . $file . '.php',
+				'source'      => 0,
+				'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/snippets/snippet.' . $file . '.php',
 				'category'    => $this->getCategoryId(),
 				'properties'  => $this->getSnippetProperties($file),
 			]);
@@ -433,9 +434,10 @@ class Install extends Command
 			], [
 				'name'        => $name,
 				'description' => '',
-				'static'      => true,
-				'source'      => 1,
-				'static_file' => 'core/components/' . strtolower(App::NAME) . '/elements/chunks/chunk.' . $file . '.tpl',
+				'snippet'     => $this->getFileContent('chunks/chunk.' . $file . '.tpl'),
+				'static'      => false,
+				'source'      => 0,
+				'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/chunks/chunk.' . $file . '.tpl',
 				'category'    => $this->getCategoryId(),
 			]);
 		}
