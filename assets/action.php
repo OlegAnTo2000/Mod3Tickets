@@ -46,7 +46,11 @@ $modx->initialize();
 if (!isset($modx)) exit('Access denied');
 if (!($modx instanceof modX)) exit('Access denied');
 
-$modx->services->add('error', modError::class);
+if (!$modx->services->has('error')) {
+	$modx->services->add('error', function ($c) use ($modx) {
+		return new \MODX\Revolution\Error\modError($modx);
+	});
+}
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');

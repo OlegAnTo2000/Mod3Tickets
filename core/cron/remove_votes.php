@@ -13,7 +13,11 @@ use MODX\Revolution\Error\modError;
 /** @noinspection PhpIncludeInspection */
 require_once \dirname(\dirname(\dirname(\dirname(\dirname(__FILE__))))) . '/index.php';
 /** @var modX $modx */
-$modx->services->add('error', modError::class);
+if (!$modx->services->has('error')) {
+	$modx->services->add('error', function ($c) use ($modx) {
+		return new \MODX\Revolution\Error\modError($modx);
+	});
+}
 $modx->getRequest();
 $modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget('FILE');

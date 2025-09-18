@@ -229,7 +229,9 @@ class Tickets
 		if (empty($action)) {
 			return false;
 		}
-		$this->modx->error->reset();
+		if ($this->modx->error instanceof \MODX\Revolution\Error\modError) {
+			$this->modx->error->reset();
+		}
 		$processorsPath = !empty($this->config['processorsPath'])
 			? $this->config['processorsPath']
 			: MODX_CORE_PATH . 'components/tickets/src/Processors/';

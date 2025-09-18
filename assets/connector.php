@@ -1,5 +1,7 @@
 <?php
 
+use Tickets\Tickets;
+
 \define('MODX_API_MODE', true);
 
 if (!defined('MODX_CORE_PATH')) {
@@ -29,7 +31,11 @@ if (!defined('MODX_CORE_PATH')) {
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CONNECTORS_PATH . 'index.php';
 
-use Tickets\Tickets;
+if (!$modx->services->has('error')) {
+	$modx->services->add('error', function ($c) use ($modx) {
+		return new \MODX\Revolution\Error\modError($modx);
+	});
+}
 
 /** @var Tickets $Tickets */
 $tickets = tickets_service($modx);
