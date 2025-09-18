@@ -52,15 +52,23 @@ class Install extends Command
 
 	protected function createSymlinks(string $vendorPath, string $corePath, string $assetsPath, OutputInterface $output): void
 	{
+		if (!is_dir($vendorPath . '/core')) {
+			$output->writeln("<error>Vendor path for core does not exist</error>");
+			throw new \Exception("Vendor path for core does not exist");
+		}
+		if (!is_dir($vendorPath . '/assets')) {
+			$output->writeln("<error>Vendor path for assets does not exist</error>");
+			throw new \Exception("Vendor path for assets does not exist");
+		}
 		if (!is_dir($corePath)) {
-			if (symlink($vendorPath . '/core', $corePath, true)) {
+			if (symlink($vendorPath . '/core', $corePath)) {
 				$output->writeln("<info>Created symlink to $vendorPath/core in $corePath</info>");
 			} else {
 				$output->writeln("<error>Failed to create symlink to $vendorPath/core in $corePath</error>");
 			}
 		}
 		if (!is_dir($assetsPath)) {
-			if (symlink($vendorPath . '/assets', $assetsPath, true)) {
+			if (symlink($vendorPath . '/assets', $assetsPath)) {
 				$output->writeln("<info>Created symlink to $vendorPath/assets in $assetsPath</info>");
 			} else {
 				$output->writeln("<error>Failed to create symlink to $vendorPath/assets in $assetsPath</error>");
