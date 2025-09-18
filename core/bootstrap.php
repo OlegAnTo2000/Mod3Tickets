@@ -41,9 +41,8 @@ if (!\function_exists('tickets_service')) {
 			throw new Exception('modX instance is required');
 		}
 
-		$tickets = $modx->services->get('tickets');
-		if ($tickets instanceof Tickets) {
-			return $tickets;
+		if ($modx->services->has('tickets') && $modx->services->get('tickets') instanceof Tickets) {
+			return $modx->services->get('tickets');
 		}
 
 		$modelPath = $modx->getOption('tickets.core_path', null, $modx->getOption('core_path') . 'components/tickets/') . 'src/Model/';
@@ -52,7 +51,6 @@ if (!\function_exists('tickets_service')) {
 		$modx->services->add('tickets', function ($c) use ($modx, $config) {
 			return new Tickets($modx, $config);
 		});
-
 		return $modx->services->get('tickets');
 	}
 }
