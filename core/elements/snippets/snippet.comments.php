@@ -1,8 +1,13 @@
 <?php
 
-use MODX\Revolution\Sources\modMediaSource;
-use Tickets\Model\TicketThread;
 use Tickets\Tickets;
+use MODX\Revolution\modUser;
+use Tickets\Model\TicketStar;
+use Tickets\Model\TicketVote;
+use Tickets\Model\TicketThread;
+use Tickets\Model\TicketComment;
+use MODX\Revolution\modUserProfile;
+use MODX\Revolution\Sources\modMediaSource;
 
 /** @var array $scriptProperties */
 if (empty($thread)) {
@@ -27,11 +32,7 @@ $tplLoginToComment   = $modx->getOption('tplLoginToComment', $scriptProperties, 
 $outputSeparator     = $modx->getOption('outputSeparator', $scriptProperties, "\n");
 
 /** @var Tickets $Tickets */
-$Tickets = $modx->getService('tickets', 'Tickets', $modx->getOption(
-	'tickets.core_path',
-	null,
-	$modx->getOption('core_path') . 'components/tickets/'
-) . 'model/tickets/', $scriptProperties);
+$Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
 $tplFiles = $Tickets->config['tplFiles'] = $modx->getOption('tplFiles', $scriptProperties, 'tpl.Tickets.comment.form.files');
@@ -85,7 +86,7 @@ if ($ticket = $thread->getOne('Ticket')) {
 }
 
 // Prepare query to db
-$class = 'TicketComment';
+$class = TicketComment::class;
 $where = [];
 if (empty($showUnpublished)) {
 	$where['published'] = 1;
@@ -94,7 +95,7 @@ if (empty($showUnpublished)) {
 // Joining tables
 $innerJoin = [
 	'Thread' => [
-		'class' => 'TicketThread',
+		'class' => TicketThread::class,
 		'on'    => '`Thread`.`id` = `TicketComment`.`thread` AND `Thread`.`name` = "' . $thread->get('name') . '"',
 	],
 ];
@@ -104,27 +105,20 @@ $leftJoin = [
 ];
 if ($Tickets->authenticated) {
 	$leftJoin['Vote'] = [
-		'class' => 'TicketVote',
+		'class' => TicketVote::class,
 		'on'    => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "TicketComment" AND `Vote`.`createdby` = ' . $modx->user->id,
 	];
 	$leftJoin['Star'] = [
-		'class' => 'TicketStar',
+		'class' => TicketStar::class,
 		'on'    => '`Star`.`id` = `TicketComment`.`id` AND `Star`.`class` = "TicketComment" AND `Star`.`createdby` = ' . $modx->user->id,
 	];
 }
 // Fields to select
 $select = [
-	'TicketComment' => $modx->getSelectColumns('TicketComment', 'TicketComment', '', ['raw'], true) .
-		', `parent` as `new_parent`',
-	'Thread'  => '`Thread`.`resource`',
-	'User'    => '`User`.`username`',
-	'Profile' => $modx->getSelectColumns(
-		modUserProfile::class,
-		'Profile',
-		'',
-		['id', 'email'],
-		true
-	) . ',`Profile`.`email` as `user_email`',
+	'TicketComment' => $modx->getSelectColumns(TicketComment::class, 'TicketComment', '', ['raw'], true) . ', `parent` as `new_parent`',
+	'Thread'        => '`Thread`.`resource`',
+	'User'          => '`User`.`username`',
+	'Profile'       => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id', 'email'], true) . ', `Profile`.`email` as `user_email`',
 ];
 if ($Tickets->authenticated) {
 	$select['Vote'] = '`Vote`.`value` as `vote`';

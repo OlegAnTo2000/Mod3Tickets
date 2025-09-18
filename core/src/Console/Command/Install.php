@@ -457,7 +457,7 @@ class Install extends Command
 
 	protected function getSnippetProperties(string $file): array
 	{
-		$propertiesPath = dirname(__DIR__, 3) . '/_build/properties/properties.' . $file . '.php';
+		$propertiesPath = MODX_CORE_PATH . 'components/' . strtolower(App::NAME) . '/install/data/properties.' . $file . '.php';
 		if (file_exists($propertiesPath)) {
 			return include $propertiesPath;
 		}
