@@ -6,6 +6,7 @@ use Tickets\App;
 use MODX\Revolution\modX;
 use MMX\Database\Models\Menu;
 use MMX\Database\Models\Namespaces;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,11 +31,11 @@ class Install extends Command
 
 		if (!is_dir($corePath)) {
 			symlink($vendorPath . '/core', $corePath);
-			$output->writeln('<info>Created symlink for "core"</info>');
+			$output->writeln('<info>Created symlink to ' . $vendorPath . '/core in ' . $corePath . '</info>');
 		}
 		if (!is_dir($assetsPath)) {
 			symlink($vendorPath . '/assets', $assetsPath);
-			$output->writeln('<info>Created symlink for "assets"</info>');
+			$output->writeln('<info>Created symlink to ' . $vendorPath . '/assets in ' . $assetsPath . '</info>');
 		}
 
 		$db = new \MMX\Database\App($this->modx);
@@ -43,7 +44,7 @@ class Install extends Command
 		$namespace = $this->createNamespace($db);
 
 		// menu
-		$this->createMenu($db);
+		// $this->createMenu($db);
 
 
 		// category
@@ -68,10 +69,22 @@ class Install extends Command
 
 	protected function createMenu(\MMX\Database\App $db): Menu
 	{
-		return Menu::updateOrCreate([
+		Model::unguard();
+		$menu = Menu::updateOrCreate([
 			'name' => App::NAME,
 		], [
-			'path' => '{core_path}components/' . App::NAME . '/',
+			'text'        => App::NAME,
+			'parent'      => 0,
+			'action'      => 0,
+			'description' => App::NAME,
+			'icon'        => '',
+			'menuindex'   => 0,
+			'params'      => '',
+			'handler'     => '',
+			'permissions' => '',
+			'namespace'   => App::NAME,
 		]);
+		Model::reguard();
+		return $menu;
 	}
 }
