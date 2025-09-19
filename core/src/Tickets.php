@@ -1007,6 +1007,7 @@ class Tickets
 		// 		->allowLinkSchemes(['http', 'https', 'data']);
 		// }
 
+
 		$sanitizer = new HtmlSanitizer($config);
 		$filtered  = $sanitizer->sanitize($text);
 
