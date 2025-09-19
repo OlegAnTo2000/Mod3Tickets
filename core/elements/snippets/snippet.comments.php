@@ -83,9 +83,9 @@ $thread->save();
 
 $ratings = [];
 /** @var Ticket $ticket */
-if ($ticket = $thread->getOne(Ticket::class)) {
+if ($ticket = $thread->getOne('Ticket')) {
 	/** @var TicketsSection $section */
-	if ($section = $ticket->getOne(TicketsSection::class)) {
+	if ($section = $ticket->getOne('TicketsSection')) {
 		/** @var TicketsSection $section */
 		$ratings = $section->getProperties('ratings');
 	}
@@ -152,9 +152,9 @@ $default = [
 	'innerJoin'         => \json_encode($innerJoin),
 	'leftJoin'          => \json_encode($leftJoin),
 	'select'            => \json_encode($select),
-	'sortby'            => $class . '.id',
+	'sortby'            => 'TicketComment.id',
 	'sortdir'           => 'ASC',
-	'groupby'           => $class . '.id',
+	'groupby'           => 'TicketComment.id',
 	'limit'             => 0,
 	'fastMode'          => true,
 	'return'            => 'data',
