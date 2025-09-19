@@ -198,16 +198,12 @@ class Tickets
 		if (!defined('MODX_API_MODE') || !MODX_API_MODE) {
 			$config = $this->makePlaceholders($this->config);
 
-			$css = !empty($this->config['frontend_css'])
-				? $this->config['frontend_css']
-				: $this->modx->getOption('tickets.frontend_css');
+			$css = $this->modx->getOption('tickets.frontend_css');
 			if (!empty($css) && preg_match('/\.css/i', $css)) {
 				$this->modx->regClientCSS(str_replace($config['pl'], $config['vl'], $css));
 			}
 
-			$js = !empty($this->config['frontend_js'])
-				? $this->config['frontend_js']
-				: $this->modx->getOption('tickets.frontend_js');
+			$js = $this->modx->getOption('tickets.frontend_js');
 			if (!empty($js) && preg_match('/\.js/i', $js)) {
 				$this->modx->regClientScript(str_replace($config['pl'], $config['vl'], $js));
 			}

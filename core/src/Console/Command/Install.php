@@ -195,7 +195,7 @@ class Install extends Command
 				'area'  => 'tickets.main',
 			],
 			'frontend_js' => [
-				'value' => '[[+jsUrl]]web/default.js',
+				'value' => '[[+jsUrl]]web/default-vanilla.js',
 				'xtype' => 'textfield',
 				'area'  => 'tickets.main',
 			],

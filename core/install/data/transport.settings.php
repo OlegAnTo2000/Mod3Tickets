@@ -6,41 +6,41 @@ use MODX\Revolution\modSystemSetting;
 $settings = array();
 
 $tmp = array(
-    'mgr_tree_icon_ticketssection' => array(
-        'xtype' => 'textfield',
-        'value' => 'icon icon-comments-o',
-        'area'  => 'tickets.main',
-        'key'   => 'mgr_tree_icon_ticketssection',
-    ),
-    'mgr_tree_icon_ticket' => array(
-        'xtype' => 'textfield',
-        'value' => 'icon icon-comment-o',
-        'area'  => 'tickets.main',
-        'key'   => 'mgr_tree_icon_ticket',
-    ),
-    'date_format' => array(
-        'xtype' => 'textfield',
-        'value' => '%d.%m.%y <small>%H:%M</small>',
-        'area'  => 'tickets.main',
-    ),
-    'enable_editor' => array(
-        'xtype' => 'combo-boolean',
-        'value' => true,
-        'area'  => 'tickets.main',
-    ),
-    'frontend_css' => array(
-        'value' => '[[+cssUrl]]web/default.css',
-        'xtype' => 'textfield',
-        'area'  => 'tickets.main',
-    ),
-    'frontend_js' => array(
-        'value' => '[[+jsUrl]]web/default.js',
-        'xtype' => 'textfield',
-        'area'  => 'tickets.main',
-    ),
-    'editor_config.ticket' => array(
-        'xtype' => 'textarea',
-        'value' => '{onTab: {keepDefault:false, replaceWith:"	"},
+	'mgr_tree_icon_ticketssection' => array(
+		'xtype' => 'textfield',
+		'value' => 'icon icon-comments-o',
+		'area'  => 'tickets.main',
+		'key'   => 'mgr_tree_icon_ticketssection',
+	),
+	'mgr_tree_icon_ticket' => array(
+		'xtype' => 'textfield',
+		'value' => 'icon icon-comment-o',
+		'area'  => 'tickets.main',
+		'key'   => 'mgr_tree_icon_ticket',
+	),
+	'date_format' => array(
+		'xtype' => 'textfield',
+		'value' => '%d.%m.%y <small>%H:%M</small>',
+		'area'  => 'tickets.main',
+	),
+	'enable_editor' => array(
+		'xtype' => 'combo-boolean',
+		'value' => true,
+		'area'  => 'tickets.main',
+	),
+	'frontend_css' => array(
+		'value' => '[[+cssUrl]]web/default.css',
+		'xtype' => 'textfield',
+		'area'  => 'tickets.main',
+	),
+	'frontend_js' => array(
+		'value' => '[[+jsUrl]]web/default-vanilla.js',
+		'xtype' => 'textfield',
+		'area'  => 'tickets.main',
+	),
+	'editor_config.ticket' => array(
+		'xtype' => 'textarea',
+		'value' => '{onTab: {keepDefault:false, replaceWith:"	"},
         markupSet: [
             {name:"Bold", className: "btn-bold", key:"B", openWith:"<b>", closeWith:"</b>" },
             {name:"Italic", className: "btn-italic", key:"I", openWith:"<i>", closeWith:"</i>"  },
@@ -57,11 +57,11 @@ $tmp = array(
             {separator:"---------------" },
             {name:"Cut", className: "btn-cut", openWith:"<cut/>" }
         ]}',
-        'area' => 'tickets.ticket',
-    ),
-    'editor_config.comment' => array(
-        'xtype' => 'textarea',
-        'value' => '{onTab: {keepDefault:false, replaceWith:"	"},
+		'area' => 'tickets.ticket',
+	),
+	'editor_config.comment' => array(
+		'xtype' => 'textarea',
+		'value' => '{onTab: {keepDefault:false, replaceWith:"	"},
         markupSet: [
             {name:"Bold", className: "btn-bold", key:"B", openWith:"<b>", closeWith:"</b>" },
             {name:"Italic", className: "btn-italic", key:"I", openWith:"<i>", closeWith:"</i>"  },
@@ -73,103 +73,103 @@ $tmp = array(
             {name:"Link", className: "btn-link", openWith:"<a href=\"[![Link:!:http://]!]\">", closeWith:"</a>" },
             {name:"Picture", className: "btn-picture", replaceWith:"<img src=\"[![Source:!:http://]!]\" />" }
         ]}',
-        'area' => 'tickets.comment',
-    ),
-    'default_template' => array(
-        'xtype' => 'modx-combo-template',
-        'value' => '',
-        'area' => 'tickets.ticket',
-    ),
-    'snippet_prepare_comment' => array(
-        'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'tickets.comment',
-    ),
-    'comment_edit_time' => array(
-        'xtype' => 'numberfield',
-        'value' => 600,
-        'area' => 'tickets.comment',
-    ),
-    'clear_cache_on_comment_save' => array(
-        'xtype' => 'combo-boolean',
-        'value' => false,
-        'area' => 'tickets.comment',
-    ),
-    'private_ticket_page' => array(
-        'xtype' => 'numberfield',
-        'value' => 0,
-        'area' => 'tickets.ticket',
-    ),
-    'unpublished_ticket_page' => array(
-        'xtype' => 'numberfield',
-        'value' => 0,
-        'area' => 'tickets.ticket',
-    ),
-    'ticket_max_cut' => array(
-        'xtype' => 'numberfield',
-        'value' => 1000,
-        'area'  => 'tickets.ticket',
-    ),
+		'area' => 'tickets.comment',
+	),
+	'default_template' => array(
+		'xtype' => 'modx-combo-template',
+		'value' => '',
+		'area' => 'tickets.ticket',
+	),
+	'snippet_prepare_comment' => array(
+		'xtype' => 'textfield',
+		'value' => '',
+		'area' => 'tickets.comment',
+	),
+	'comment_edit_time' => array(
+		'xtype' => 'numberfield',
+		'value' => 600,
+		'area' => 'tickets.comment',
+	),
+	'clear_cache_on_comment_save' => array(
+		'xtype' => 'combo-boolean',
+		'value' => false,
+		'area' => 'tickets.comment',
+	),
+	'private_ticket_page' => array(
+		'xtype' => 'numberfield',
+		'value' => 0,
+		'area' => 'tickets.ticket',
+	),
+	'unpublished_ticket_page' => array(
+		'xtype' => 'numberfield',
+		'value' => 0,
+		'area' => 'tickets.ticket',
+	),
+	'ticket_max_cut' => array(
+		'xtype' => 'numberfield',
+		'value' => 1000,
+		'area'  => 'tickets.ticket',
+	),
 
-    'mail_from' => array(
-        'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'tickets.mail',
-    ),
-    'mail_from_name' => array(
-        'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'tickets.mail',
-    ),
-    'mail_queue' => array(
-        'xtype' => 'combo-boolean',
-        'value' => false,
-        'area' => 'tickets.mail',
-    ),
-    'mail_bcc' => array(
-        'xtype' => 'textfield',
-        'value' => '',
-        'area' => 'tickets.mail',
-    ),
-    'mail_bcc_level' => array(
-        'xtype' => 'numberfield',
-        'value' => 1,
-        'area' => 'tickets.mail',
-    ),
-    'section_content_default' => array(
-        'value' => '',
-        'xtype' => 'textarea',
-        'area' => 'tickets.section',
-    ),
+	'mail_from' => array(
+		'xtype' => 'textfield',
+		'value' => '',
+		'area' => 'tickets.mail',
+	),
+	'mail_from_name' => array(
+		'xtype' => 'textfield',
+		'value' => '',
+		'area' => 'tickets.mail',
+	),
+	'mail_queue' => array(
+		'xtype' => 'combo-boolean',
+		'value' => false,
+		'area' => 'tickets.mail',
+	),
+	'mail_bcc' => array(
+		'xtype' => 'textfield',
+		'value' => '',
+		'area' => 'tickets.mail',
+	),
+	'mail_bcc_level' => array(
+		'xtype' => 'numberfield',
+		'value' => 1,
+		'area' => 'tickets.mail',
+	),
+	'section_content_default' => array(
+		'value' => '',
+		'xtype' => 'textarea',
+		'area' => 'tickets.section',
+	),
 
-    'source_default' => array(
-        'value' => 0,
-        'xtype' => 'modx-combo-source',
-        'area' => 'tickets.main',
-    ),
+	'source_default' => array(
+		'value' => 0,
+		'xtype' => 'modx-combo-source',
+		'area' => 'tickets.main',
+	),
 
-    'count_guests' => array(
-        'xtype' => 'combo-boolean',
-        'value' => false,
-        'area' => 'tickets.ticket',
-    ),
+	'count_guests' => array(
+		'xtype' => 'combo-boolean',
+		'value' => false,
+		'area' => 'tickets.ticket',
+	),
 
-    'max_files_upload' => array(
-        'xtype' => 'numberfield',
-        'value' => 0,
-        'area' => 'tickets.ticket',
-    ),
+	'max_files_upload' => array(
+		'xtype' => 'numberfield',
+		'value' => 0,
+		'area' => 'tickets.ticket',
+	),
 );
 
 /** @var modX $modx */
 foreach ($tmp as $k => $v) {
-    /** @var modSystemSetting $setting */
-    $setting = $modx->newObject(modSystemSetting::class);
-    $setting->fromArray(array_merge([
-        'key' => PKG_NAME_LOWER . '.' . $k,
-        'namespace' => PKG_NAME_LOWER,
-    ], $v), '', true, true);
-    $settings[] = $setting;
+	/** @var modSystemSetting $setting */
+	$setting = $modx->newObject(modSystemSetting::class);
+	$setting->fromArray(array_merge([
+		'key' => PKG_NAME_LOWER . '.' . $k,
+		'namespace' => PKG_NAME_LOWER,
+	], $v), '', true, true);
+	$settings[] = $setting;
 }
 
 return $settings;
