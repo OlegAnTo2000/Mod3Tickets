@@ -914,7 +914,7 @@ class Tickets
 
 		$text = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
 
-		$text = '<div class="__tmp_wrapper">' . $text . '</div>';
+		// $text = '<div class="__tmp_wrapper">' . $text . '</div>';
 
 		$replaceTags    = ['[[', ']]', '{', '}'];
 		$replaceSymbols = ['\*\(\*\(\*\(\*\(\*\(\*', '\*\)\*\)\*\)\*\)\*\)\*', '\~\(\~\(\~\(\~\(\~\(\~', '\~\)\~\)\~\)\~\)\~\)\~'];
@@ -977,35 +977,35 @@ class Tickets
 			->allowRelativeLinks()
 			->withMaxInputLength(200000);
 
-		if ($type === 'comment') {
-			$config->blockElement('h1')
-				->blockElement('h2')
-				->blockElement('h3')
-				->blockElement('h4')
-				->blockElement('h5')
-				->blockElement('h6')
-				->blockElement('hr')
-				->blockElement('iframe')
-				->dropAttribute('class', '*')
-				->dropAttribute('style', '*');
-		}
+		// if ($type === 'comment') {
+		// 	$config->blockElement('h1')
+		// 		->blockElement('h2')
+		// 		->blockElement('h3')
+		// 		->blockElement('h4')
+		// 		->blockElement('h5')
+		// 		->blockElement('h6')
+		// 		->blockElement('hr')
+		// 		->blockElement('iframe')
+		// 		->dropAttribute('class', '*')
+		// 		->dropAttribute('style', '*');
+		// }
 
-		if ($type === 'ticket') {
-			$config->allowElement('h1')
-				->allowElement('h2')
-				->allowElement('h3')
-				->allowElement('h4')
-				->allowElement('h5')
-				->allowElement('h6')
-				->allowElement('hr')
-				->allowElement('img')
-				->allowAttribute('src', 'img')
-				->allowAttribute('alt', 'img')
-				->allowAttribute('title', 'img')
-				->forceAttribute('img', 'loading', 'lazy')
-				->forceAttribute('img', 'decoding', 'async')
-				->allowLinkSchemes(['http', 'https', 'data']);
-		}
+		// if ($type === 'ticket') {
+		// 	$config->allowElement('h1')
+		// 		->allowElement('h2')
+		// 		->allowElement('h3')
+		// 		->allowElement('h4')
+		// 		->allowElement('h5')
+		// 		->allowElement('h6')
+		// 		->allowElement('hr')
+		// 		->allowElement('img')
+		// 		->allowAttribute('src', 'img')
+		// 		->allowAttribute('alt', 'img')
+		// 		->allowAttribute('title', 'img')
+		// 		->forceAttribute('img', 'loading', 'lazy')
+		// 		->forceAttribute('img', 'decoding', 'async')
+		// 		->allowLinkSchemes(['http', 'https', 'data']);
+		// }
 
 		$sanitizer = new HtmlSanitizer($config);
 		$filtered  = $sanitizer->sanitize($text);
@@ -1025,7 +1025,7 @@ class Tickets
 			);
 		}
 
-		$filtered = preg_replace('#^<div class="__tmp_wrapper">(.*)</div>$#s', '$1', $filtered);
+		// $filtered = preg_replace('#^<div class="__tmp_wrapper">(.*)</div>$#s', '$1', $filtered);
 		return $filtered;
 	}
 
