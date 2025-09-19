@@ -934,6 +934,7 @@ class Tickets
 
 		// Sanitize text using HtmlSanitizer
 		$config->allowSafeElements()
+			->allowElement('span')
 			->allowElement('a')
 			->allowElement('p')
 			->allowElement('ul')

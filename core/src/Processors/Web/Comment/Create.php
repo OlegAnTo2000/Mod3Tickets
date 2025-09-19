@@ -77,9 +77,7 @@ class Create extends CreateProcessor
 				$this->setProperty('email', '');
 				$this->addFieldError($field, $this->modx->lexicon('ticket_comment_err_email'));
 			} else {
-				if ('email' == $field) {
-					$value = strtolower($value);
-				}
+				if ('email' == $field) $value = strtolower($value);
 				$this->setProperty($field, $value);
 			}
 		}
