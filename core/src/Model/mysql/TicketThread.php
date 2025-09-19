@@ -224,7 +224,7 @@ class TicketThread extends \Tickets\Model\TicketThread
         array (
             'Comments' => 
             array (
-                'class' => 'TicketComment',
+                'class' => '\\Tickets\\Model\\TicketComment',
                 'local' => 'id',
                 'foreign' => 'thread',
                 'cardinality' => 'many',
@@ -232,25 +232,18 @@ class TicketThread extends \Tickets\Model\TicketThread
             ),
             'Total' => 
             array (
-                'class' => 'TicketTotal',
+                'class' => '\\Tickets\\Model\\TicketTotal',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'TicketThread',
-                    ),
-                ),
             ),
         ),
         'aggregates' => 
         array (
             'Ticket' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'resource',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -258,7 +251,7 @@ class TicketThread extends \Tickets\Model\TicketThread
             ),
             'Resource' => 
             array (
-                'class' => 'MODX\\Revolution\\modResource',
+                'class' => '\\MODX\\Revolution\\modResource',
                 'local' => 'resource',
                 'foreign' => 'id',
                 'cardinality' => 'one',

@@ -9,7 +9,7 @@ class TicketsSection extends \Tickets\Model\TicketsSection
     public static $metaMap = array (
         'package' => 'Tickets\\Model\\',
         'version' => '3.0',
-        'extends' => 'MODX\\Revolution\\modResource',
+        'extends' => '\\MODX\\Revolution\\modResource',
         'tableMeta' => 
         array (
             'engine' => 'InnoDB',
@@ -24,7 +24,7 @@ class TicketsSection extends \Tickets\Model\TicketsSection
         array (
             'Tickets' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'id',
                 'foreign' => 'parent',
                 'cardinality' => 'many',
@@ -32,18 +32,11 @@ class TicketsSection extends \Tickets\Model\TicketsSection
             ),
             'Total' => 
             array (
-                'class' => 'TicketTotal',
+                'class' => '\\Tickets\\Model\\TicketTotal',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'TicketsSection',
-                    ),
-                ),
             ),
         ),
     );

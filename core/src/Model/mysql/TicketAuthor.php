@@ -283,7 +283,55 @@ class TicketAuthor extends \Tickets\Model\TicketAuthor
                     ),
                 ),
             ),
-            'votes' => 
+            'votes_tickets' => 
+            array (
+                'alias' => 'votes_tickets',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'votes_tickets' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'votes_comments' => 
+            array (
+                'alias' => 'votes_comments',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'votes_comments' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'stars_tickets' => 
+            array (
+                'alias' => 'stars_tickets',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'stars_tickets' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'stars_comments' => 
             array (
                 'alias' => 'stars_comments',
                 'primary' => false,
@@ -304,7 +352,7 @@ class TicketAuthor extends \Tickets\Model\TicketAuthor
         array (
             'Actions' => 
             array (
-                'class' => 'TicketAuthorAction',
+                'class' => '\\Tickets\\Model\\TicketAuthorAction',
                 'local' => 'id',
                 'foreign' => 'createdby',
                 'cardinality' => 'many',
@@ -315,7 +363,7 @@ class TicketAuthor extends \Tickets\Model\TicketAuthor
         array (
             'User' => 
             array (
-                'class' => 'MODX\\Revolution\\modUser',
+                'class' => '\\MODX\\Revolution\\modUser',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -323,7 +371,7 @@ class TicketAuthor extends \Tickets\Model\TicketAuthor
             ),
             'UserProfile' => 
             array (
-                'class' => 'MODX\\Revolution\\modUserProfile',
+                'class' => '\\MODX\\Revolution\\modUserProfile',
                 'local' => 'id',
                 'foreign' => 'internalKey',
                 'cardinality' => 'one',

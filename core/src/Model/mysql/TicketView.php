@@ -95,7 +95,7 @@ class TicketView extends \Tickets\Model\TicketView
         array (
             'Ticket' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'parent',
                 'foreign' => 'id',
                 'cardinality' => 'one',

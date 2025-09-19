@@ -276,33 +276,19 @@ class TicketComment extends \Tickets\Model\TicketComment
         array (
             'Votes' => 
             array (
-                'class' => 'TicketVote',
+                'class' => '\\Tickets\\Model\\TicketVote',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'TicketComment',
-                    ),
-                ),
             ),
             'Total' => 
             array (
-                'class' => 'TicketTotal',
+                'class' => '\\Tickets\\Model\\TicketTotal',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'TicketComment',
-                    ),
-                ),
             ),
         ),
         'aggregates' => 
@@ -325,7 +311,7 @@ class TicketComment extends \Tickets\Model\TicketComment
             ),
             'Thread' => 
             array (
-                'class' => 'TicketThread',
+                'class' => '\\Tickets\\Model\\TicketThread',
                 'local' => 'thread',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -333,7 +319,7 @@ class TicketComment extends \Tickets\Model\TicketComment
             ),
             'Parent' => 
             array (
-                'class' => 'TicketComment',
+                'class' => '\\Tickets\\Model\\TicketComment',
                 'local' => 'parent',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -341,7 +327,7 @@ class TicketComment extends \Tickets\Model\TicketComment
             ),
             'Children' => 
             array (
-                'class' => 'TicketComment',
+                'class' => '\\Tickets\\Model\\TicketComment',
                 'local' => 'id',
                 'foreign' => 'parent',
                 'cardinality' => 'many',

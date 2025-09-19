@@ -44,41 +44,41 @@ class TicketsSection extends modResource
 		$this->set('class_key', TicketsSection::class);
 	}
 
-	// /**
-	//  * @param string $className
-	//  * @param null   $criteria
-	//  * @param bool   $cacheFlag
-	//  *
-	//  * @return modAccessibleObject|object|null
-	//  */
-	// public static function load(xPDO &$xpdo, $className, $criteria = null, $cacheFlag = true)
-	// {
-	// 	if (!is_object($criteria)) {
-	// 		$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
-	// 	}
-	// 	/* @noinspection PhpParamsInspection */
-	// 	$xpdo->addDerivativeCriteria($className, $criteria);
+	/**
+	 * @param string $className
+	 * @param null   $criteria
+	 * @param bool   $cacheFlag
+	 *
+	 * @return modAccessibleObject|object|null
+	 */
+	public static function load(xPDO &$xpdo, $className, $criteria = null, $cacheFlag = true)
+	{
+		if (!is_object($criteria)) {
+			$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
+		}
+		/* @noinspection PhpParamsInspection */
+		$xpdo->addDerivativeCriteria($className, $criteria);
 
-	// 	return parent::load($xpdo, $className, $criteria, $cacheFlag);
-	// }
+		return parent::load($xpdo, $className, $criteria, $cacheFlag);
+	}
 
-	// /**
-	//  * @param string $className
-	//  * @param null   $criteria
-	//  * @param bool   $cacheFlag
-	//  *
-	//  * @return array
-	//  */
-	// public static function loadCollection(xPDO &$xpdo, $className, $criteria = null, $cacheFlag = true)
-	// {
-	// 	if (!is_object($criteria)) {
-	// 		$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
-	// 	}
-	// 	/* @noinspection PhpParamsInspection */
-	// 	$xpdo->addDerivativeCriteria($className, $criteria);
+	/**
+	 * @param string $className
+	 * @param null   $criteria
+	 * @param bool   $cacheFlag
+	 *
+	 * @return array
+	 */
+	public static function loadCollection(xPDO &$xpdo, $className, $criteria = null, $cacheFlag = true)
+	{
+		if (!is_object($criteria)) {
+			$criteria = $xpdo->getCriteria($className, $criteria, $cacheFlag);
+		}
+		/* @noinspection PhpParamsInspection */
+		$xpdo->addDerivativeCriteria($className, $criteria);
 
-	// 	return parent::loadCollection($xpdo, $className, $criteria, $cacheFlag);
-	// }
+		return parent::loadCollection($xpdo, $className, $criteria, $cacheFlag);
+	}
 
 	/**
 	 * @return string

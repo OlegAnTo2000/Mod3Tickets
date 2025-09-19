@@ -133,7 +133,71 @@ class TicketTotal extends \Tickets\Model\TicketTotal
                     ),
                 ),
             ),
-            'owner' => 
+            'views' => 
+            array (
+                'alias' => 'views',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'views' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'comments' => 
+            array (
+                'alias' => 'comments',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'comments' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'stars' => 
+            array (
+                'alias' => 'stars',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'stars' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'tickets' => 
+            array (
+                'alias' => 'tickets',
+                'primary' => false,
+                'unique' => false,
+                'type' => 'BTREE',
+                'columns' => 
+                array (
+                    'tickets' => 
+                    array (
+                        'length' => '',
+                        'collation' => 'A',
+                        'null' => false,
+                    ),
+                ),
+            ),
+            'rating' => 
             array (
                 'alias' => 'rating',
                 'primary' => false,
@@ -154,7 +218,7 @@ class TicketTotal extends \Tickets\Model\TicketTotal
         array (
             'User' => 
             array (
-                'class' => 'MODX\\Revolution\\modUser',
+                'class' => '\\MODX\\Revolution\\modUser',
                 'local' => 'uid',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -162,63 +226,35 @@ class TicketTotal extends \Tickets\Model\TicketTotal
             ),
             'TicketsSection' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'foreign',
-                'criteria' => 
-                array (
-                    'local' => 
-                    array (
-                        'class' => 'TicketsSection',
-                    ),
-                ),
             ),
             'Ticket' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'foreign',
-                'criteria' => 
-                array (
-                    'local' => 
-                    array (
-                        'class' => 'Ticket',
-                    ),
-                ),
             ),
             'TicketComment' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'foreign',
-                'criteria' => 
-                array (
-                    'local' => 
-                    array (
-                        'class' => 'TicketComment',
-                    ),
-                ),
             ),
             'TicketThread' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'foreign',
-                'criteria' => 
-                array (
-                    'local' => 
-                    array (
-                        'class' => 'TicketThread',
-                    ),
-                ),
             ),
         ),
     );

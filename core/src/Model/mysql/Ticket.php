@@ -9,7 +9,7 @@ class Ticket extends \Tickets\Model\Ticket
     public static $metaMap = array (
         'package' => 'Tickets\\Model\\',
         'version' => '3.0',
-        'extends' => 'MODX\\Revolution\\modResource',
+        'extends' => '\\MODX\\Revolution\\modResource',
         'tableMeta' => 
         array (
             'engine' => 'InnoDB',
@@ -24,7 +24,7 @@ class Ticket extends \Tickets\Model\Ticket
         array (
             'Views' => 
             array (
-                'class' => 'TicketView',
+                'class' => '\\Tickets\\Model\\TicketView',
                 'local' => 'id',
                 'foreign' => 'parent',
                 'cardinality' => 'many',
@@ -32,70 +32,42 @@ class Ticket extends \Tickets\Model\Ticket
             ),
             'Votes' => 
             array (
-                'class' => 'TicketVote',
+                'class' => '\\Tickets\\Model\\TicketVote',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'Ticket',
-                    ),
-                ),
             ),
             'Stars' => 
             array (
-                'class' => 'TicketStar',
+                'class' => '\\Tickets\\Model\\TicketStar',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'Ticket',
-                    ),
-                ),
             ),
             'Files' => 
             array (
-                'class' => 'TicketFile',
+                'class' => '\\Tickets\\Model\\TicketFile',
                 'local' => 'id',
                 'foreign' => 'parent',
                 'cardinality' => 'many',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'Ticket',
-                    ),
-                ),
             ),
             'Total' => 
             array (
-                'class' => 'TicketTotal',
+                'class' => '\\Tickets\\Model\\TicketTotal',
                 'local' => 'id',
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
-                'criteria' => 
-                array (
-                    'foreign' => 
-                    array (
-                        'class' => 'Ticket',
-                    ),
-                ),
             ),
         ),
         'aggregates' => 
         array (
             'Section' => 
             array (
-                'class' => 'TicketsSection',
+                'class' => '\\Tickets\\Model\\TicketsSection',
                 'local' => 'parent',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -103,7 +75,7 @@ class Ticket extends \Tickets\Model\Ticket
             ),
             'Threads' => 
             array (
-                'class' => 'TicketThread',
+                'class' => '\\Tickets\\Model\\TicketThread',
                 'local' => 'id',
                 'foreign' => 'resource',
                 'cardinality' => 'many',

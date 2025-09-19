@@ -278,7 +278,7 @@ class TicketAuthorAction extends \Tickets\Model\TicketAuthorAction
         array (
             'User' => 
             array (
-                'class' => 'MODX\\Revolution\\modUser',
+                'class' => '\\MODX\\Revolution\\modUser',
                 'local' => 'createdby',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -286,7 +286,7 @@ class TicketAuthorAction extends \Tickets\Model\TicketAuthorAction
             ),
             'UserProfile' => 
             array (
-                'class' => 'MODX\\Revolution\\modUserProfile',
+                'class' => '\\MODX\\Revolution\\modUserProfile',
                 'local' => 'createdby',
                 'foreign' => 'internalKey',
                 'cardinality' => 'one',
@@ -294,7 +294,7 @@ class TicketAuthorAction extends \Tickets\Model\TicketAuthorAction
             ),
             'Author' => 
             array (
-                'class' => 'TicketAuthor',
+                'class' => '\\Tickets\\Model\\TicketAuthor',
                 'local' => 'createdby',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -302,7 +302,7 @@ class TicketAuthorAction extends \Tickets\Model\TicketAuthorAction
             ),
             'Ticket' => 
             array (
-                'class' => 'Ticket',
+                'class' => '\\Tickets\\Model\\Ticket',
                 'local' => 'ticket',
                 'foreign' => 'id',
                 'cardinality' => 'one',
@@ -310,7 +310,7 @@ class TicketAuthorAction extends \Tickets\Model\TicketAuthorAction
             ),
             'Section' => 
             array (
-                'class' => 'TicketsSection',
+                'class' => '\\Tickets\\Model\\TicketsSection',
                 'local' => 'section',
                 'foreign' => 'id',
                 'cardinality' => 'one',
