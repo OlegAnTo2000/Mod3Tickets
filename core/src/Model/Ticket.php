@@ -239,15 +239,16 @@ class Ticket extends modResource
 	 * Html filter and typograf.
 	 *
 	 * @var mixed for processing
+	 * 
 	 * @var bool
 	 *
 	 * @return mixed Filtered text
 	 */
-	public function Jevix($text, $replaceTags = true)
+	public function Jevix($text, $disableModxAndFenomTags = true)
 	{
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->xpdo->getService('Tickets')) {
-			return $Tickets->sanitizeText($text, $replaceTags);
+		if ($Tickets = $this->xpdo->services->get('tickets')) {
+			return $Tickets->sanitizeText($text, $disableModxAndFenomTags);
 		}
 
 		return 'Error on loading class "Tickets".';
@@ -404,7 +405,7 @@ class Ticket extends modResource
 	{
 		$createdon = parent::get('createdon');
 		/** @var Tickets $Tickets */
-		if ($Tickets = $this->xpdo->getService('Tickets')) {
+		if ($Tickets = $this->xpdo->services->get('tickets')) {
 			$createdon = $Tickets->dateFormat($createdon);
 		}
 
@@ -761,8 +762,8 @@ class Ticket extends modResource
 		parent::clearCache($context);
 	}
 
-	public function sanitizeText($text = null, $replaceTags = true)
+	public function sanitizeText($text = null, $disableModxAndFenomTags = true)
 	{
-		return tickets_service()->sanitizeText($text, $replaceTags);
+		return tickets_service()->sanitizeText($text, $disableModxAndFenomTags);
 	}
 }

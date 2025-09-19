@@ -2,13 +2,14 @@
 
 namespace Tickets\Console\Command;
 
-use MatthiasMullie\Minify\JS;
-use MatthiasMullie\Minify\CSS;
 use Tickets\App;
 use Phinx\Config\Config;
 use MODX\Revolution\modX;
+use Illuminate\Support\Arr;
 use Phinx\Migration\Manager;
+use MatthiasMullie\Minify\JS;
 use MMX\Database\Models\Menu;
+use MatthiasMullie\Minify\CSS;
 use MMX\Database\Models\Chunk;
 use Phinx\Wrapper\TextWrapper;
 use MMX\Database\Models\Plugin;
@@ -261,6 +262,16 @@ class Install extends Command
 				'value' => false,
 				'area' => 'tickets.comment',
 			],
+			'allow_markdown_in_comments' => [
+				'xtype' => 'combo-boolean',
+				'value' => true,
+				'area' => 'tickets.comment',
+			],
+			'allow_markdown_in_tickets' => [
+				'xtype' => 'combo-boolean',
+				'value' => true,
+				'area'  => 'tickets.ticket',
+			],
 			'private_ticket_page' => [
 				'xtype' => 'numberfield',
 				'value' => 0,
@@ -324,11 +335,21 @@ class Install extends Command
 		];
 
 		foreach ($settings as $key => $data) {
-			SystemSetting::updateOrCreate([
+			$setting = SystemSetting::firstOrNew([
 				'key' => strtolower(App::NAME) . '.' . $key,
-			], array_merge([
+			]);
+
+			// if new setting - set value
+			if (!$setting->exists && isset($data['value'])) {
+				$setting->value = $data['value'];
+			}
+
+			// update other fields always
+			$setting->fill(array_merge([
 				'namespace' => strtolower(App::NAME),
-			], $data));
+			], Arr::except($data, ['value'])));
+
+			$setting->save();
 		}
 
 		Model::reguard();

@@ -51,6 +51,10 @@ $_lang['setting_tickets.comment_edit_time']                = 'Time to edit';
 $_lang['setting_tickets.comment_edit_time_desc']           = 'Time in seconds for editing own comment.';
 $_lang['setting_tickets.clear_cache_on_comment_save']      = 'Clear cache on commenting';
 $_lang['setting_tickets.clear_cache_on_comment_save_desc'] = 'If true, cache of ticket will be cleared on any action with comment: create\update\remove. It needed only if you call snippet "TicketComments" uncached.';
+$_lang['setting_tickets.allow_markdown_in_comments']       = 'Allow markdown in comments';
+$_lang['setting_tickets.allow_markdown_in_comments_desc']  = 'If true, allows to use markdown in comments.';
+$_lang['setting_tickets.allow_markdown_in_tickets']        = 'Allow markdown in tickets';
+$_lang['setting_tickets.allow_markdown_in_tickets_desc']   = 'If true, allows to use markdown in tickets.';
 
 $_lang['setting_tickets.mail_from']           = 'Mailbox outgoing mail';
 $_lang['setting_tickets.mail_from_desc']      = 'Address to send the notifications. If not full - will be used system setting "emailsender".';

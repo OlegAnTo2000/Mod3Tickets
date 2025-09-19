@@ -2,9 +2,10 @@
 
 namespace Tickets\Model;
 
-use MODX\Revolution\Mail\modMail;
-use xPDO\Om\xPDOSimpleObject;
 use xPDO\xPDO;
+use xPDO\Om\xPDOSimpleObject;
+use MODX\Revolution\Mail\modMail;
+use MODX\Revolution\Mail\modPHPMailer;
 
 class TicketQueue extends xPDOSimpleObject
 {
@@ -14,7 +15,7 @@ class TicketQueue extends xPDOSimpleObject
 	public function Send()
 	{
 		/** @var modPHPMailer $mail */
-		$mail = $this->xpdo->getService('mail', 'mail.modPHPMailer');
+		$mail = $this->xpdo->services->get('mail', new modPHPMailer($this->xpdo));
 		$mail->setHTML(true);
 
 		$mail->set(modMail::MAIL_SUBJECT, $this->subject);

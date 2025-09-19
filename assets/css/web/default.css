@@ -192,7 +192,7 @@
 	margin: 10px 0;
 	overflow: hidden;
 }
-#comment-preview-placeholder {
+#comment-preview-placeholder.active {
 	display: block;
 }
 

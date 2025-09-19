@@ -2,66 +2,68 @@
 
 namespace Tickets;
 
-use function abs;
-use function array_key_exists;
-use function array_map;
-use function array_merge;
-use function array_unique;
-use function date;
-use function defined;
-use function explode;
-use function file_exists;
-use function html_entity_decode;
-use function htmlentities;
-use function in_array;
-use function is_array;
-use function is_object;
-use function json_decode;
-use function json_encode;
-use function md5;
-use function method_exists;
-use function mktime;
-
-use MODX\Revolution\modManagerController;
-use MODX\Revolution\modResource;
-use MODX\Revolution\modSnippet;
-use MODX\Revolution\modUser;
-use MODX\Revolution\modUserProfile;
-use MODX\Revolution\modX;
-use MODX\Revolution\pdoTools;
-use MODX\Revolution\Processors\ProcessorResponse;
-use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
-use MODX\Revolution\Processors\Resource\Update as ResourceUpdateProcessor;
-
-use function mt_rand;
-
 use PDO;
-
-use function preg_match;
-use function preg_replace;
-use function print_r;
-use function round;
-use function str_replace;
-use function strpos;
-use function strtolower;
-use function strtotime;
-
-use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
-use Tickets\Model\Ticket;
-use Tickets\Model\TicketAuthor;
-use Tickets\Model\TicketComment;
-use Tickets\Model\TicketQueue;
-use Tickets\Model\TicketsSection;
-use Tickets\Model\TicketThread;
-use Tickets\Model\TicketView;
-use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
-use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
-use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
-
+use Parsedown;
+use function abs;
+use function md5;
+use function date;
 use function time;
 use function trim;
+use function round;
+use ParsedownExtra;
+use function mktime;
+use function strpos;
+use function defined;
+use function explode;
+use function mt_rand;
+use function print_r;
+use function in_array;
+use function is_array;
+use function array_map;
+use function is_object;
+
+use function strtotime;
+use function preg_match;
+use function strtolower;
+use function array_merge;
+use function file_exists;
+use function json_decode;
+use function json_encode;
+use function str_replace;
+use MODX\Revolution\modX;
+use Tickets\Model\Ticket;
+
+use function array_unique;
+
+use function htmlentities;
+
+use function preg_replace;
+use function method_exists;
+use MODX\Revolution\modUser;
 use function version_compare;
+use MODX\Revolution\pdoTools;
+use Tickets\Model\TicketView;
+use function array_key_exists;
+use Tickets\Model\TicketQueue;
+
+use MODX\Revolution\modSnippet;
+use Tickets\Model\TicketAuthor;
+use Tickets\Model\TicketThread;
+use function html_entity_decode;
+use MODX\Revolution\modResource;
+use Tickets\Model\TicketComment;
+use Tickets\Model\TicketsSection;
+use MODX\Revolution\modUserProfile;
+use MODX\Revolution\modManagerController;
+use MODX\Revolution\Processors\ProcessorResponse;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
+
+use Tickets\Processors\Web\Ticket\Vote as TicketVoteProcessor;
+use Tickets\Processors\Web\Ticket\Delete as TicketDeleteProcessor;
+use Tickets\Processors\Web\Ticket\Undelete as TicketUndeleteProcessor;
+use MODX\Revolution\Processors\Resource\Create as ResourceCreateProcessor;
+use MODX\Revolution\Processors\Resource\Update as ResourceUpdateProcessor;
 
 class Tickets
 {
@@ -139,6 +141,9 @@ class Tickets
 			'enableCaptcha'     => false,
 
 			'requiredFields' => '',
+
+			'allowMarkdownInComments' => $this->modx->getOption('tickets.allow_markdown_in_comments', null, true),
+			'allowMarkdownInTickets' => $this->modx->getOption('tickets.allow_markdown_in_tickets', null, true),
 		], $config);
 
 		$this->modx->addPackage('Tickets\Model', $this->config['srcPath'], null, 'Tickets\\');
@@ -890,37 +895,61 @@ class Tickets
 		return $this->error('');
 	}
 
-	public function sanitizeText($text = null, $replaceTags = true)
+	/**
+	 * Sanitize text.
+	 *
+	 * @param string $text
+	 * @param bool   $disableModxAndFenomTags Replace MODX and Fenom tags symbols with special html entities [[ > &#91;&#91;
+	 *
+	 * @return string
+	 */
+	public function sanitizeText($text = null, $disableModxAndFenomTags = true)
 	{
-		if (empty($text)) {
-			return ' ';
-		}
+		if (empty($text)) return ' ';
 
 		// Loading parser if needed - it is for mgr context
 		if (!is_object($this->modx->parser)) {
 			$this->modx->getParser();
 		}
 
-		$text            = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
-		$params['input'] = str_replace(
+		$text = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
+
+		// Replace MODX and Fenom tags symbols with temporary symbols
+		$text = str_replace(
 			['[', ']', '{', '}'],
 			['*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'],
 			$text
 		);
 
+		// Parse markdown if allowed
+		if ($this->config['allowMarkdownInComments'] || $this->config['allowMarkdownInTickets']) {
+			$text = $this->parseMarkdown($text);
+		}
+
+		// Sanitize text using HtmlSanitizer
 		$builder = (new HtmlSanitizerConfig())
-			->allowSafeElements()                   // безопасный базовый набор
-			// ->allowElement('['a', 'p', 'ul', 'ol', 'li', 'strong', 'em', 'code', 'blockquote', 'br']')
+			->allowSafeElements()
 			->allowElement('a')
 			->allowElement('p')
 			->allowElement('ul')
 			->allowElement('ol')
 			->allowElement('li')
 			->allowElement('strong')
+			->allowElement('b')
 			->allowElement('em')
+			->allowElement('i')
 			->allowElement('code')
+			->allowElement('pre')
 			->allowElement('blockquote')
 			->allowElement('br')
+			->allowElement('table')
+			->forceAttribute('table', 'class', 'table table-bordered')
+			->allowElement('thead')
+			->allowElement('tbody')
+			->allowElement('tfoot')
+			->allowElement('tr')
+			->allowElement('th')
+			->allowElement('td')
 			->allowAttribute('href', 'a')
 			->allowAttribute('title', 'a')
 			->forceAttribute('a', 'rel', 'nofollow noopener ugc')
@@ -931,7 +960,8 @@ class Tickets
 		$sanitizer = new HtmlSanitizer($builder);
 		$filtered  = $sanitizer->sanitize($text);
 
-		if ($replaceTags) {
+		// Replace temporary symbols
+		if ($disableModxAndFenomTags) {
 			$filtered = str_replace(
 				['*(*(*(*(*(*', '*)*)*)*)*)*', '`', '~(~(~(~(~(~', '~)~)~)~)~)~'],
 				['&#91;', '&#93;', '&#96;', '&#123;', '&#125;'],
@@ -1854,5 +1884,33 @@ class Tickets
 			$controller->addLastJavascript($ticketsJsUrl . 'author/authors.panel.js');
 			$controller->addLastJavascript($ticketsJsUrl . 'author/authors.grid.js');
 		}
+	}
+
+	public function getConfig(?string $key = null): mixed
+	{
+		return $key ? $this->config[$key] : $this->config;
+	}
+
+	public function setConfig(array $config): self
+	{
+		$this->config = $config;
+		return $this;
+	}
+
+	public function addConfig(array $config): self
+	{
+		$this->config = array_merge($this->config, $config);
+		return $this;
+	}
+
+	public function setConfigValue(string $key, mixed $value): self
+	{
+		$this->config[$key] = $value;
+		return $this;
+	}
+
+	public function parseMarkdown(string $markdown): string
+	{
+		return (new ParsedownExtra())->text($markdown);
 	}
 }
