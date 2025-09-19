@@ -448,7 +448,7 @@ class TicketsApp {
           const holder = this.$(this.sel.commentPreviewPlaceholder);
           if (holder) {
             holder.innerHTML = resp.data.preview || '';
-            holder.style.display = '';
+            holder.classList.add('active');
           }
           if (typeof window.prettyPrint === 'function') window.prettyPrint();
         } else {

@@ -2,6 +2,8 @@
 
 namespace Tickets\Console\Command;
 
+use MatthiasMullie\Minify\JS;
+use MatthiasMullie\Minify\CSS;
 use Tickets\App;
 use Phinx\Config\Config;
 use MODX\Revolution\modX;
@@ -19,10 +21,10 @@ use MODX\Revolution\modAccessPolicy;
 use MMX\Database\Models\SystemSetting;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\StringInput;
 
 class Install extends Command
 {
@@ -190,12 +192,12 @@ class Install extends Command
 				'area'  => 'tickets.main',
 			],
 			'frontend_css' => [
-				'value' => '[[+cssUrl]]web/default.css',
+				'value' => '[[+cssUrl]]web/default.min.css',
 				'xtype' => 'textfield',
 				'area'  => 'tickets.main',
 			],
 			'frontend_js' => [
-				'value' => '[[+jsUrl]]web/default-vanilla.js',
+				'value' => '[[+jsUrl]]web/default-vanilla.min.js',
 				'xtype' => 'textfield',
 				'area'  => 'tickets.main',
 			],
@@ -641,5 +643,14 @@ class Install extends Command
 		$manager = new Manager($config, new StringInput(' '), $output);
 
 		$manager->migrate('local');
+	}
+
+	public function minifyCssJs(OutputInterface $output): void
+	{
+		$css = new CSS(App::VENDOR_PATH . 'assets/css/web/default.css');
+		$css->minify(App::VENDOR_PATH . 'assets/css/web/default.min.css');
+
+		$js = new JS(App::VENDOR_PATH . 'assets/js/web/default-vanilla.js');
+		$js->minify(App::VENDOR_PATH . 'assets/js/web/default-vanilla.min.js');
 	}
 }
