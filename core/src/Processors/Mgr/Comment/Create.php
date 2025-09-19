@@ -77,7 +77,7 @@ class Create extends CreateProcessor
 		/** @var Tickets $Tickets */
 		if ($Tickets = $this->modx->services->get('tickets')) {
 			$this->object->fromArray([
-				'text' => $Tickets->sanitizeText($text, true),
+				'text' => $Tickets->sanitizeText($text, true, null, 'comment'),
 				'raw'  => $text,
 			]);
 		}

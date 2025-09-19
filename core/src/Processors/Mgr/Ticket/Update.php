@@ -121,7 +121,7 @@ class Update extends ResourceUpdate
 			$introtext = $this->object->getIntroText($this->getProperty('content'), false);
 		}
 		if (empty($properties['disable_jevix'])) {
-			$introtext = $this->object->sanitizeText($introtext);
+			$introtext = $this->object->sanitizeText($introtext, true, null, 'ticket');
 		}
 
 		// Set properties

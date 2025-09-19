@@ -557,7 +557,7 @@ class Tickets
 			}
 		}
 
-		$preview = $this->sanitizeText($data['text'], true);
+		$preview = $this->sanitizeText($data['text'], true, null, 'comment');
 		$preview = preg_replace('/\[\[.*?\]\]/', '', $preview);
 
 		return $this->success('', ['preview' => $preview]);
@@ -602,7 +602,7 @@ class Tickets
 		}
 		unset($data['action']);
 		$data['raw']            = trim($data['text']);
-		$data['text']           = $this->sanitizeText($data['text'], true);
+		$data['text']           = $this->sanitizeText($data['text'], true, null, 'comment');
 		$data['allowGuest']     = !empty($this->config['allowGuest']);
 		$data['allowGuestEdit'] = !empty($this->config['allowGuestEdit']);
 		$data['requiredFields'] = $this->config['requiredFields'];
@@ -903,7 +903,7 @@ class Tickets
 	 *
 	 * @return string
 	 */
-	public function sanitizeText($text = null, $disableModxAndFenomTags = true)
+	public function sanitizeText($text = null, $disableModxAndFenomTags = true, ?bool $allowMarkdown = false, string $type = 'comment')
 	{
 		if (empty($text)) return ' ';
 
@@ -926,13 +926,14 @@ class Tickets
 		);
 
 		// Parse markdown if allowed
-		if ($this->config['allowMarkdownInComments'] || $this->config['allowMarkdownInTickets']) {
+		if ($allowMarkdown || $this->config['allowMarkdownInComments'] || $this->config['allowMarkdownInTickets']) {
 			$text = $this->parseMarkdown($text);
 		}
 
+		$config = new HtmlSanitizerConfig();
+
 		// Sanitize text using HtmlSanitizer
-		$builder = (new HtmlSanitizerConfig())
-			->allowSafeElements()
+		$config->allowSafeElements()
 			->allowElement('a')
 			->allowElement('p')
 			->allowElement('ul')
@@ -954,6 +955,17 @@ class Tickets
 			->allowElement('tr')
 			->allowElement('th')
 			->allowElement('td')
+			->allowElement('del')
+			->allowElement('dt')
+			->allowElement('dd')
+			->allowElement('dl')
+			->allowElement('abbr')
+			->allowElement('cite')
+			->allowElement('q')
+			->allowElement('mark')
+			->allowElement('sub')
+			->allowElement('sup')
+			->allowElement('kbd')
 			->allowAttribute('href', 'a')
 			->allowAttribute('title', 'a')
 			->forceAttribute('a', 'rel', 'nofollow noopener ugc')
@@ -961,7 +973,37 @@ class Tickets
 			->allowLinkSchemes(['http', 'https', 'mailto'])
 			->allowRelativeLinks();
 
-		$sanitizer = new HtmlSanitizer($builder);
+		if ($type === 'comment') {
+			$config->blockElement('h1')
+				->blockElement('h2')
+				->blockElement('h3')
+				->blockElement('h4')
+				->blockElement('h5')
+				->blockElement('h6')
+				->blockElement('hr')
+				->blockElement('iframe')
+				->dropAttribute('class', '*')
+				->dropAttribute('style', '*');
+		}
+
+		if ($type === 'ticket') {
+			$config->allowElement('h1')
+				->allowElement('h2')
+				->allowElement('h3')
+				->allowElement('h4')
+				->allowElement('h5')
+				->allowElement('h6')
+				->allowElement('hr')
+				->allowElement('img')
+				->allowAttribute('src', 'img')
+				->allowAttribute('alt', 'img')
+				->allowAttribute('title', 'img')
+				->forceAttribute('img', 'loading', 'lazy')
+				->forceAttribute('img', 'decoding', 'async')
+				->allowLinkSchemes(['http', 'https', 'data']);
+		}
+
+		$sanitizer = new HtmlSanitizer($config);
 		$filtered  = $sanitizer->sanitize($text);
 
 		// Replace temporary symbols

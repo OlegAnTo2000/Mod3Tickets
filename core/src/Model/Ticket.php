@@ -221,7 +221,7 @@ class Ticket extends modResource
 	{
 		$content    = parent::get('content');
 		$properties = $this->getProperties();
-		$content    = tickets_service()->sanitizeText($content, false);
+		$content    = tickets_service()->sanitizeText($content, false, null, 'ticket');
 
 		if (!$properties['process_tags']) {
 			$content = str_replace(
@@ -248,7 +248,7 @@ class Ticket extends modResource
 	{
 		/** @var Tickets $Tickets */
 		if ($Tickets = $this->xpdo->services->get('tickets')) {
-			return $Tickets->sanitizeText($text, $disableModxAndFenomTags);
+			return $Tickets->sanitizeText($text, $disableModxAndFenomTags, null, 'ticket');
 		}
 
 		return 'Error on loading class "Tickets".';
@@ -275,7 +275,7 @@ class Ticket extends modResource
 			$tmp       = explode('<cut/>', $content);
 			$introtext = reset($tmp);
 			if ($Tickets = tickets_service()) {
-				$introtext = $Tickets->sanitizeText($introtext, true);
+				$introtext = $Tickets->sanitizeText($introtext, true, null, 'ticket');
 			}
 		}
 
@@ -764,6 +764,6 @@ class Ticket extends modResource
 
 	public function sanitizeText($text = null, $disableModxAndFenomTags = true)
 	{
-		return tickets_service()->sanitizeText($text, $disableModxAndFenomTags);
+		return tickets_service()->sanitizeText($text, $disableModxAndFenomTags, null, 'ticket');
 	}
 }

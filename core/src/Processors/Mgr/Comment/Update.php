@@ -61,7 +61,7 @@ class Update extends UpdateProcessor
 			$this->object->fromArray([
 				'editedon' => time(),
 				'editedby' => $this->modx->user->id,
-				'text'     => $Tickets->sanitizeText($text, true),
+				'text'     => $Tickets->sanitizeText($text, true, null, 'comment'),
 				'raw'      => $text,
 			]);
 		}
