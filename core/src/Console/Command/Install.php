@@ -650,10 +650,10 @@ class Install extends Command
 
 	public function minifyCssJs(OutputInterface $output): void
 	{
-		$css = new CSS(App::VENDOR_PATH . 'assets/css/web/default.css');
-		$css->minify(App::VENDOR_PATH . 'assets/css/web/default.min.css');
+		$css = new CSS(App::VENDOR_PATH . '/assets/css/web/default.css');
+		$css->minify(App::VENDOR_PATH . '/assets/css/web/default.min.css');
 
-		$js = new JS(App::VENDOR_PATH . 'assets/js/web/default-vanilla.js');
-		$js->minify(App::VENDOR_PATH . 'assets/js/web/default-vanilla.min.js');
+		$js = new JS(App::VENDOR_PATH . '/assets/js/web/default-vanilla.js');
+		$js->minify(App::VENDOR_PATH . '/assets/js/web/default-vanilla.min.js');
 	}
 }
