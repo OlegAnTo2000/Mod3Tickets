@@ -85,7 +85,6 @@ final class CreateTicketsTables extends AbstractMigration
 				$table->string('ip', 16)->nullable()->default('0.0.0.0');
 
 				$table->primary(['id', 'createdby', 'class']);
-				$table->index('createdon');
 				$table->index('owner');
 			}
 		);
@@ -101,7 +100,6 @@ final class CreateTicketsTables extends AbstractMigration
 				$table->unsignedInteger('createdby')->default(0);
 
 				$table->primary(['id', 'createdby', 'class']);
-				$table->index('createdon');
 				$table->index('owner');
 			}
 		);
@@ -163,7 +161,6 @@ final class CreateTicketsTables extends AbstractMigration
 				$table->index('source');
 				$table->index('type');
 				$table->index('deleted');
-				$table->index('hash');
 			}
 		);
 
