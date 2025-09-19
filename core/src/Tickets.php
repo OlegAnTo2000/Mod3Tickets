@@ -634,6 +634,7 @@ class Tickets
 		} else {
 			$response = $this->runProcessor('web/comment/create', $data);
 		}
+
 		/** @var ProcessorResponse $response */
 		if ($response->isError()) {
 			$this->modx->log(
@@ -643,7 +644,6 @@ class Tickets
 					1
 				)
 			);
-
 			return $this->error($response->getMessage(), $response->getFieldErrors());
 		} else {
 			$comment               = $response->getObject();
