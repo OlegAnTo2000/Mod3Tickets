@@ -84,6 +84,9 @@ class Install extends Command
 		$this->migrate($db, $output);
 		$output->writeln("<info>Migrated database</info>");
 
+		$this->minifyCssJs($output);
+		$output->writeln('<info>Minified CSS and JS</info>');
+
 		$this->modx->getCacheManager()->refresh();
 		$output->writeln('<info>Cleared MODX cache</info>');
 	}
