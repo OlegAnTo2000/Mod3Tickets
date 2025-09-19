@@ -15,7 +15,13 @@ class TicketQueue extends xPDOSimpleObject
 	public function Send()
 	{
 		/** @var modPHPMailer $mail */
-		$mail = $this->xpdo->services->get('mail', new modPHPMailer($this->xpdo));
+		if (!$this->xpdo->services->has('mail')) {
+			$this->xpdo->services->add('mail', function ($c) {
+				return new modPHPMailer($this->xpdo);
+			});
+		}
+		/** @var modPHPMailer $mail */
+		$mail = $this->xpdo->services->get('mail');
 		$mail->setHTML(true);
 
 		$mail->set(modMail::MAIL_SUBJECT, $this->subject);
