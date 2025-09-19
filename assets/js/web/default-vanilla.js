@@ -82,6 +82,8 @@ class TicketsApp {
       if (this.isVisible(cf)) newLink.style.display = 'none';
     }
 
+		this.initEditors();
+
     // Init tpanel
     this.tpanel = new TicketsTpanel(this);
     this.tpanel.initialize();
@@ -887,6 +889,15 @@ class TicketsApp {
 
     this.ticketSisyphus = { release };
   }
+
+	// === Lightweight Markdown editor bootstrap ===
+	initEditors() {
+		if (this.cfg.enable_editor === false) return;
+		const ticketTA = this.$(this.sel.ticketEditor);
+		if (ticketTA) new SimpleMdEditor(ticketTA);
+		const commentTA = this.$(this.sel.commentEditor);
+		if (commentTA) new SimpleMdEditor(commentTA);
+	}
 }
 
 /* ========================= TPANEL ========================= */
@@ -973,6 +984,168 @@ class TicketsToaster {
   info(msg, o) { this.show('info', msg, o); }
   closeAll() { this.container.innerHTML = ''; }
 }
+
+// simple-md-editor.js
+class SimpleMdEditor {
+  /**
+   * @param {HTMLTextAreaElement} textarea
+   * @param {Object} [opts]
+   * @param {Array<string>} [opts.buttons] порядок/набор кнопок
+   */
+  constructor(textarea, opts = {}) {
+    if (!textarea) throw new Error('SimpleMdEditor: textarea is required');
+    this.ta = textarea;
+    this.opts = Object.assign(
+      {
+        buttons: ['bold','italic','code','h1','h2','quote','ul','ol','link','image','hr'],
+      },
+      opts
+    );
+    this.ta.spellcheck = false;
+    SimpleMdEditor.ensureStyles();
+    this.buildToolbar();
+  }
+
+  // --- Styles (один раз на страницу) ---
+  static ensureStyles() {
+    if (document.getElementById('simple-md-editor-styles')) return;
+    const css = `
+      .md-toolbar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+      .md-toolbar button{border:1px solid #d1d5db;background:#f9fafb;border-radius:6px;padding:6px 8px;cursor:pointer;font:13px/1 system-ui}
+      .md-toolbar button:hover{background:#f3f4f6}
+      .md-toolbar button:active{transform:translateY(1px)}
+    `;
+    const style = document.createElement('style');
+    style.id = 'simple-md-editor-styles';
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+
+  // --- UI ---
+  buildToolbar() {
+    const labels = {
+      bold:   {label:'B',   title:'Жирный (** **)'},
+      italic: {label:'I',   title:'Курсив (* *)'},
+      code:   {label:'</>', title:'Код (` `)'},
+      h1:     {label:'H1',  title:'Заголовок #'},
+      h2:     {label:'H2',  title:'Заголовок ##'},
+      quote:  {label:'❝',   title:'Цитата >'},
+      ul:     {label:'•',   title:'Список -'},
+      ol:     {label:'1.',  title:'Нумерованный 1.'},
+      link:   {label:'🔗',  title:'Ссылка [текст](url)'},
+      image:  {label:'🖼',  title:'Картинка ![alt](url)'},
+      hr:     {label:'―',   title:'Горизонтальная линия ---'},
+    };
+
+    const wrap = document.createElement('div');
+    wrap.className = 'md-toolbar';
+    wrap.innerHTML = this.opts.buttons
+      .map((act) => {
+        const l = labels[act];
+        return l ? `<button type="button" data-act="${act}" title="${l.title}">${l.label}</button>` : '';
+      })
+      .join('');
+    this.ta.insertAdjacentElement('beforebegin', wrap);
+
+    wrap.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-act]');
+      if (!b) return;
+      const act = b.dataset.act;
+      this.ta.focus();
+      switch (act) {
+        case 'bold':  return this.surround('**');
+        case 'italic':return this.surround('*');
+        case 'code':  return this.surround('`');
+        case 'h1':    return this.toggleLinePrefix('# ');
+        case 'h2':    return this.toggleLinePrefix('## ');
+        case 'quote': return this.toggleLinePrefix('> ');
+        case 'ul':    return this.toggleLinePrefix('- ');
+        case 'ol':    return this.toggleLinePrefix('1. ');
+        case 'link':  return this.insertLink();
+        case 'image': return this.insertImage();
+        case 'hr':    return this.insertAtCursor('\n\n---\n\n');
+      }
+    });
+  }
+
+  // --- Selection helpers ---
+  getSel() {
+    const ta = this.ta;
+    return { start: ta.selectionStart, end: ta.selectionEnd, val: ta.value };
+  }
+  setSel(start, end) {
+    this.ta.selectionStart = start;
+    this.ta.selectionEnd = end;
+  }
+
+  // --- Inline wrappers ---
+  surround(mark) {
+    const { start, end, val } = this.getSel();
+    const before = val.slice(0, start);
+    const sel = val.slice(start, end);
+    const after = val.slice(end);
+    const text = sel || 'текст';
+    const newVal = `${before}${mark}${text}${mark}${after}`;
+    this.ta.value = newVal;
+    const caretStart = start + mark.length;
+    const caretEnd = caretStart + (sel ? sel.length : 'текст'.length);
+    this.setSel(caretStart, caretEnd);
+  }
+
+  insertAtCursor(text) {
+    const { start, end, val } = this.getSel();
+    this.ta.value = val.slice(0, start) + text + val.slice(end);
+    const pos = start + text.length;
+    this.setSel(pos, pos);
+  }
+
+  // --- Block modifiers (prefix by lines) ---
+  toggleLinePrefix(prefix) {
+    const { start, end, val } = this.getSel();
+
+    // расширяем до границ строк
+    const ls = val.lastIndexOf('\n', start - 1) + 1;
+    const le = val.indexOf('\n', end);
+    const blockEnd = le === -1 ? val.length : le;
+    const block = val.slice(ls, blockEnd);
+
+    const lines = block.split('\n');
+    const re = new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const allPrefixed = lines.every((l) => re.test(l));
+    const changed = lines.map((l) =>
+      allPrefixed ? l.replace(re, '') : (l.trim() ? prefix + l : l)
+    );
+    const newBlock = changed.join('\n');
+
+    this.ta.value = val.slice(0, ls) + newBlock + val.slice(blockEnd);
+    this.setSel(ls, ls + newBlock.length);
+  }
+
+  // --- Link / Image ---
+  insertLink() {
+    const { start, end, val } = this.getSel();
+    const sel = val.slice(start, end) || 'текст';
+    const url = prompt('URL ссылки:', 'https://');
+    if (!url) return;
+    const md = `[${sel}](${url})`;
+    this.insertAtCursor(md);
+  }
+
+  insertImage() {
+    const alt = prompt('ALT изображения:', 'image');
+    const url = prompt('URL изображения:', 'https://');
+    if (!url) return;
+    const md = `![${alt || ''}](${url})`;
+    this.insertAtCursor(md);
+  }
+
+  // --- Destroy (опционально) ---
+  destroy() {
+    const toolbar = this.ta.previousElementSibling;
+    if (toolbar && toolbar.classList.contains('md-toolbar')) toolbar.remove();
+  }
+}
+
 
 /* ========================== UTILS ========================= */
 class TicketsUtils {

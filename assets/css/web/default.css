@@ -192,6 +192,9 @@
 	margin: 10px 0;
 	overflow: hidden;
 }
+#comment-preview-placeholder {
+	display: block;
+}
 
 /* Messages */
 .tickets-message-success {
