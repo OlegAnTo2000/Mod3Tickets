@@ -37,6 +37,13 @@ class TicketsSection extends \Tickets\Model\TicketsSection
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\TicketsSection',
+                    ),
+                ),
             ),
         ),
     );

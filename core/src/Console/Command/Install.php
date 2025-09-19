@@ -67,7 +67,7 @@ class Install extends Command
 		$output->writeln("<info>Created plugins</info>");
 
 		// snippets
-		$this->createSnippets($db);
+		$this->createSnippets($db, $output);
 		$output->writeln("<info>Created snippets</info>");
 
 		// chunks
@@ -370,7 +370,7 @@ class Install extends Command
 		Model::reguard();
 	}
 
-	protected function createSnippets(\MMX\Database\App $db): void
+	protected function createSnippets(\MMX\Database\App $db, OutputInterface $output): void
 	{
 		Model::unguard();
 
@@ -397,7 +397,7 @@ class Install extends Command
 				'source'      => 0,
 				'static_file' => '', //'core/components/' . strtolower(App::NAME) . '/elements/snippets/snippet.' . $file . '.php',
 				'category'    => $this->getCategoryId(),
-				'properties'  => $this->getSnippetProperties($file),
+				'properties'  => $this->getSnippetProperties($file, $output),
 			]);
 		}
 
@@ -484,13 +484,64 @@ class Install extends Command
 		return $category ? $category->id : 0;
 	}
 
-	protected function getSnippetProperties(string $file): array
+	protected function getSnippetProperties(string $snippetName, OutputInterface $output): array
 	{
-		$propertiesPath = MODX_CORE_PATH . 'components/' . strtolower(App::NAME) . '/install/data/properties.' . $file . '.php';
-		if (file_exists($propertiesPath)) {
-			return include $propertiesPath;
+		$propertiesPath = MODX_CORE_PATH . 'components/' . strtolower(App::NAME) . '/install/properties/properties.' . $snippetName . '.php';
+
+		if (!file_exists($propertiesPath)) {
+			$output->writeln("<comment>Properties file not found: {$propertiesPath}</comment>");
+			return [];
 		}
-		return [];
+
+		$properties = include $propertiesPath;
+
+		if (!is_array($properties)) {
+			$output->writeln("<error>Invalid properties format in file: {$propertiesPath}. Expected array, got " . gettype($properties) . "</error>");
+			return [];
+		}
+
+		// Валидация структуры properties
+		$validatedProperties = [];
+		$validTypes = ['textfield', 'textarea', 'combo-boolean', 'numberfield', 'list', 'checkbox', 'radio'];
+
+		foreach ($properties as $key => $property) {
+			if (!is_array($property)) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} is not an array, skipping</comment>");
+				continue;
+			}
+
+			// Проверяем обязательные поля
+			if (!isset($property['name'])) {
+				$property['name'] = $key;
+			}
+			if (!isset($property['type'])) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} missing 'type' field, using 'textfield' as default</comment>");
+				$property['type'] = 'textfield';
+			} elseif (!in_array($property['type'], $validTypes)) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} has invalid type '{$property['type']}', using 'textfield' as default</comment>");
+				$property['type'] = 'textfield';
+			}
+			if (!isset($property['value'])) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} missing 'value' field, using empty string as default</comment>");
+				$property['value'] = '';
+			}
+
+			// Валидация значений в зависимости от типа
+			if ($property['type'] === 'combo-boolean' && !is_bool($property['value'])) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} should be boolean for combo-boolean type, converting</comment>");
+				$property['value'] = (bool)$property['value'];
+			} elseif ($property['type'] === 'numberfield' && !is_numeric($property['value'])) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} should be numeric for numberfield type, using 0 as default</comment>");
+				$property['value'] = 0;
+			} elseif ($property['type'] === 'list' && !isset($property['options'])) {
+				$output->writeln("<comment>Property '{$key}' in {$snippetName} of type 'list' missing 'options' field</comment>");
+			}
+
+			$validatedProperties[$key] = $property;
+		}
+
+		$output->writeln("<info>Loaded " . count($validatedProperties) . " properties for snippet '{$snippetName}'</info>");
+		return $validatedProperties;
 	}
 
 	protected function createPolicies(\MMX\Database\App $db): void

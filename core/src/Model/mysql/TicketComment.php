@@ -281,6 +281,13 @@ class TicketComment extends \Tickets\Model\TicketComment
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\TicketComment',
+                    ),
+                ),
             ),
             'Total' => 
             array (
@@ -289,6 +296,13 @@ class TicketComment extends \Tickets\Model\TicketComment
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\TicketComment',
+                    ),
+                ),
             ),
         ),
         'aggregates' => 

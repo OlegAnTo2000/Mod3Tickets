@@ -37,6 +37,13 @@ class Ticket extends \Tickets\Model\Ticket
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\Ticket',
+                    ),
+                ),
             ),
             'Stars' => 
             array (
@@ -45,6 +52,13 @@ class Ticket extends \Tickets\Model\Ticket
                 'foreign' => 'id',
                 'cardinality' => 'many',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\Ticket',
+                    ),
+                ),
             ),
             'Files' => 
             array (
@@ -53,6 +67,13 @@ class Ticket extends \Tickets\Model\Ticket
                 'foreign' => 'parent',
                 'cardinality' => 'many',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\Ticket',
+                    ),
+                ),
             ),
             'Total' => 
             array (
@@ -61,6 +82,13 @@ class Ticket extends \Tickets\Model\Ticket
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\Ticket',
+                    ),
+                ),
             ),
         ),
         'aggregates' => 

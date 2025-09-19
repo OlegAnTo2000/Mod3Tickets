@@ -3,7 +3,7 @@
     <object class="TicketsSection" extends="\MODX\Revolution\modResource">
         <composite alias="Tickets" class="\Tickets\Model\Ticket" local="id" foreign="parent" cardinality="many" owner="local"/>
         <composite alias="Total" class="\Tickets\Model\TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\TicketsSection"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\TicketsSection"}]]></criteria>
         </composite>
     </object>
 
@@ -13,16 +13,16 @@
         <aggregate alias="Threads" class="\Tickets\Model\TicketThread" local="id" foreign="resource" cardinality="many" owner="local"/>
         <composite alias="Views" class="\Tickets\Model\TicketView" local="id" foreign="parent" cardinality="many" owner="local"/>
         <composite alias="Votes" class="\Tickets\Model\TicketVote" local="id" foreign="id" cardinality="many" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\Ticket"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\Ticket"}]]></criteria>
         </composite>
         <composite alias="Stars" class="\Tickets\Model\TicketStar" local="id" foreign="id" cardinality="many" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\Ticket"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\Ticket"}]]></criteria>
         </composite>
         <composite alias="Files" class="\Tickets\Model\TicketFile" local="id" foreign="parent" cardinality="many" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\Ticket"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\Ticket"}]]></criteria>
         </composite>
         <composite alias="Total" class="\Tickets\Model\TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\Ticket"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\Ticket"}]]></criteria>
         </composite>
     </object>
 
@@ -82,10 +82,10 @@
         <aggregate alias="Parent" class="\Tickets\Model\TicketComment" local="parent" foreign="id" cardinality="one" owner="foreign"/>
         <aggregate alias="Children" class="\Tickets\Model\TicketComment" local="id" foreign="parent" cardinality="many" owner="local"/>
         <composite alias="Votes" class="\Tickets\Model\TicketVote" local="id" foreign="id" cardinality="many" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\TicketComment"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\TicketComment"}]]></criteria>
         </composite>
         <composite alias="Total" class="\Tickets\Model\TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\TicketComment"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\TicketComment"}]]></criteria>
         </composite>
     </object>
 
@@ -137,7 +137,7 @@
                    owner="foreign"/>
         <composite alias="Comments" class="\Tickets\Model\TicketComment" local="id" foreign="thread" cardinality="many" owner="local"/>
         <composite alias="Total" class="\Tickets\Model\TicketTotal" local="id" foreign="id" cardinality="one" owner="local">
-            <criteria target="foreign"><![CDATA[{"class":"\Tickets\Model\TicketThread"}]]></criteria>
+            <criteria target="foreign"><![CDATA[{"class":"\\Tickets\\Model\\TicketThread"}]]></criteria>
         </composite>
     </object>
 

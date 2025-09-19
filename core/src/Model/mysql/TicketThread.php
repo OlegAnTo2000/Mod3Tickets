@@ -237,6 +237,13 @@ class TicketThread extends \Tickets\Model\TicketThread
                 'foreign' => 'id',
                 'cardinality' => 'one',
                 'owner' => 'local',
+                'criteria' => 
+                array (
+                    'foreign' => 
+                    array (
+                        'class' => '\\Tickets\\Model\\TicketThread',
+                    ),
+                ),
             ),
         ),
         'aggregates' => 
