@@ -914,10 +914,14 @@ class Tickets
 
 		$text = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
 
+		$replaceTags    = ['[[', ']]', '{', '}'];
+		$replaceSymbols = ['\*\(\*\(\*\(\*\(\*\(\*', '\*\)\*\)\*\)\*\)\*\)\*', '\~\(\~\(\~\(\~\(\~\(\~', '\~\)\~\)\~\)\~\)\~\)\~'];
+		$htmlEntities   = ['&#91;', '&#93;', '&#96;', '&#123;', '&#125;'];
+
 		// Replace MODX and Fenom tags symbols with temporary symbols
 		$text = str_replace(
-			['[', ']', '{', '}'],
-			['*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'],
+			$replaceTags,
+			$replaceSymbols,
 			$text
 		);
 
@@ -963,14 +967,14 @@ class Tickets
 		// Replace temporary symbols
 		if ($disableModxAndFenomTags) {
 			$filtered = str_replace(
-				['*(*(*(*(*(*', '*)*)*)*)*)*', '`', '~(~(~(~(~(~', '~)~)~)~)~)~'],
-				['&#91;', '&#93;', '&#96;', '&#123;', '&#125;'],
+				$replaceSymbols,
+				$htmlEntities,
 				$filtered
 			);
 		} else {
 			$filtered = str_replace(
-				['*(*(*(*(*(*', '*)*)*)*)*)*', '~(~(~(~(~(~', '~)~)~)~)~)~'],
-				['[', ']', '{', '}'],
+				$replaceSymbols,
+				$replaceTags,
 				$filtered
 			);
 		}
