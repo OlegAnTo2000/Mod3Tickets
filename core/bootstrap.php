@@ -6,6 +6,8 @@ use Tickets\Tickets;
 if (!defined('MODX_CORE_PATH')) {
 	if (file_exists('/modx/config.core.php')) {
 		require '/modx/config.core.php'; // for local development
+	} else if (file_exists(__DIR__ . '/modx/config.core.php')) {
+		require __DIR__ . '/modx/config.core.php'; // for local development
 	} else {
 		$dir = __DIR__;
 		while (true) {
@@ -24,7 +26,8 @@ if (!defined('MODX_CORE_PATH')) {
 	if (!defined('MODX_CORE_PATH')) {
 		exit('Could not load MODX core');
 	}
-	require MODX_CORE_PATH . '/vendor/autoload.php';
+	require_once MODX_CORE_PATH . 'config/config.inc.php';
+	require MODX_CORE_PATH . 'vendor/autoload.php';
 }
 
 if (!isset($modx)) {

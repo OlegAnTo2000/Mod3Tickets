@@ -2,3 +2,4 @@
 vendor
 .php-cs-fixer.cache
 config.core.php
+core/modx/config.core.php
