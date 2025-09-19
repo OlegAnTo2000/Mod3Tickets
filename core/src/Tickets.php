@@ -914,6 +914,8 @@ class Tickets
 
 		$text = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
 
+		$text = '<div class="__tmp_wrapper">' . $text . '</div>';
+
 		$replaceTags    = ['[[', ']]', '{', '}'];
 		$replaceSymbols = ['\*\(\*\(\*\(\*\(\*\(\*', '\*\)\*\)\*\)\*\)\*\)\*', '\~\(\~\(\~\(\~\(\~\(\~', '\~\)\~\)\~\)\~\)\~\)\~'];
 		$htmlEntities   = ['&#91;', '&#93;', '&#96;', '&#123;', '&#125;'];
@@ -972,7 +974,8 @@ class Tickets
 			->forceAttribute('a', 'rel', 'nofollow noopener ugc')
 			->forceAttribute('a', 'target', '_blank')
 			->allowLinkSchemes(['http', 'https', 'mailto'])
-			->allowRelativeLinks();
+			->allowRelativeLinks()
+			->withMaxInputLength(200000);
 
 		if ($type === 'comment') {
 			$config->blockElement('h1')
@@ -1022,6 +1025,7 @@ class Tickets
 			);
 		}
 
+		$filtered = preg_replace('#^<div class="__tmp_wrapper">(.*)</div>$#s', '$1', $filtered);
 		return $filtered;
 	}
 
