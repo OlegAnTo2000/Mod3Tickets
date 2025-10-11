@@ -997,7 +997,7 @@ class SimpleMdEditor {
     this.ta = textarea;
     this.opts = Object.assign(
       {
-        buttons: ['bold','italic','code','h1','h2','quote','ul','ol','link','image','hr'],
+        buttons: ['bold','italic','code','codeblock', 'h2', 'h3', 'h4', 'quote','ul','ol','link','image','hr'],
       },
       opts
     );
@@ -1024,17 +1024,19 @@ class SimpleMdEditor {
   // --- UI ---
   buildToolbar() {
     const labels = {
-      bold:   {label:'B',   title:'Жирный (** **)'},
-      italic: {label:'I',   title:'Курсив (* *)'},
-      code:   {label:'</>', title:'Код (` `)'},
-      h1:     {label:'H1',  title:'Заголовок #'},
-      h2:     {label:'H2',  title:'Заголовок ##'},
-      quote:  {label:'❝',   title:'Цитата >'},
-      ul:     {label:'•',   title:'Список -'},
-      ol:     {label:'1.',  title:'Нумерованный 1.'},
-      link:   {label:'🔗',  title:'Ссылка [текст](url)'},
-      image:  {label:'🖼',  title:'Картинка ![alt](url)'},
-      hr:     {label:'―',   title:'Горизонтальная линия ---'},
+			bold     : {label:'B',   title:'Bold'},
+			italic   : {label:'I',   title:'Italic'},
+			code     : {label:'Code', title:'Code'},
+			codeblock: {label:'Code Block', title:'Code Block'},
+			h2       : {label:'H2',  title:'Header 2'},
+			h3       : {label:'H3',  title:'Header 3'},
+			h4       : {label:'H4',  title:'Header 4'},
+			quote    : {label:'❝',   title:'Quote'},
+			ul       : {label:'•',   title:'List'},
+			ol       : {label:'1.',  title:'Ordered List'},
+			link     : {label:'🔗',  title:'Link'},
+			image    : {label:'🖼',  title:'Image'},
+			hr       : {label:'―',   title:'Line'},
     };
 
     const wrap = document.createElement('div');
@@ -1053,17 +1055,19 @@ class SimpleMdEditor {
       const act = b.dataset.act;
       this.ta.focus();
       switch (act) {
-        case 'bold':  return this.surround('**');
-        case 'italic':return this.surround('*');
-        case 'code':  return this.surround('`');
-        case 'h1':    return this.toggleLinePrefix('# ');
-        case 'h2':    return this.toggleLinePrefix('## ');
-        case 'quote': return this.toggleLinePrefix('> ');
-        case 'ul':    return this.toggleLinePrefix('- ');
-        case 'ol':    return this.toggleLinePrefix('1. ');
-        case 'link':  return this.insertLink();
-        case 'image': return this.insertImage();
-        case 'hr':    return this.insertAtCursor('\n\n---\n\n');
+        case 'bold'     : return this.surround('**');
+        case 'italic'   : return this.surround('*');
+        case 'code'     : return this.surround('`');
+        case 'codeblock': return this.toggleLinePrefix('```plaintext\n```');
+        case 'h2'       : return this.toggleLinePrefix('## ');
+        case 'h3'       : return this.toggleLinePrefix('### ');
+        case 'h4'       : return this.toggleLinePrefix('#### ');
+        case 'quote'    : return this.toggleLinePrefix('> ');
+        case 'ul'       : return this.toggleLinePrefix('- ');
+        case 'ol'       : return this.toggleLinePrefix('1. ');
+        case 'link'     : return this.insertLink();
+        case 'image'    : return this.insertImage();
+        case 'hr'       : return this.insertAtCursor('\n\n---\n\n');
       }
     });
   }
@@ -1084,11 +1088,11 @@ class SimpleMdEditor {
     const before = val.slice(0, start);
     const sel = val.slice(start, end);
     const after = val.slice(end);
-    const text = sel || 'текст';
+    const text = sel || '';
     const newVal = `${before}${mark}${text}${mark}${after}`;
     this.ta.value = newVal;
     const caretStart = start + mark.length;
-    const caretEnd = caretStart + (sel ? sel.length : 'текст'.length);
+    const caretEnd = caretStart + (sel ? sel.length : ''.length);
     this.setSel(caretStart, caretEnd);
   }
 
@@ -1101,39 +1105,42 @@ class SimpleMdEditor {
 
   // --- Block modifiers (prefix by lines) ---
   toggleLinePrefix(prefix) {
-    const { start, end, val } = this.getSel();
-
-    // расширяем до границ строк
-    const ls = val.lastIndexOf('\n', start - 1) + 1;
-    const le = val.indexOf('\n', end);
-    const blockEnd = le === -1 ? val.length : le;
-    const block = val.slice(ls, blockEnd);
-
-    const lines = block.split('\n');
-    const re = new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const allPrefixed = lines.every((l) => re.test(l));
-    const changed = lines.map((l) =>
-      allPrefixed ? l.replace(re, '') : (l.trim() ? prefix + l : l)
-    );
-    const newBlock = changed.join('\n');
-
-    this.ta.value = val.slice(0, ls) + newBlock + val.slice(blockEnd);
-    this.setSel(ls, ls + newBlock.length);
-  }
+		const { start, end, val } = this.getSel();
+	
+		// расширяем до границ строк
+		const ls = val.lastIndexOf('\n', start - 1) + 1;
+		const le = val.indexOf('\n', end);
+		const blockEnd = le === -1 ? val.length : le;
+		const block = val.slice(ls, blockEnd);
+	
+		const lines = block.split('\n');
+		const re = new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+		const allPrefixed = lines.every((l) => re.test(l));
+	
+		const changed = lines.map((l) =>
+			allPrefixed ? l.replace(re, '') : prefix + (l || '')
+		);
+	
+		const newBlock = changed.join('\n');
+	
+		this.ta.value = val.slice(0, ls) + newBlock + val.slice(blockEnd);
+		this.setSel(ls, ls + newBlock.length);
+	}
+	
 
   // --- Link / Image ---
   insertLink() {
     const { start, end, val } = this.getSel();
-    const sel = val.slice(start, end) || 'текст';
-    const url = prompt('URL ссылки:', 'https://');
+    const sel = val.slice(start, end) || '';
+    const url = prompt('URL:', 'https://');
     if (!url) return;
     const md = `[${sel}](${url})`;
     this.insertAtCursor(md);
   }
 
   insertImage() {
-    const alt = prompt('ALT изображения:', 'image');
-    const url = prompt('URL изображения:', 'https://');
+    const alt = 'image';
+    const url = prompt('URL:', 'https://');
     if (!url) return;
     const md = `![${alt || ''}](${url})`;
     this.insertAtCursor(md);

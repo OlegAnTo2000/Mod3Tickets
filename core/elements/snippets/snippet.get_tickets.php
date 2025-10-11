@@ -65,7 +65,7 @@ $leftJoin = [
 	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `User`.`id`'],
 	'Total'   => ['class' => TicketTotal::class],
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$leftJoin['Vote'] = [
 		'class' => TicketVote::class,
 		'on'    => '`Vote`.`id` = `Ticket`.`id` AND `Vote`.`class` = "Ticket" AND `Vote`.`createdby` = ' . $modx->user->id,
@@ -90,7 +90,7 @@ $select = [
 		: $modx->getSelectColumns(Ticket::class, 'Ticket', '', ['content'], true),
 	'Total' => 'comments, views, stars, rating, rating_plus, rating_minus',
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$select['Vote']   = '`Vote`.`value` as `vote`';
 	$select['Star']   = 'COUNT(`Star`.`id`) as `star`';
 	$select['Thread'] = '`Thread`.`id` as `thread`';
@@ -175,7 +175,7 @@ if (!empty($rows) && \is_array($rows)) {
 			}
 		}
 		if (!isset($row['cant_vote'])) {
-			if (!$Tickets->authenticated || $modx->user->id == $row['createdby']) {
+			if (!$Tickets->isAuthenticated() || $modx->user->id == $row['createdby']) {
 				$row['cant_vote'] = 1;
 			} elseif (\array_key_exists('vote', $row)) {
 				if ('' == $row['vote']) {
@@ -195,7 +195,7 @@ if (!empty($rows) && \is_array($rows)) {
 		// Special fields for quick placeholders
 		$row['active']      = (int) !empty($row['can_vote']);
 		$row['inactive']    = (int) !empty($row['cant_vote']);
-		$row['can_star']    = $Tickets->authenticated;
+		$row['can_star']    = $Tickets->isAuthenticated();
 		$row['stared']      = !empty($row['star']);
 		$row['unstared']    = empty($row['star']);
 		$row['isauthor']    = $modx->user->id == $row['createdby'];
@@ -204,7 +204,7 @@ if (!empty($rows) && \is_array($rows)) {
 		$row['date_ago'] = $Tickets->dateFormat($row['createdon']);
 		$row['idx']      = $pdoFetch->idx++;
 		// Processing new comments
-		if ($Tickets->authenticated && !empty($row['thread'])) {
+		if ($Tickets->isAuthenticated() && !empty($row['thread'])) {
 			$last_view = $pdoFetch->getObject(TicketView::class, [
 				'parent' => $row['id'],
 				'uid'    => $modx->user->id,
@@ -254,7 +254,7 @@ if (!empty($toSeparatePlaceholders)) {
 
 	if (!empty($tplWrapper) && (!empty($wrapIfEmpty) || !empty($output))) {
 		$array = ['output' => $output];
-		if ($Tickets->authenticated && TicketsSection::class == $modx->resource->class_key) {
+		if ($Tickets->isAuthenticated() && TicketsSection::class == $modx->resource->class_key) {
 			/** @var TicketsSection $section */
 			$section             = &$modx->resource;
 			$array['subscribed'] = $section->isSubscribed();

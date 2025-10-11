@@ -2,23 +2,12 @@
 
 namespace Tickets\Processors\Mgr\Comment;
 
-use function explode;
-use function html_entity_decode;
-use function is_array;
-use function is_numeric;
-
 use MODX\Revolution\modResource;
 use MODX\Revolution\modUser;
 use MODX\Revolution\modUserProfile;
 use MODX\Revolution\Processors\Model\GetListProcessor;
-
-use function strip_tags;
-
 use Tickets\Model\TicketComment;
 use Tickets\Model\TicketThread;
-
-use function trim;
-
 use xPDO\Om\xPDOObject;
 use xPDO\Om\xPDOQuery;
 
@@ -31,12 +20,12 @@ class GetList extends GetListProcessor
 	public $defaultSortDirection = 'DESC';
 
 	/**
-	 * @return xPDOQuery
+	 * Фильтрация перед подсчётом total
 	 */
 	public function prepareQueryBeforeCount(xPDOQuery $c): xPDOQuery
 	{
-		/* Get all comments by section */
-		if ($section = (int) $this->getProperty('section')) {
+		// По разделу
+		if ($section = (int)$this->getProperty('section')) {
 			if ($section = $this->modx->getObject(modResource::class, $section)) {
 				$parents = $this->modx->getChildIds(
 					$section->get('id'),
@@ -48,25 +37,28 @@ class GetList extends GetListProcessor
 				}
 				$c->where(['Thread.resource:IN' => $parents]);
 			}
-		} /* OR get all comments by threads list */ elseif ($threads = $this->getProperty('threads')) {
+		}
+		// По списку тредов
+		elseif ($threads = $this->getProperty('threads')) {
 			if (!is_array($threads)) {
 				$threads = explode(',', $threads);
 			}
 			if (!empty($threads)) {
 				$c->where(['TicketComment.thread:IN' => $threads]);
 			}
-		} /* OR get all comments by tickets list */ elseif ($parents = $this->getProperty('parents')) {
+		}
+		// По списку ресурсов
+		elseif ($parents = $this->getProperty('parents')) {
 			if (!is_array($parents)) {
 				$parents = explode(',', $parents);
 			}
 			if (!empty($parents)) {
 				$c->where(['Thread.resource:IN' => $parents]);
 			}
-		} /* OR get all comments */ else {
-			// $c->where(array('Thread.resource:!=' => 0));
 		}
 
-		if ($query = $this->getProperty('query', null)) {
+		// Поисковый запрос
+		if ($query = $this->getProperty('query')) {
 			$query = trim($query);
 			if (is_numeric($query)) {
 				$c->where([
@@ -75,19 +67,28 @@ class GetList extends GetListProcessor
 				]);
 			} else {
 				$c->where([
-					'TicketComment.text:LIKE'     => '%' . $query . '%',
-					'OR:TicketComment.raw:LIKE'   => '%' . $query . '%',
-					'OR:TicketComment.name:LIKE'  => '%' . $query . '%',
-					'OR:TicketComment.email:LIKE' => '%' . $query . '%',
+					'TicketComment.text:LIKE'     => "%{$query}%",
+					'OR:TicketComment.raw:LIKE'   => "%{$query}%",
+					'OR:TicketComment.name:LIKE'  => "%{$query}%",
+					'OR:TicketComment.email:LIKE' => "%{$query}%",
 				]);
 			}
 		}
 
+		return $c;
+	}
+
+	/**
+	 * Присоединяем таблицы и выбираем нужные поля
+	 */
+	public function prepareQueryAfterCount(xPDOQuery $c): xPDOQuery
+	{
 		$c->leftJoin(TicketThread::class, 'Thread');
 		$c->leftJoin(modUser::class, 'User');
 		$c->leftJoin(modUserProfile::class, 'UserProfile');
 		$c->leftJoin(modResource::class, 'Resource', 'Thread.resource = Resource.id');
-		$c->select($this->modx->getSelectColumns(TicketComment::class, TicketComment::class));
+
+		$c->select($this->modx->getSelectColumns(TicketComment::class, 'TicketComment'));
 		$c->select([
 			'Thread.resource',
 			'Thread.properties',
@@ -97,24 +98,25 @@ class GetList extends GetListProcessor
 			'Resource.pagetitle',
 			'Resource.context_key',
 		]);
-		$c->groupby('TicketComment.id');
 
 		return $c;
 	}
 
 	/**
-	 * @return array
+	 * Преобразуем строку для ответа
 	 */
-	public function prepareRow(xPDOObject $object)
+	public function prepareRow(xPDOObject $object): array
 	{
 		$array = parent::prepareRow($object);
 
 		$array['text'] = strip_tags(html_entity_decode($array['text'], ENT_QUOTES, 'UTF-8'));
+
 		if (!empty($array['fullname'])) {
 			$array['name'] = $array['fullname'];
 		} elseif (!empty($array['username'])) {
 			$array['name'] = $array['username'];
 		}
+
 		if (!empty($array['properties']['threadUrl'])) {
 			$array['preview_url'] = $array['properties']['threadUrl'];
 		} elseif (!empty($array['resource'])) {
@@ -123,12 +125,11 @@ class GetList extends GetListProcessor
 		}
 		unset($array['properties']);
 
+		// --- Actions ---
 		$array['actions'] = [];
 
-		// Reply
 		if ($this->getProperty('threads') || $this->getProperty('parents')) {
 			$array['actions'][] = [
-				'cls'    => '',
 				'icon'   => 'icon icon-reply',
 				'title'  => $this->modx->lexicon('tickets_action_reply'),
 				'action' => 'replyComment',
@@ -137,9 +138,7 @@ class GetList extends GetListProcessor
 			];
 		}
 
-		// Edit
 		$array['actions'][] = [
-			'cls'    => '',
 			'icon'   => 'icon icon-edit',
 			'title'  => $this->modx->lexicon('tickets_action_edit'),
 			'action' => 'editComment',
@@ -147,10 +146,8 @@ class GetList extends GetListProcessor
 			'menu'   => true,
 		];
 
-		// View
 		if (!empty($array['preview_url']) && !empty($array['published']) && empty($array['deleted'])) {
 			$array['actions'][] = [
-				'cls'    => '',
 				'icon'   => 'icon icon-eye',
 				'title'  => $this->modx->lexicon('tickets_action_view'),
 				'action' => 'viewComment',
@@ -159,10 +156,8 @@ class GetList extends GetListProcessor
 			];
 		}
 
-		// Publish
 		if (!$array['published']) {
 			$array['actions'][] = [
-				'cls'      => '',
 				'icon'     => 'icon icon-power-off action-green',
 				'title'    => $this->modx->lexicon('tickets_action_publish'),
 				'multiple' => $this->modx->lexicon('tickets_action_publish'),
@@ -172,7 +167,6 @@ class GetList extends GetListProcessor
 			];
 		} else {
 			$array['actions'][] = [
-				'cls'      => '',
 				'icon'     => 'icon icon-power-off action-gray',
 				'title'    => $this->modx->lexicon('tickets_action_unpublish'),
 				'multiple' => $this->modx->lexicon('tickets_action_unpublish'),
@@ -182,10 +176,8 @@ class GetList extends GetListProcessor
 			];
 		}
 
-		// Delete
 		if (!$array['deleted']) {
 			$array['actions'][] = [
-				'cls'      => '',
 				'icon'     => 'icon icon-trash-o action-yellow',
 				'title'    => $this->modx->lexicon('tickets_action_delete'),
 				'multiple' => $this->modx->lexicon('tickets_action_delete'),
@@ -195,7 +187,6 @@ class GetList extends GetListProcessor
 			];
 		} else {
 			$array['actions'][] = [
-				'cls'      => '',
 				'icon'     => 'icon icon-undo action-green',
 				'title'    => $this->modx->lexicon('tickets_action_undelete'),
 				'multiple' => $this->modx->lexicon('tickets_action_undelete'),
@@ -206,7 +197,6 @@ class GetList extends GetListProcessor
 		}
 
 		$array['actions'][] = [
-			'cls'      => '',
 			'icon'     => 'icon icon-trash-o action-red',
 			'title'    => $this->modx->lexicon('tickets_action_remove'),
 			'multiple' => $this->modx->lexicon('tickets_action_remove'),
@@ -215,9 +205,7 @@ class GetList extends GetListProcessor
 			'menu'     => true,
 		];
 
-		// Menu
 		$array['actions'][] = [
-			'cls'    => '',
 			'icon'   => 'icon icon-cog actions-menu',
 			'menu'   => false,
 			'button' => true,

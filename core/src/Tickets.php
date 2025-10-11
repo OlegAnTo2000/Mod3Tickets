@@ -71,8 +71,8 @@ class Tickets
 	public $modx;
 	/** @var pdoFetch */
 	public $pdoTools;
-	public $initialized   = [];
-	public $authenticated = false;
+	public $namespace   = 'tickets';
+	public $initialized = [];
 	private $prepareCommentCustom;
 	private $last_view = 0;
 	public $config     = [];
@@ -81,22 +81,10 @@ class Tickets
 	{
 		$this->modx = &$modx;
 
-		$corePath = $this->modx->getOption(
-			'tickets.core_path',
-			$config,
-			$this->modx->getOption('core_path') . 'components/tickets/'
-		);
-		$assetsPath = $this->modx->getOption(
-			'tickets.assets_path',
-			$config,
-			$this->modx->getOption('assets_path') . 'components/tickets/'
-		);
-		$assetsUrl = $this->modx->getOption(
-			'tickets.assets_url',
-			$config,
-			$this->modx->getOption('assets_url') . 'components/tickets/'
-		);
-		$actionUrl    = $this->modx->getOption('tickets.action_url', $config, $assetsUrl . 'action.php');
+		$corePath = $this->getOption('core_path', $config, $this->modx->getOption('core_path', null, MODX_CORE_PATH) . 'components/tickets/');
+		$assetsPath = $this->getOption('assets_path', $config, $this->modx->getOption('assets_path', null, MODX_ASSETS_PATH) . 'components/tickets/');
+		$assetsUrl = $this->getOption('assets_url', $config, $this->modx->getOption('assets_url', null, MODX_ASSETS_URL) . 'components/tickets/');
+		$actionUrl    = $assetsUrl . 'action.php';
 		$connectorUrl = $assetsUrl . 'connector.php';
 
 		$this->config = array_merge([
@@ -147,15 +135,37 @@ class Tickets
 		], $config);
 
 		$this->modx->addPackage('Tickets\Model', $this->config['srcPath'], null, 'Tickets\\');
-		$this->modx->lexicon->load('tickets:default');
+		$this->modx->services->get('lexicon')->load('tickets:default');
 
 		if ($name = $this->config['snippetPrepareComment']) {
 			if ($snippet = $this->modx->getObject(modSnippet::class, ['name' => $name])) {
 				$this->prepareCommentCustom = $snippet->get('content');
 			}
 		}
+	}
 
-		$this->authenticated = $this->modx->user->isAuthenticated($this->modx->context->get('key'));
+	/**
+	 * Get a local configuration option or a namespaced system setting by key.
+	 *
+	 * @param string $key The option key to search for.
+	 * @param array $options An array of options that override local options.
+	 * @param mixed $default The default value returned if the option is not found locally or as a
+	 * namespaced system setting; by default this value is null.
+	 * @return mixed The option value or the default value specified.
+	 */
+	public function getOption($key, $options = [], $default = null)
+	{
+		$option = $default;
+		if (!empty($key) && is_string($key)) {
+			if ($options != null && array_key_exists($key, $options)) {
+				$option = $options[$key];
+			} elseif (array_key_exists($key, $this->config)) {
+				$option = $this->config[$key];
+			} elseif (array_key_exists("{$this->namespace}.{$key}", $this->modx->config)) {
+				$option = $this->modx->getOption("{$this->namespace}.{$key}");
+			}
+		}
+		return $option;
 	}
 
 	/**
@@ -182,7 +192,7 @@ class Tickets
 				'cssUrl'            => $this->config['cssUrl'] . 'web/',
 				'actionUrl'         => $this->config['actionUrl'],
 				'close_all_message' => $this->modx->lexicon('tickets_message_close_all'),
-				'tpanel'            => (int) $this->authenticated,
+				'tpanel'            => (int) $this->isAuthenticated(),
 				'enable_editor'     => (int) $this->modx->getOption('tickets.enable_editor'),
 			];
 			$this->modx->regClientStartupScript(
@@ -215,6 +225,11 @@ class Tickets
 		}
 
 		return true;
+	}
+
+	public function isAuthenticated(): bool
+	{
+		return $this->modx->user->isAuthenticated($this->modx->context->get('key'));
 	}
 
 	/**
@@ -606,10 +621,10 @@ class Tickets
 		$data['allowGuest']     = !empty($this->config['allowGuest']);
 		$data['allowGuestEdit'] = !empty($this->config['allowGuestEdit']);
 		$data['requiredFields'] = $this->config['requiredFields'];
-		$data['published']      = (!$this->authenticated && empty($this->config['autoPublishGuest'])) || ($this->authenticated && empty($this->config['autoPublish']))
+		$data['published']      = (!$this->isAuthenticated() && empty($this->config['autoPublishGuest'])) || ($this->isAuthenticated() && empty($this->config['autoPublish']))
 			? false
 			: true;
-		if ($this->authenticated) {
+		if ($this->isAuthenticated()) {
 			if (empty($data['name'])) {
 				$data['name'] = $this->modx->user->Profile->get('fullname');
 			}
@@ -761,9 +776,9 @@ class Tickets
 		$time       = time() - strtotime($comment['createdon']);
 		$time_limit = $this->config['commentEditTime'];
 
-		if ($this->authenticated && $this->modx->user->id != $comment['createdby']) {
+		if ($this->isAuthenticated() && $this->modx->user->id != $comment['createdby']) {
 			return $this->error($this->modx->lexicon('ticket_comment_err_wrong_user'));
-		} elseif (!$this->authenticated) {
+		} elseif (!$this->isAuthenticated()) {
 			if (!$this->config['allowGuest'] || !$this->config['allowGuestEdit']) {
 				return $this->error($this->modx->lexicon('ticket_comment_err_guest_edit'));
 			} elseif (!isset($_SESSION['TicketComments']['ids'][$id])) {
@@ -843,11 +858,11 @@ class Tickets
 	 */
 	public function getNewComments($name, $log = true)
 	{
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			return $this->error($this->modx->lexicon('access_denied'));
 		} elseif ($thread = $this->modx->getObject(TicketThread::class, ['name' => $name])) {
 			if (
-				$this->authenticated && $view = $this->modx->getObject(
+				$this->isAuthenticated() && $view = $this->modx->getObject(
 					TicketView::class,
 					['uid' => $this->modx->user->id, 'parent' => $thread->get('resource')]
 				)
@@ -1086,7 +1101,7 @@ class Tickets
 			}
 		}
 		if (!isset($node['cant_vote'])) {
-			if (!$this->authenticated || $this->modx->user->id == $node['createdby']) {
+			if (!$this->isAuthenticated() || $this->modx->user->id == $node['createdby']) {
 				$node['cant_vote'] = 1;
 			} elseif (array_key_exists('vote', $node)) {
 				if (empty($node['vote'])) {
@@ -1115,7 +1130,7 @@ class Tickets
 		$node['rating_total'] = abs($node['rating_plus']) + abs($node['rating_minus']);
 
 		// Handle stars
-		if ($this->authenticated && array_key_exists('star', $node)) {
+		if ($this->isAuthenticated() && array_key_exists('star', $node)) {
 			$node['can_star'] = 1;
 			$node['stared']   = !empty($node['star']);
 			$node['unstared'] = empty($node['star']);
@@ -1124,7 +1139,7 @@ class Tickets
 		// Check comment novelty
 		if (isset($node['resource']) && 0 === $this->last_view) {
 			if (
-				$this->authenticated && $view = $this->modx->getObject(
+				$this->isAuthenticated() && $view = $this->modx->getObject(
 					TicketView::class,
 					['parent' => $node['resource'], 'uid' => $this->modx->user->id]
 				)
@@ -1138,7 +1153,7 @@ class Tickets
 		// Processing comment and selecting needed template
 		$node = $this->prepareComment($node);
 		if (empty($tpl)) {
-			$tpl = $this->authenticated || !empty($this->config['allowGuest'])
+			$tpl = $this->isAuthenticated() || !empty($this->config['allowGuest'])
 				? $this->config['tplCommentAuth']
 				: $this->config['tplCommentGuest'];
 		}
@@ -1172,7 +1187,7 @@ class Tickets
 			$node['children'] = '';
 		}
 		$node['comment_was_edited'] = (bool) $node['editedon'];
-		$node['comment_new']        = $this->authenticated && $node['createdby'] != $this->modx->user->id && $this->last_view > 0 && strtotime($node['createdon']) > $this->last_view;
+		$node['comment_new']        = $this->isAuthenticated() && $node['createdby'] != $this->modx->user->id && $this->last_view > 0 && strtotime($node['createdon']) > $this->last_view;
 
 		return $this->getChunk($tpl, $node, $this->config['fastMode']);
 	}
@@ -1463,7 +1478,7 @@ class Tickets
 	 */
 	public function subscribeThread($name)
 	{
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			return $this->error('ticket_err_access_denied');
 		}
 		/** @var TicketThread $thread */
@@ -1483,7 +1498,7 @@ class Tickets
 	 */
 	public function subscribeSection($id)
 	{
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			return $this->error('ticket_err_access_denied');
 		}
 		/** @var TicketsSection $section */
@@ -1503,7 +1518,7 @@ class Tickets
 	 */
 	public function subscribeAuthor($id)
 	{
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			return $this->error('ticket_err_access_denied');
 		}
 		/** @var TicketAuthor $profile */
@@ -1685,7 +1700,7 @@ class Tickets
 	{
 		$key = 'Tickets_User';
 
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			if (!$this->modx->getOption('tickets.count_guests', false)) {
 				return;
 			}
@@ -1740,7 +1755,7 @@ class Tickets
 	 */
 	public function fileUpload($data, $class = 'Ticket')
 	{
-		if (!$this->authenticated || empty($this->config['allowFiles'])) {
+		if (!$this->isAuthenticated() || empty($this->config['allowFiles'])) {
 			return $this->error('ticket_err_access_denied');
 		}
 
@@ -1796,7 +1811,7 @@ class Tickets
 	 */
 	public function fileDelete($id)
 	{
-		if (!$this->authenticated || empty($this->config['allowFiles'])) {
+		if (!$this->isAuthenticated() || empty($this->config['allowFiles'])) {
 			return $this->error('ticket_err_access_denied');
 		}
 		/** @var ProcessorResponse $response */
@@ -1815,7 +1830,7 @@ class Tickets
 	 */
 	public function fileSort($rank)
 	{
-		if (!$this->authenticated) {
+		if (!$this->isAuthenticated()) {
 			return $this->error('ticket_err_access_denied');
 		}
 		$response = $this->runProcessor(Processors\Web\File\Sort::class, ['rank' => $rank]);

@@ -88,7 +88,7 @@ if (Ticket::class != $class) {
 			$data['voted'] = $voted;
 		}
 	}
-	$data['can_vote'] = false === $data['voted'] && $Tickets->authenticated && $modx->user->id != $ticket->createdby;
+	$data['can_vote'] = false === $data['voted'] && $Tickets->isAuthenticated() && $modx->user->id != $ticket->createdby;
 	$data             = \array_merge($ticket->getProperties('tickets'), $data);
 	if (!isset($data['rating'])) {
 		$data['rating'] = $data['rating_total'] = $data['rating_plus'] = $data['rating_minus'] = 0;
@@ -139,7 +139,7 @@ if (isset($data['section.properties']['ratings']['days_ticket_vote'])) {
 	}
 }
 if (!isset($data['cant_vote'])) {
-	if (!$Tickets->authenticated || $modx->user->id == $ticket->createdby) {
+	if (!$Tickets->isAuthenticated() || $modx->user->id == $ticket->createdby) {
 		$data['cant_vote'] = 1;
 	} elseif (\array_key_exists('vote', $data)) {
 		if ('' == $data['vote']) {
@@ -161,7 +161,7 @@ if (!isset($data['cant_vote'])) {
 
 $data['active']   = (int) !empty($data['can_vote']);
 $data['inactive'] = (int) !empty($data['cant_vote']);
-$data['can_star'] = $Tickets->authenticated;
+$data['can_star'] = $Tickets->isAuthenticated();
 
 if (!empty($getUser)) {
 	$fields = $modx->getFieldMeta(modUserProfile::class);

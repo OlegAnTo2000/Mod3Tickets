@@ -25,8 +25,11 @@ if (!defined('MODX_CORE_PATH')) {
 	if (!defined('MODX_CORE_PATH')) {
 		exit('Access denied');
 	}
+	require_once MODX_CORE_PATH . '/config/config.inc.php';
 	require_once MODX_CORE_PATH . '/vendor/autoload.php';
 }
+
+if (empty($_REQUEST['action'])) exit('Access denied');
 
 /** @noinspection PhpIncludeInspection */
 require_once MODX_CONNECTORS_PATH . 'index.php';
@@ -39,6 +42,8 @@ if (!$modx->services->has('error')) {
 
 /** @var Tickets $Tickets */
 $tickets = tickets_service($modx);
+
+$_REQUEST['action'] = '\\Tickets\\Processors\\' . $tickets->convertActionToClass($_REQUEST['action']);
 
 /** @var \MODX\Revolution\modConnectorRequest $request */
 $request = $modx->request;

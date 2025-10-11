@@ -15,10 +15,8 @@
             <span class="ticket-comment-rating[[+can_vote]][[+cant_vote]]">
                 <span class="rating[[+rating_positive]][[+rating_negative]]"
                       title="[[%ticket_rating_total]] [[+rating_total]]: ↑[[+rating_plus]] [[%ticket_rating_and]] ↓[[+rating_minus]]">[[+rating]]</span>
-                <span class="vote plus[[+voted_plus]]" title="[[%ticket_like]]"><i
-                            class="glyphicon glyphicon-arrow-up"></i></span>
-                <span class="vote minus[[+voted_minus]]" title="[[%ticket_dislike]]"><i
-                            class="glyphicon glyphicon-arrow-down"></i></span>
+                <span class="vote plus[[+voted_plus]]" title="[[%ticket_like]]">↑</span>
+                <span class="vote minus[[+voted_minus]]" title="[[%ticket_dislike]]">↓</span>
             </span>
         </div>
         <div class="ticket-comment-text">

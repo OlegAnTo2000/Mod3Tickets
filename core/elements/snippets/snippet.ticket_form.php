@@ -12,7 +12,7 @@ use MODX\Revolution\Sources\modMediaSource;
 $Tickets = \tickets_service($modx, $scriptProperties);
 $Tickets->initialize($modx->context->key, $scriptProperties);
 
-if (!$Tickets->authenticated) {
+if (!$Tickets->isAuthenticated()) {
 	return $modx->lexicon('ticket_err_no_auth');
 }
 

@@ -109,7 +109,7 @@ $leftJoin = [
 	'User'    => ['class' => modUser::class, 'on' => '`User`.`id` = `TicketComment`.`createdby`'],
 	'Profile' => ['class' => modUserProfile::class, 'on' => '`Profile`.`internalKey` = `TicketComment`.`createdby`'],
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$leftJoin['Vote'] = [
 		'class' => TicketVote::class,
 		'on'    => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "TicketComment" AND `Vote`.`createdby` = ' . $modx->user->id,
@@ -126,7 +126,7 @@ $select = [
 	'User'          => '`User`.`username`',
 	'Profile'       => $modx->getSelectColumns(modUserProfile::class, 'Profile', '', ['id', 'email'], true) . ', `Profile`.`email` as `user_email`',
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$select['Vote'] = '`Vote`.`value` as `vote`';
 	$select['Star'] = 'COUNT(`Star`.`id`) as `star`';
 }
@@ -183,7 +183,7 @@ if (!empty($rows) && \is_array($rows)) {
 		$rows = \array_reverse($rows);
 	}
 
-	$tpl = !$thread->get('closed') && ($Tickets->authenticated || !empty($allowGuest))
+	$tpl = !$thread->get('closed') && ($Tickets->isAuthenticated() || !empty($allowGuest))
 		? $tplCommentAuth
 		: $tplCommentGuest;
 	foreach ($rows as $row) {
@@ -203,7 +203,7 @@ $commentsThread = $pdoFetch->getChunk($tplComments, [
 $pls = ['thread' => $scriptProperties['thread']];
 
 if (!empty($allowFiles)) {
-	if ($Tickets->authenticated) {
+	if ($Tickets->isAuthenticated()) {
 		if (empty($source)) {
 			$source = $Tickets->config['source'] = $modx->getOption(
 				'tickets.source_default',
@@ -252,9 +252,9 @@ $key                          = \md5(\json_encode($Tickets->config));
 $_SESSION['TicketForm'][$key] = $Tickets->config;
 $pls['formkey']               = $key;
 
-if (!$Tickets->authenticated && empty($allowGuest)) {
+if (!$Tickets->isAuthenticated() && empty($allowGuest)) {
 	$form = $pdoFetch->getChunk($tplLoginToComment);
-} elseif (!$Tickets->authenticated) {
+} elseif (!$Tickets->isAuthenticated()) {
 	$pls['name']  = $_SESSION['TicketComments']['name'];
 	$pls['email'] = $_SESSION['TicketComments']['email'];
 	if (!empty($enableCaptcha)) {

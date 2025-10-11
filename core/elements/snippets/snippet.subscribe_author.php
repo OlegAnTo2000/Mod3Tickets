@@ -8,7 +8,7 @@ use Tickets\Model\TicketAuthor;
 /** @var Tickets $Tickets */
 $Tickets = \tickets_service($modx, $scriptProperties);
 
-if (!$Tickets->authenticated || empty($scriptProperties['createdby'])) {
+if (!$Tickets->isAuthenticated() || empty($scriptProperties['createdby'])) {
 	return '';
 }
 

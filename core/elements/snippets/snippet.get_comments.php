@@ -148,7 +148,7 @@ $leftJoin = [
 	'Ticket'  => ['class' => Ticket::class, 'on' => '`Ticket`.`id` = `Thread`.`resource`'],
 	'Section' => ['class' => TicketsSection::class, 'on' => '`Section`.`id` = `Ticket`.`parent`'],
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$leftJoin['Vote'] = [
 		'class' => TicketVote::class,
 		'on'    => '`Vote`.`id` = `TicketComment`.`id` AND `Vote`.`class` = "' . TicketComment::class . '" AND `Vote`.`createdby` = ' . $modx->user->id,
@@ -177,7 +177,7 @@ $select = [
 		? $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.')
 		: $modx->getSelectColumns(TicketsSection::class, 'Section', 'section.', ['content'], true),
 ];
-if ($Tickets->authenticated) {
+if ($Tickets->isAuthenticated()) {
 	$select['Vote'] = '`Vote`.`value` as `vote`';
 	$select['Star'] = 'COUNT(`Star`.`id`) as `star`';
 }

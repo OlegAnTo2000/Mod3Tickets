@@ -50,10 +50,20 @@ if (!\function_exists('tickets_service')) {
 
 		$modelPath = $modx->getOption('tickets.core_path', null, MODX_CORE_PATH . 'components/tickets/') . 'src/Model/';
 		$modx->addPackage('Tickets\Model', $modelPath, null, 'Tickets\\');
-		$modx->lexicon->load('tickets:default');
+
 		$modx->services->add('tickets', function ($c) use ($modx, $config) {
 			return new Tickets($modx, $config);
 		});
+
+		if (!$modx->services->has('lexicon')) {
+			$modx->services->add('lexicon', function ($c) use ($modx) {
+				return new \MODX\Revolution\modLexicon($modx);
+			});
+		}
+		/** @var \MODX\Revolution\modLexicon $lexicon */
+		$lexicon = $modx->services->get('lexicon');
+		$lexicon->load('tickets:default');
+
 		return $modx->services->get('tickets');
 	}
 }

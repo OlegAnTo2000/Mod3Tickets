@@ -16,12 +16,8 @@
                 <span class="rating[[+rating_positive]][[+rating_negative]]">
                     [[+rating]]
                 </span>
-                <span class="plus" title="[[%ticket_like]]">
-                    <i class="glyphicon glyphicon-arrow-up"></i>
-                </span>
-                <span class="minus" title="[[%ticket_dislike]]">
-                    <i class="glyphicon glyphicon-arrow-down"></i>
-                </span>
+                <span class="plus" title="[[%ticket_like]]">↑</span>
+                <span class="minus" title="[[%ticket_dislike]]">↓</span>
             </span>
         </div>
         <div class="ticket-comment-text">
