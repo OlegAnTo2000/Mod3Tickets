@@ -1,6 +1,89 @@
-## Tickets
-
 Tickets system for MODX Revolution 3
+
+## Установка
+
+### 1. скачать корневой композер modx
+
+```bash
+cd /to/modx/root/ # тут путь до корня сайта с MODX3  
+wget https://raw.githubusercontent.com/modxcms/revolution/v3.1.2-pl/composer.json # тут версия важна 
+composer update
+```
+
+### 2. скачиваем пакет (локально либо из гитхаба)
+
+локально:
+
+```json
+"require": {
+	...,
+	"oleganto2000/tickets": "dev-master"
+},
+"repositories": [
+	{
+		"type": "path",
+		"url": "C:\\Projects\\GitHub\\Mod3Tickets",
+		"options": {
+			"symlink": true
+		}
+	}
+]
+```
+
+из гитхаб:
+
+```json
+"require": {
+	...,
+	"oleganto2000/tickets": "dev-master"
+},
+"repositories": [
+	{
+		"type": "vsc",
+		"url": "https://github.com/OlegAnTo2000/Mod3Tickets"
+	}
+]
+```
+
+```
+composer require oleganto2000/tickets
+```
+
+```
+composer update oleganto2000/tickets
+```
+
+### 3. ставим пакет
+
+⚠️ На Windows работает только при запуске консоли от имени администратора, так как создаются символические ссылки для `assets/components/tickets` и `core/components/tickets`
+
+```
+composer exec tickets install
+```
+
+### 4. удаление пакета
+
+❌ Логика комманды Remove написана не полностью
+
+```
+composer exec tickets remove
+```
+
+## Локальная разработка
+
+Например у вас стоит актуальный MODX в папке `C:\OSPanel\home\modx315.com\public_html` а пакет лежит в `C:\Projects\GitHub\Mod3Tickets`
+
+В пакете нужно указать путь к конфигу MODX, в самом MODX - в composer указать путь локального репозитория пакета.
+
+В пакете в файл `core/modx/config.core.php` прописываем:
+
+```php
+define('MODX_CORE_PATH', 'C:/OSPanel/home/modx315.com/public_html/core/');
+```
+
+В Composer этой MODX установки прописываем локальный вариант репозитория из пункта загрузки пакета, где `"type": "path"`.
+
+## План работ
 
 ### Что уже сделано для перевода Tickets с MODX2 на MODX3
 
