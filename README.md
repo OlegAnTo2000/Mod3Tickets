@@ -81,13 +81,13 @@ composer exec tickets remove
 
 В пакете нужно указать путь к конфигу MODX, в самом MODX - в composer указать путь локального репозитория пакета.
 
-В пакете в файл `core/modx/config.core.php` прописываем:
+В пакете в файл `core/modx/config.core.php` прописываем путь до ядра MODX (укажите свой):
 
 ```php
 define('MODX_CORE_PATH', 'C:/OSPanel/home/modx315.com/public_html/core/');
 ```
 
-В Composer этой MODX установки прописываем локальный вариант репозитория из пункта загрузки пакета, где `"type": "path"`.
+В Composer этой MODX установки прописываем локальный вариант репозитория из readme пункта загрузки пакета, где `"type": "path"`.
 
 ## План работ
 
