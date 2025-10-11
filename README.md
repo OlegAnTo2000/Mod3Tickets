@@ -1,5 +1,7 @@
 Tickets system for MODX Revolution 3
 
+Адаптированный вариант https://github.com/modx-pro/Tickets
+
 ## Установка
 
 ### 1. скачать корневой композер modx
