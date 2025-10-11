@@ -6,8 +6,14 @@ Tickets system for MODX Revolution 3
 
 ```bash
 cd /to/modx/root/ # тут путь до корня сайта с MODX3  
-wget https://raw.githubusercontent.com/modxcms/revolution/v3.1.2-pl/composer.json # тут версия важна 
+wget https://raw.githubusercontent.com/modxcms/revolution/v3.1.2-pl/composer.json composer.json # тут версия важна 
 composer update
+```
+
+curl windows
+
+```bash
+curl https://raw.githubusercontent.com/modxcms/revolution/v3.1.2-pl/composer.json -o composer.json
 ```
 
 ### 2. скачиваем пакет (локально либо из гитхаба)
